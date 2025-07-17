@@ -8,10 +8,16 @@ USE chatapp
 GRANT ALL PRIVILEGES ON chatapp.* TO 'testuser';
 
 CREATE TABLE users (
-    uid VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255) PRIMARY KEY,
     user_name VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) NOT NULL,
+    icon_img VARCHAR(255),
+    company_id INT ,
+    nickname VARCHAR(255),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_at DATETIME,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE 
 );
 
 CREATE TABLE chat (
@@ -22,7 +28,7 @@ CREATE TABLE chat (
     chat_type INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(uid) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE messages (

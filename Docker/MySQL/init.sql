@@ -39,7 +39,7 @@ CREATE TABLE messages (
     stamp_id varchar(255),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(uid) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE members (
     chat_id VARCHAR(255) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(uid) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
 )
 

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from models import db, User
@@ -34,7 +34,7 @@ def login():
 def logout():
     logout_user()
     flash('ログアウトしました。')
-    return redirect(url_for('login'))
+    return redirect('/login')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

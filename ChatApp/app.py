@@ -1,24 +1,14 @@
-from flask import Flask, render_template, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask import Flask, render_template, redirect, request
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from models import db, User
-from forms import LoginForm, RegistrationForm 
 import os
 
 app = Flask(__name__)
-
-# Configuration settings
-## basedir = os.path.abspath(os.path.dirname(__file__))
-## app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'mysecret'
-## app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-## app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Initialize extensions
-## db.init_app(app)
-## migrate = Migrate(app, db)
-## login_manager = LoginManager(app)
-## login_manager.login_view = 'login'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql:///chatapp.db'
+app.config['SECRET_KEY'] = os.urandom(24)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 # User loader function
 @login_manager.user_loader
@@ -27,16 +17,17 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        # Userテーブルからemailに一致するユーザを取得
+        user = User.query.filter_by(email = email).first()
+        if db.check_password_hash(user.password, password):
             login_user(user)
             flash('ログインに成功しました。')
-            return redirect(url_for('chat'))
-        else:
-            flash('ユーザー名またはパスワードが無効です。')
-    return render_template('login.html', form=form)
+            return redirect('/chat')
+    else:
+        return render_template('login.html')
 
 @app.route('/logout')
 @login_required
@@ -47,15 +38,19 @@ def logout():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(email=form.email.data)
-        user.set_password(form.password.data)
+    if request.method == 'POST':
+        user = User(
+            user_name = request.form.get('user_name'),
+            email = request.form.get('email'),
+            password = request.form.get('password'),
+            passwordConfirmation = request.form.get('password-confirmation'),
+        )
         db.session.add(user)
         db.session.commit()
-        flash('ユーザー登録が完了しました。')
-        return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+        flash('ユーザを登録しました。')
+        return render_template('/login.html')
+    else:
+            return render_template('/register.html')
 
 if __name__ == '__main__':
     with app.app_context():

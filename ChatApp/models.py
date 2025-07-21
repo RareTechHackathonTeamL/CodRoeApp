@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+<<<<<<< HEAD
 db = SQLAlchemy()
 
 class User(UserMixin):
@@ -21,3 +22,6 @@ class User(UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+=======
+print("hello")
+>>>>>>> 2130add8927e06d717a0a763cf91a9e51209b8e4

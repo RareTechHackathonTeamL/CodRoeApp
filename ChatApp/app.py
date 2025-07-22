@@ -9,11 +9,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql:///chatapp.db'
 app.config['SECRET_KEY'] = os.urandom(24)
 login_manager = LoginManager()
 login_manager.init_app(app)
+db.init_app(app)
 
 # User loader function
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+@app.route('/')
+def top():
+    return render_template('login.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -48,11 +53,9 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash('ユーザを登録しました。')
-        return render_template('/login.html')
+        return redirect('/login')
     else:
-            return render_template('/register.html')
+        return render_template('register.html')
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)

@@ -16,7 +16,7 @@ db.init_app(app)
 # User loader function
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.get(user_id)
 
 @app.route('/', methods=['GET'])
 def top():
@@ -34,14 +34,14 @@ def login():
             flash('ログインに成功しました。')
             return redirect('/chat')
     else:
-        return render_template('login.html')
+        return render_template('home.html')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('ログアウトしました。')
-    return redirect('/login')
+    return render_template('new.html')
 
 @app.route('/register', methods=['GET'])
 def register_view():
@@ -55,13 +55,16 @@ def register():
             user_id = uuid.uuid4(),
             user_name = request.form.get('user_name'),
             email = request.form.get('email'),
-            password_hash = request.form.get('password'),
+            password = request.form.get('password'),
+            created_at = '2025-07-24'
             # passwordConfirmation = request.form.get('password-confirmation'),
         )
         db.session.add(user)
         db.session.commit()
+        login_user(user)
+        db.session.close()
         flash('ユーザを登録しました。')
-        return redirect('/login')
+        return render_template('home.html')
     #else:
     #    return render_template('register.html')
     

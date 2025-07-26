@@ -51,7 +51,7 @@ def login_process():
 def logout():
     logout_user()
     flash('ログアウトしました。')
-    return redirect(url_for('login_view'))
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET'])
 def register_view():
@@ -71,7 +71,7 @@ def register_process():
     elif registered_name != None:
         flash('同じユーザ名のユーザが存在します。別の名前で登録してください。')
     elif user_name == '' or email =='' or password == '' or passwordConfirmation == '':
-            flash('空のフォームがあるようです。')
+        flash('空のフォームがあるようです。')
     elif password != passwordConfirmation:
         flash('入力された2つのパスワードが一致しません。')
     else:

@@ -67,13 +67,13 @@ def register_process():
     registered_name = User.query.filter_by(user_name=user_name).first()
 
     if registered_user != None:
-        flash('既にユーザ登録されているようです。')
+        flash('このEメールアドレスは既に使用されています。別のEメールアドレスで登録してください。')
     elif registered_name != None:
-        flash('同じユーザ名のユーザが存在します。別の名前で登録してください。')
+        flash('このユーザは既に使用されています。別のユーザ名で登録してください。')
     elif user_name == '' or email =='' or password == '' or passwordConfirmation == '':
         flash('空のフォームがあるようです。')
     elif password != passwordConfirmation:
-        flash('入力された2つのパスワードが一致しません。')
+        flash('パスワードが一致しません。')
     else:
         user = User(
             user_id = uuid.uuid4(),

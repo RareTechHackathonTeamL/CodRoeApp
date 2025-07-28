@@ -20,9 +20,15 @@ class User(UserMixin, db.Model):
 
     def get_id(self):
         return self.user_id  
+    
+# Chatテーブル
+class Chat(db.Model):
+    __tablename__ = 'chat'
 
-    #def set_password(self, password):
-    #    self.password = generate_password_hash(password)
-
-    #def check_password(self, password):
-    #    return check_password_hash(self.password, password)
+    id = db.Column(db.String(255), nullable=False, primary_key=True)
+    # user_id = db.Column(db.String(255), nullable=False)
+    chat_name = db.Column(db.String(255), nullable=False)
+    chat_type = db.Column(db.Integer, nullable=False)
+    detail = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime)
+    # update_at = db.Column(db.DateTime)

@@ -3,6 +3,7 @@
 {% endblock title %}
 {% block content %}
 <h1>チャット一覧</h1>
+<h2> {{ current_user.user_name }} </h2>
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <ul>

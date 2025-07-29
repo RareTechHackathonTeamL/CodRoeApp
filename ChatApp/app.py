@@ -33,7 +33,7 @@ def login_process():
     password = request.form.get('password')
     # Userテーブルからemailに一致するユーザを取得
     user = User.query.filter_by(email=email).first()
-    user_id = user.user_id
+    # user_id = user.user_id
     if user == None:
         flash('Eメールアドレスまたはパスワードが間違っています。')
         return render_template('login.html')

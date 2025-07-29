@@ -1,0 +1,19 @@
+{% extends 'util/base.html' %} {% block title %}
+<title>chatroom</title>
+{% endblock title %}
+{% block content %}
+<div>Chat Room</div>
+<div>{{ chat.chat_name }}</div>
+<form action="/chat" method="GET">
+    <input type="submit" value="チャット一覧へ">
+</form>
+<form method="post">
+    <input name="message" placeholder="メッセージを入力">
+    <button type="submmit">送信</button>
+</form>
+<ul>
+    {% for message in messages %}
+    <li>{{ message.message }}</li>
+    {% endfor %}
+</ul>
+{% endblock content %}

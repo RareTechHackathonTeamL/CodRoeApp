@@ -20,11 +20,6 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return self.user_id  
 
-    #def set_password(self, password):
-    #    self.password = generate_password_hash(password)
-
-    #def check_password(self, password):
-    #    return check_password_hash(self.password, password)
 
 
 # Chatテーブル

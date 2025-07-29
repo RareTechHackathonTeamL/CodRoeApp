@@ -1,8 +1,10 @@
-from flask import render_template, request, flash, session
+from flask import render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required
+from models import User, Chat, Message
+import pymysql
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import User, Chat, Message
+
 from __init__ import create_app, login_manager, db
 
 app = create_app()
@@ -14,7 +16,7 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET'])
 def top():
-    return render_template('login.html')
+    return redirect(url_for('login_view'))
 
 @app.route('/login', methods=['GET'])
 def login_view():
@@ -26,6 +28,7 @@ def login_process():
     password = request.form.get('password')
     # Userテーブルからemailに一致するユーザを取得
     user = User.query.filter_by(email=email).first()
+    # user_id = user.user_id
     if user == None:
         flash('Eメールアドレスまたはパスワードが間違っています。')
         return render_template('login.html')
@@ -33,8 +36,9 @@ def login_process():
         if check_password_hash(user.password, password):
             login_user(user)
             user_name = user.user_name
-            flash( user_name + 'さん！おかえりなさい！')
-            return render_template('home.html')
+            #user_id = user.user_id
+            flash('おかえりなさい！ ' + user_name + 'さん！')
+            return redirect(url_for('chats_view'))
         else:
             flash('Eメールアドレスまたはパスワードが間違っています。')
             return render_template('login.html')
@@ -45,6 +49,7 @@ def logout():
     logout_user()
     flash('ログアウトしました。')
     return render_template('login.html')
+
 
 @app.route('/register', methods=['GET'])
 def register_view():
@@ -79,13 +84,17 @@ def register_process():
         db.session.commit()
         login_user(user)
         db.session.close()
-        flash( 'ようこそ！' + user_name + 'さん！ユーザを登録しました。')
-        return render_template('home.html')
+        flash( 'ようこそ！ ' + user_name + 'さん！')
+        return redirect(url_for('chats_view'))
     return render_template('register.html')
+    
+@app.route('/chats', methods=['GET'])
+@login_required
+def chats_view():
+    chats = Chat.query.all()
+    # chats = Chat.query.filter_by(Chat.user_id == current_user.get_id()).order_by(Chat.created_at).all()
+    return render_template('chats.html', chats=chats)
 
-@app.route('/chat', methods=['GET'])
-def chat_view():
-    return render_template('home.html')
 
 # チャットルーム作成
 @app.route('/chat', methods=['POST'])

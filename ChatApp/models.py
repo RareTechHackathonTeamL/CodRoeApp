@@ -17,15 +17,18 @@ class Chat(db.Model):
     created_at = db.Column(db.DateTime)
     update_at = db.Column(db.DateTime)
 
+    messages = db.relationship('Message', backref='chat')
+
     @classmethod
     def create(cls, chat_id, user_id, chat_name, detail):
         now = datetime.datetime.now()
-        chat_a = Chat(id=chat_id, chat_name=chat_name, chat_type=1, detail=detail, created_at=now, update_at=now)
+        chat_new = Chat(id=chat_id, chat_name=chat_name, chat_type=1, detail=detail, created_at=now, update_at=now)
         try:
             with db.session.begin():
-                db.session.add(chat_a)
+                db.session.add(chat_new)
                 db.session.commit()
         except Exception as e:
+            db.session.rolllback()
             print(e)
         finally:
             db.session.close()
@@ -35,8 +38,61 @@ class Chat(db.Model):
         try:
             with db.session.begin():
                 result = db.session.query(Chat).filter(Chat.chat_name == reserch_chat_name).first()
+            return result
         except Exception as e:
             print(e)
         finally:
             db.session.close()
-        return result
+
+    @classmethod
+    def find_by_chat_info(cls, reserch_chat_id):
+        try:
+            with db.session.begin():
+                result = db.session.query(Chat).filter(Chat.id == reserch_chat_id).first()
+            return {"chat_name": result.chat_name, "detail": result.detail}
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+
+# Messageテーブル
+class Message(db.Model):
+    __tablename__ = 'messages'
+
+    id = db.Column(db.String(255), nullable=False, primary_key=True)
+    # user_id = db.Column(db.String(255), nullable=False)
+    chat_id = db.Column(db.String(255), db.ForeignKey('chat.id'), nullable=False)
+    message = db.Column(db.Text)
+    # stamp_id = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, nullable=False)
+    update_at = db.Column(db.DateTime)
+
+    @classmethod
+    def create(cls, id, uid, cid, message):
+        now = datetime.datetime.now()
+        insert_message = Message(id=id, chat_id=cid, message=message, created_at=now)
+        try:
+            with db.session.begin():
+                db.session.add(insert_message)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def get_messages(cls, cid):
+        try:
+            with db.session.begin():
+                messages = db.session.query(Message).filter(Message.chat_id == cid).all()
+            
+            result = [{
+                'message': m.message,
+                'created_at': m.created_at,
+                } for m in messages]
+            return result
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()

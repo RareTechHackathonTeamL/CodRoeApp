@@ -69,10 +69,7 @@ CREATE TABLE stamps (
     update_at DATETIME
 );
 
+
 INSERT INTO chat(id, chat_name, detail, chat_type, created_at) VALUES('aaaaaaaaaa', '明太子を語る会', "明太子について語りましょう！！", 0, '2025-07-01');
 INSERT INTO chat(id, chat_name, detail, chat_type, created_at) VALUES('bbbbbbbbbb', 'スケトウダラを語る会', "スケトウダラについてダラダラ語りましょう！！", 0, '2025-07-02');
-
--- INSERT INTO users(uid, user_name, email, password) VALUES('970af84c-dd40-47ff-af23-282b72b7cca8','テスト','test@gmail.com','37268335dd6931045bdcdf92623ff819a64244b53d0e746d438797349d4da578');
--- INSERT INTO channels(id, uid, name, abstract) VALUES(1, '970af84c-dd40-47ff-af23-282b72b7cca8','ぼっち部屋','テストさんの孤独な部屋です');
--- INSERT INTO messages(id, uid, cid, message) VALUES(1, '970af84c-dd40-47ff-af23-282b72b7cca8', '1', '誰かかまってください、、')
 

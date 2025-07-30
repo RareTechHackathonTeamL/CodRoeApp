@@ -48,7 +48,7 @@ def login_process():
 def logout():
     logout_user()
     flash('ログアウトしました。')
-    return render_template('login.html')
+    return redirect(url_for('login_view'))
 
 
 @app.route('/register', methods=['GET'])

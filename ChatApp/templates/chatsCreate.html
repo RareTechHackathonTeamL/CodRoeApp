@@ -6,6 +6,11 @@
 <form action="/chats" method="GET">
     <input type="submit" value="チャット一覧へ">
 </form>
+{% if error %}
+<div>
+    <h3>{{ error }}</h3>
+</div>
+{% endif %}
 <form action="/chat/create" method="post">
     <input name="chat_name" placeholder="name">
     <input name="detail">

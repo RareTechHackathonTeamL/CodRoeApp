@@ -106,6 +106,8 @@ def chat_create_view():
 @login_required
 def create_chat():
     new_chat_name = request.form.get('chat_name')
+    if new_chat_name == '':
+        return redirect(url_for('chat_create_view'))
     chat_exist = Chat.find_by_name(new_chat_name)
 
     if chat_exist == None:
@@ -117,7 +119,7 @@ def create_chat():
         return redirect(url_for('chats_view'))
     else:
         error = 'すでに同じ名前のチャンネルが存在しています'
-        return redirect(url_for('chat_create_view', error))
+        return render_template('chatsCreate.html', error=error)
 
 # チャットへ遷移
 @app.route('/chat/<chat_id>/messages', methods=['GET'])
@@ -138,7 +140,7 @@ def create_message(chat_id):
     # TODO: 追加機能・メッセージではなくスタンプの場合用
     if message:
         Message.create(id, user_id, chat_id, message)
-    return redirect(url_for('messages_view', chat_id=chat_id, user_id=user_id))
+    return redirect(f'/chat/{chat_id}/messages')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True)

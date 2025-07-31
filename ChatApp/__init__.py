@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 import uuid
+from util.assets import bundle_css_files
 
 DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
@@ -29,4 +30,5 @@ def create_app():
     login_manager.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
+    bundle_css_files(app)
     return app

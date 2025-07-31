@@ -125,10 +125,11 @@ def create_chat():
 @app.route('/chat/<chat_id>/messages', methods=['GET'])
 @login_required
 def messages_view(chat_id):
+    user_id = current_user.get_id()
     chat_room = Chat.find_by_chat_info(chat_id)
     messages = Message.get_messages(chat_id)
 
-    return render_template('messages.html', chat=chat_room, messages=messages)
+    return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages)
 
 # メッセージ作成
 @app.route('/chat/<chat_id>/messages', methods=['POST'])
@@ -140,6 +141,14 @@ def create_message(chat_id):
     # TODO: 追加機能・メッセージではなくスタンプの場合用
     if message:
         Message.create(id, user_id, chat_id, message)
+    return redirect(f'/chat/{chat_id}/messages')
+
+# メッセージ削除
+@app.route('/chat/<chat_id>/messages/<message_id>', methods=['POST'])
+@login_required
+def delete_message(chat_id, message_id):
+    Message.delete(message_id)
+
     return redirect(f'/chat/{chat_id}/messages')
 
 if __name__ == '__main__':

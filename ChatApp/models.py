@@ -66,7 +66,7 @@ class Chat(db.Model):
     def find_by_chat_info(cls, reserch_chat_id):
         try:
             result = db.session.query(Chat).filter(Chat.id == reserch_chat_id).first()
-            return {"id": result.id, "chat_name": result.chat_name, "detail": result.detail}
+            return {"id": result.id, "user_id": result.user_id, "chat_name": result.chat_name, "detail": result.detail}
         except Exception as e:
             print(e)
         finally:
@@ -98,10 +98,22 @@ class Message(db.Model):
             db.session.close()
 
     @classmethod
+    def delete(cls, message_id):
+        try:
+            db.session.query(Message).filter(Message.id==message_id).delete()
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
     def get_messages(cls, cid):
         try:
             messages = db.session.query(Message).filter(Message.chat_id == cid).all()
             result = [{
+                'id': m.id,
+                'user_id': m.user_id,
                 'message': m.message,
                 'created_at': m.created_at,
                 } for m in messages]

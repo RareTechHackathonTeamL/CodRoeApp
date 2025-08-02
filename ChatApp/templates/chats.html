@@ -15,9 +15,9 @@
 {% endwith %}
 <div>
     {% for chat in chats %}
-    <form action="/chat/{{ chat.id }}/messages" method="GET">
-        <input type="submit" value="{{ chat.chat_name}}">
-    </form>
+    <h2>{{ chat.chat_name }}</h2>
+    <p>{{ chat.detail }}</p>
+    <p>{{ chat.created_at }}</p>
     {% endfor %}
 </div>
 <form action="/chat/create" method="GET">

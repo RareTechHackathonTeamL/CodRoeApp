@@ -1,8 +1,9 @@
 {% extends 'util/base.html' %} {% block title %}
-<title>Chats</title>
+<title>chats</title>
 {% endblock title %}
 {% block content %}
 <h1>チャット一覧</h1>
+<h2> {{ current_user.user_name }} </h2>
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <ul>
@@ -14,13 +15,14 @@
 {% endwith %}
 <div>
     {% for chat in chats %}
-        <div>
-            <h2>チャット名：{{ chat.chat_name }}</h2>
-            <p>説明：{{ chat.detail }}</p>
-            <p>作成日時：{{ chat.created_at }}</p>
-        </div>
+    <form action="/chat/{{ chat.id }}/messages" method="GET">
+        <input type="submit" value="{{ chat.chat_name}}">
+    </form>
     {% endfor %}
 </div>
+<form action="/chat/create" method="GET">
+    <input type="submit" value="チャット作成">
+</form>
 <form action="/logout" method="GET">
     <input type="submit" value="ログアウト">
 </form>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>チャット作成</title>
+    <link rel="stylesheet" href="../static/gem/bundled.css" />
+</head>
+
+<body class="body">
+    <!----- ヘッダー ----->
+    <header class="header">
+        <h1>チャット作成</h1>
+        <!-- chatlistが同じファイル内にないため行かない -->
+        <a href="chatlist.html" class="back-button">
+            <!-- ファイル統一の為変更 -->
+            <img src="../static/img/left.png" alt="Parrots" class="header-image" />
+        </a>
+    </header>
+    <!----- ヘッダーEND ----->
+
+    <!-- メイン -->
+    <main class="main">
+        <div class="input-box-list">
+            <div>チャット名</div>
+
+            <input type="text" name="name" value="" class="chat-name" />
+
+            <div>説明</div>
+
+            <input type="text" name="name" value="" class="chatexplanation" />
+
+            <a href="chatlist.html" class="main-button">
+                <!----- main-buttonをケバブケースに統一する為変更----->
+                <input type="submit" value="登録" class="main-button" />
+            </a>
+        </div>
+    </main>
+    <!-- メインEND -->
+
+    <!-- フッター -->
+    <footer>
+        <a href="top.html" class="footer-button">
+            <div class="footer-item">
+                <!-- src="chatcreate(2).png"を変更-->
+                <!-- chat-create-create.pngを変更-->
+                <img src="../static/img/chat-create-create.png" alt="チャット作成" class="footer-image" />
+                チャット作成
+            </div>
+        </a>
+
+        <a href="top.html" class="footer-button">
+            <div class="footer-item">
+                <!-- src="chatlist(2).png"を変更-->
+                <!-- chat-list-create.pngを変更-->
+                <img src="../static/img/chat-list-create.png" alt="チャット一覧" class="footer-image" />
+                チャット一覧
+            </div>
+        </a>
+
+        <a href="top.html" class="footer-button">
+            <div class="footer-item">
+                <!-- src="logout(2).png"を変更-->
+                <!-- logout-create.pngを変更-->
+                <img src="../static/img/logout-create.png" alt="ログアウト" class="footer-image" />
+                ログアウト
+            </div>
+        </a>
+    </footer>
+    <!-- フッターEND -->
+</body>
+
+</html>

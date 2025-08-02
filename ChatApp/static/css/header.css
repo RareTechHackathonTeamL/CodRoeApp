@@ -1,0 +1,44 @@
+/* 新規以外OK */
+
+/* ヘッダー */
+.header {
+
+    color: white;
+    width: 100%;
+    height: 120px;
+    background-color: rgb(255, 148, 148);
+    display: flex;
+
+    /* 「チャット作成」を中心に配置 */
+    justify-content: center;
+
+    /* 矢印マークがチャット作成と同じ高さで配置される */
+    align-items: center;
+
+}
+
+/* 「チャット作成」 */
+h1 {
+
+    margin-top: 78px;
+    font-size: 18px;
+
+}
+
+/*「矢印」*/
+.back-button {
+
+    position: absolute;
+    left: 17px;
+
+    /* 矢印上の余白指定 */
+    margin-top: 75px;
+
+}
+
+.header-image {
+
+    height: 24px;
+    width: 24px;
+
+}

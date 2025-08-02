@@ -1,0 +1,168 @@
+/* メイン */
+/*ボックスを中央*/
+.list {
+    display: flex;
+    justify-content: center;
+    /* 文字したの線除去 */
+    text-decoration: none;
+}
+
+/*ボックス内の表示*/
+h3 {
+
+    padding: 16px;
+    height: 43px;
+    border: 1px solid rgb(255, 148, 148);
+    border-radius: 12px;
+    width: 288px;
+    background: white;
+    color: rgb(255, 148, 148);
+    font-size: 14px;
+}
+
+.message-box {
+
+    /*上下の吹き出しの隙間*/
+    margin-top: 16px;
+
+    /*文字が長くなった時に吹き出しがタイムラインからはみ出さない様にする*/
+    max-width: 100%;
+
+    /* 文字サイズ */
+    font-size: 14px;
+}
+
+
+.message-content {
+
+    /* 文字を真ん中に表示 */
+    padding: 20px;
+
+}
+
+
+.left .message-box {
+
+    /*左寄せ*/
+    float: left;
+    line-height: 1.3em;
+
+    /* 文字・字背景色指定 */
+    color: rgb(255, 148, 148);
+    background-color: white;
+
+    /* なんか吹き出しっぽくするやつ */
+    border-radius: 30px 30px 30px 0px;
+    margin-right: 50px;
+}
+
+/* メッセージ（右側） */
+.right .message-box {
+
+    /*右寄せ*/
+    float: right;
+    line-height: 1.3em;
+
+    /* 文字・字背景色指定 */
+    color: #fff;
+    background: rgb(255, 148, 148);
+
+    /* なんか吹き出しっぽくするやつ */
+    border-radius: 30px 30px 0px 30px;
+    margin-left: 50px;
+
+}
+
+/* メインEND */
+
+
+
+
+
+.main {
+    color: rgb(255, 148, 148);
+    font-size: 14px;
+
+    /* 中央に配置 */
+    display: flex;
+    justify-content: center;
+
+
+}
+
+.input-box-list {
+
+    /* 矢印上の余白指定 */
+    margin-top: 45px;
+
+    padding: 16px;
+    height: 43px;
+    width: 288px;
+    border-radius: 12px;
+}
+
+.chat-name {
+
+    width: 320px;
+    height: 50px;
+    border: 1px solid rgb(255, 148, 148);
+    border-radius: 12px;
+
+}
+
+.chatexplanation {
+
+    width: 320px;
+    height: 150px;
+    border: 1px solid rgb(255, 148, 148);
+    border-radius: 12px;
+
+}
+
+
+
+
+/* メインEND */
+
+#footer-message {
+
+    /*常に送信ボタンの横幅を引いたサイズに動的に計算するやつ*/
+    width: calc(100% - 75px);
+
+    /*文字がテキストエリアの中心になる様に隙間調整*/
+    line-height: 16px;
+    height: 48px;
+    padding: 14px 6px 0px 6px;
+
+    /*角丸・枠なし*/
+    border: none;
+    border-radius: 24px;
+
+    /*文字を左寄せ*/
+    text-align: left;
+
+    /*paddingとborderの要素の高さと幅の影響をなくす（要素に高さと幅を含める）*/
+    box-sizing: border-box;
+
+}
+
+.send-button {
+    /* 送信ボタンサイズ指定 */
+    width: 48px;
+    height: 48px;
+}
+
+.chat-screen {
+    padding: 16px;
+    font-size: 14px;
+    width: 100%;
+    height: 94px;
+    background-color: rgb(255, 148, 148);
+    /*←絶対位置(下)*/
+    position: absolute;
+    /*下に固定*/
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

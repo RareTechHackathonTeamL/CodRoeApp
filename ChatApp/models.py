@@ -53,6 +53,31 @@ class Chat(db.Model):
             db.session.close()
 
     @classmethod
+    def update(cls, chat_id, new_name, new_detail):
+        try:
+            chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
+            if new_name != '':
+                chat_info.chat_name = new_name
+            if new_detail != '':
+                chat_info.detail = new_detail
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def delete(cls, chat_id):
+        try:
+            db.session.query(Chat).filter(Chat.id == chat_id).delete()
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
     def find_by_name(cls, reserch_chat_name):
         try:
             result = db.session.query(Chat).filter(Chat.chat_name == reserch_chat_name).first()

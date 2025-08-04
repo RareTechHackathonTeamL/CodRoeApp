@@ -121,6 +121,44 @@ def create_chat():
         error = 'すでに同じ名前のチャンネルが存在しています'
         return render_template('chatsCreate.html', error=error)
 
+# チャット編集画面
+@app.route('/chat/<chat_id>/detail', methods=['GET'])
+@login_required
+def chat_detail(chat_id):
+    chat_room = Chat.find_by_chat_info(chat_id)
+    return render_template('chatsUpdate.html', chat=chat_room)
+
+# チャット更新
+@app.route('/chat/update/<chat_id>', methods=['POST'])
+@login_required
+def update_chat(chat_id):
+    user_id = current_user.get_id()
+    new_name = request.form.get('chat_name')
+    new_detail = request.form.get('detail')
+    chat_info = Chat.find_by_chat_info(chat_id)
+    if chat_info['user_id'] != user_id:
+        error = '他の人が作ったチャンネルです'
+        return render_template('ChatsUpdate.html', chat=chat_info, error=error)
+    elif (new_name == "") and (new_detail == ""):
+        return render_template('ChatsUpdate.html', chat=chat_info)
+    elif chat_info != None:
+        Chat.update(chat_id, new_name, new_detail)
+        message = 'チャット情報が更新されました！'
+    return render_template('ChatsUpdate.html', chat=chat_info, message=message)
+
+# チャット削除
+@app.route('/chat/delete/<chat_id>', methods=['POST'])
+@login_required
+def delete_chat(chat_id):
+    user_id = current_user.get_id()
+    chat_info = Chat.find_by_chat_info(chat_id)
+    if chat_info['user_id'] != user_id:
+        error = '他の人が作ったチャンネルです'
+        return render_template('ChatsUpdate.html', chat=chat_info, error=error)
+    elif chat_info != None:
+        Chat.delete(chat_id)
+    return redirect(url_for('chats_view'))
+
 # チャットへ遷移
 @app.route('/chat/<chat_id>/messages', methods=['GET'])
 @login_required
@@ -147,7 +185,9 @@ def create_message(chat_id):
 @app.route('/chat/<chat_id>/messages/<message_id>', methods=['POST'])
 @login_required
 def delete_message(chat_id, message_id):
-    Message.delete(message_id)
+
+    if message_id:
+        Message.delete(message_id)
 
     return redirect(f'/chat/{chat_id}/messages')
 

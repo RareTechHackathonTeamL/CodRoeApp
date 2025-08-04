@@ -7,6 +7,11 @@
 <form action="/chats" method="GET">
     <input type="submit" value="チャット一覧へ">
 </form>
+{% if chat.user_id == user_id %}
+<form action="/chat/{{ chat.id }}/detail" method="GET">
+    <input type="submit" value="チャット編集へ">
+</form>
+{% endif %}
 <form method="post">
     <input name="message" placeholder="メッセージを入力">
     <button type="submmit">送信</button>

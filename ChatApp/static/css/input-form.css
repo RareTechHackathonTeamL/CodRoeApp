@@ -40,7 +40,7 @@
      content: "";
      width: 24px;
      height: 24px;
-     background: url(../../images/icon.png) no-repeat center center / auto 100%;
+     background: url(../images/icon.png) no-repeat center center / auto 100%;
      display: inline-block;
      position: absolute;
      top: 10px;
@@ -65,7 +65,7 @@
      content: "";
      width: 24px;
      height: 24px;
-     background: url(../../images/mail.png) no-repeat center center / auto 100%;
+     background: url(../images/mail.png) no-repeat center center / auto 100%;
      display: inline-block;
      position: absolute;
      top: 10px;
@@ -90,7 +90,7 @@
      content: "";
      width: 24px;
      height: 24px;
-     background: url(../../images/password.png) no-repeat center center / auto 100%;
+     background: url(../img/password.png) no-repeat center center / auto 100%;
      display: inline-block;
      position: absolute;
      top: 10px;

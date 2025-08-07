@@ -1,27 +1,60 @@
-{% extends 'util/base.html' %} {% block title %}
-<title>Login</title>
+{% extends 'util/base.html' %}
+
+{% block title %}
+<title>新規登録</title>
 {% endblock title %}
+
 {% block content %}
-<h1>ログインしてください</h1>
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-<form action="/login" method="POST">
-    <label for="">Eメールアドレス</label>
-    <input type="email" name="email"><br />
-    <label for="">パスワード</label>
-    <input type="password" name="password"><br />
-    <input type="submit" value="ログイン">
-</form>
-<form action="/register" method="GET">
-    <input type="submit" value="ユーザ登録">
-</form>
+
+<body class="loguin">
+    <!----- ヘッダー ----->
+
+    <header class="header-login">
+        <div class="center">
+            <img src="../../static/img/main-character.png" class="tarako">
+        </div>
+    </header>
+    <!----- ヘッダー END ----->
+
+    <!----- メインコンテンツ ----->
+    <main class="main-login">
+        <div class="container">
+            <img src="../../static/img/title-logo.png" class="title-logo">
+            <h2>明太子好きのためのコミュニティ</h2>
+        </div>
+        <div class="container">
+            <div class="input-form">
+                <form action="main.html" method="post">
+
+                    <div class="input-box-login">
+                        <div class="font">
+                            メールアドレス
+                        </div>
+
+                        <div class="search-box">
+                            <input type="email" name="email-address" value="" placeholder="   xxxx@example.com"
+                                class="text-box">
+                        </div>
+
+                        <div class="input-box-login">
+                            <div class="font">
+                                パスワード
+                            </div>
+                            <div class="search-box1">
+                                <input type="password" name="mail" value="" class="text-box">
+                            </div>
+                        </div>
+                        <p><input type="submit" value="ログイン" class="main-button-login"></p>
+                </form>
+
+                <div class="container">
+                    <h2>アカウントをお持ちでない方は、
+                        <form action="/register" method="GET">
+                             <input type="submit" class="btn" value="ユーザ登録">
+                        </form>
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </main>
 {% endblock content %}
-
-

@@ -24,7 +24,7 @@
         </div>
         <div class="container">
             <div class="input-form">
-                <form action="main.html" method="post">
+                <form action="/login" method="POST">
 
                     <div class="input-box-login">
                         <div class="font">
@@ -32,7 +32,7 @@
                         </div>
 
                         <div class="search-box">
-                            <input type="email" name="email-address" value="" placeholder="   xxxx@example.com"
+                            <input type="email" name="email" value="" placeholder="   xxxx@example.com"
                                 class="text-box">
                         </div>
 
@@ -41,7 +41,7 @@
                                 パスワード
                             </div>
                             <div class="search-box1">
-                                <input type="password" name="mail" value="" class="text-box">
+                                <input type="password" name="password" value="" class="text-box">
                             </div>
                         </div>
                         <p><input type="submit" value="ログイン" class="main-button-login"></p>
@@ -50,11 +50,11 @@
                 <div class="container">
                     <h2>アカウントをお持ちでない方は、
                         <form action="/register" method="GET">
-                             <input type="submit" class="btn" value="こちら">
+                            <input type="submit" class="btn" value="こちら">
                         </form>
-                    </h2>   
+                    </h2>
                 </div>
             </div>
         </div>
     </main>
-{% endblock content %}
+    {% endblock content %}

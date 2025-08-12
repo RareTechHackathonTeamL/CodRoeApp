@@ -8,10 +8,11 @@
   </header>
   <main>
     <a href="chatscreen.html" class="list">
-      <h3>
-        全体チャット<br />
-        太郎さん博多の明子専門店で...
-      </h3>
+        {% for chat in chats %}
+        <form action="/chat/{{ chat.id }}/messages" method="GET">
+        <input type="submit" value="{{ chat.chat_name}}" class="h3-box">
+        </form>
+        {% endfor %}
     </a>
   </main>
 

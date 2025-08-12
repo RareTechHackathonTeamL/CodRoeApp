@@ -24,6 +24,11 @@
 
  }
 
+ .footer-login{
+    color: rgb(107, 114, 128);
+    font-size: 12px;
+ }
+
 
 
  /*たらこ様のアイコンに関してのCSS*/
@@ -58,7 +63,7 @@
 
 
  .btn {
-     color: rgb(236, 72, 153);
+     color: rgb(255, 148, 148);
  }
 
 

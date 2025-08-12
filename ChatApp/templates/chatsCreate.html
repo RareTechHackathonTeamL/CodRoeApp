@@ -16,20 +16,22 @@
 
   <!-- メイン -->
   <main class="main">
-    <div class="input-box-list">
-      <div>チャット名</div>
+    <form action="/chat/create" method="post">
+      <div class="input-box-list">
+        <div>チャット名</div>
 
-      <input type="text" name="name" value="" class="chat-name" />
+        <input type="text" name="chat_name" value="" class="chat-name" />
 
-      <div>説明</div>
+        <div>説明</div>
 
-      <input type="text" name="name" value="" class="chatexplanation" />
+        <input type="text" name="name" value="" class="chatexplanation" />
 
-      <a href="chatlist.html" class="main-button">
-        <!----- main-buttonをケバブケースに統一する為変更----->
-        <input type="submit" value="登録" class="main-button" />
-      </a>
-    </div>
+        <a href="chatlist.html" class="main-button">
+          <!----- main-buttonをケバブケースに統一する為変更----->
+          <input type="submit" value="登録" class="main-button" />
+        </a>
+      </div>
+    </form>
   </main>
   <!-- メインEND -->
 

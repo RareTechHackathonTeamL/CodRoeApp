@@ -34,15 +34,16 @@ class Chat(db.Model):
     chat_name = db.Column(db.String(255), nullable=False)
     chat_type = db.Column(db.Integer, nullable=False)
     detail = db.Column(db.String(255), nullable=True)
-    created_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, nullable=False)
     update_at = db.Column(db.DateTime)
+    latest_messages = db.Column(db.DateTime, nullable=False)    # チャット一覧で最新のメッセージが来ているものを上に表示させたいため、新規メッセージ・チャット新規作成のみでupdateする
 
     messages = db.relationship('Message', backref='chat')
 
     @classmethod
     def create(cls, chat_id, user_id, chat_name, detail):
         now = datetime.datetime.now()
-        chat_new = Chat(id=chat_id, user_id=user_id, chat_name=chat_name, chat_type=1, detail=detail, created_at=now, update_at=now)
+        chat_new = Chat(id=chat_id, user_id=user_id, chat_name=chat_name, chat_type=1, detail=detail, created_at=now, update_at=now, latest_messages=now)
         try:
             db.session.add(chat_new)
             db.session.commit()
@@ -60,6 +61,19 @@ class Chat(db.Model):
                 chat_info.chat_name = new_name
             if new_detail != '':
                 chat_info.detail = new_detail
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def update_latest(cls, chat_id):
+        try:
+            now = datetime.datetime.now()
+            chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
+            chat_info.latest_messages = now
             db.session.commit()
         except Exception as e:
             db.session.rollback()
@@ -92,6 +106,16 @@ class Chat(db.Model):
         try:
             result = db.session.query(Chat).filter(Chat.id == reserch_chat_id).first()
             return {"id": result.id, "user_id": result.user_id, "chat_name": result.chat_name, "detail": result.detail}
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def get_chat_latest(cls):
+        try:
+            chats = db.session.query(Chat).order_by(Chat.latest_messages.desc()).all()
+            return chats
         except Exception as e:
             print(e)
         finally:
@@ -135,7 +159,7 @@ class Message(db.Model):
     @classmethod
     def get_messages(cls, cid):
         try:
-            messages = db.session.query(Message).filter(Message.chat_id == cid).all()
+            messages = db.session.query(Message).filter(Message.chat_id == cid).order_by(Message.created_at).all()
             result = [{
                 'id': m.id,
                 'user_id': m.user_id,

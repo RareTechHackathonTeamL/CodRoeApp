@@ -87,11 +87,12 @@ def register_process():
         flash( 'ようこそ！ ' + user_name + 'さん！')
         return redirect(url_for('chats_view'))
     return render_template('register.html')
-    
+
+# チャット一覧遷移
 @app.route('/chats', methods=['GET'])
 @login_required
 def chats_view():
-    chats = Chat.query.all()
+    chats = Chat.get_chat_latest()
     # chats = Chat.query.filter_by(Chat.user_id == current_user.get_id()).order_by(Chat.created_at).all()
     return render_template('chats.html', chats=chats)
 
@@ -179,6 +180,7 @@ def create_message(chat_id):
     # TODO: 追加機能・メッセージではなくスタンプの場合用
     if message:
         Message.create(id, user_id, chat_id, message)
+        Chat.update_latest(chat_id)
     return redirect(f'/chat/{chat_id}/messages')
 
 # メッセージ削除

@@ -1,0 +1,19 @@
+{% extends 'util/base.html' %} {% block title %}
+<title>Create Chat</title>
+{% endblock title %}
+{% block content %}
+<div>チャット作成画面</div>
+<form action="/chats" method="GET">
+    <input type="submit" value="チャット一覧へ">
+</form>
+{% if error %}
+<div>
+    <h3>{{ error }}</h3>
+</div>
+{% endif %}
+<form action="/chat/create" method="post">
+    <input name="chat_name" placeholder="name">
+    <input name="detail">
+    <button type="submmit">チャット作成</button>
+</form>
+{% endblock content %}

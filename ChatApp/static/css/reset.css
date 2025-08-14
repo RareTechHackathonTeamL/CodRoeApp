@@ -1,0 +1,32 @@
+html {
+
+    /* ブラウザによって表示されるデザインが違うので初期設定で余白を0にする */
+    margin: 0;
+    padding: 0;
+    background-color: rgb(255, 245, 228);
+
+    /*Arialがインストールされていない時にsans-serif（ゴシック体）で表示する*/
+    font-family: Arial, sans-serif;
+}
+
+.body {
+
+    /* ブラウザによって表示されるデザインが違うので初期設定で余白を0にする */
+    margin: 0;
+    padding: 0;
+    background-color: rgb(255, 245, 228);
+
+    /*Arialがインストールされていない時にsans-serif（ゴシック体）で表示する*/
+    font-family: Arial, sans-serif;
+}
+
+.loguin {
+
+    /* ブラウザによって表示されるデザインが違うので初期設定で余白を0にする */
+    margin: 0;
+    padding: 0;
+    background-color: rgb(255, 227, 225);
+
+    /*Arialがインストールされていない時にsans-serif（ゴシック体）で表示する*/
+    font-family: Arial, sans-serif;
+}

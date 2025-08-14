@@ -35,6 +35,7 @@ CREATE TABLE chat (
     chat_type INT NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_at DATETIME,
+    latest_messages DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -70,6 +71,6 @@ CREATE TABLE stamps (
 );
 
 INSERT INTO users(user_id, user_name, email, password, created_at) VALUES('a', 'テスト', 'demota@gmail.com', 'a', '2025-07-01');
-INSERT INTO chat(id, user_id, chat_name, detail, chat_type, created_at) VALUES('aaaaaaaaaa', 'a', '明太子を語る会', "明太子について語りましょう！！", 0, '2025-07-01');
-INSERT INTO chat(id, user_id, chat_name, detail, chat_type, created_at) VALUES('bbbbbbbbbb', 'a', 'スケトウダラを語る会', "スケトウダラについてダラダラ語りましょう！！", 0, '2025-07-02');
+INSERT INTO chat(id, user_id, chat_name, detail, chat_type, created_at, latest_messages) VALUES('aaaaaaaaaa', 'a', '明太子を語る会', "明太子について語りましょう！！", 0, '2025-07-01','2025-07-01');
+INSERT INTO chat(id, user_id, chat_name, detail, chat_type, created_at, latest_messages) VALUES('bbbbbbbbbb', 'a', 'スケトウダラを語る会', "スケトウダラについてダラダラ語りましょう！！", 0, '2025-07-02', '2025-07-02');
 INSERT INTO messages(id, user_id, chat_id, message, created_at) VALUES('c', 'a', 'aaaaaaaaaa', '私は辛さ控えめかつ、塩味が強めが好きだなぁ', '2025-07-01');

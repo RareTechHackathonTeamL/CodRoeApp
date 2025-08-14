@@ -1,0 +1,75 @@
+ /*メインCSS*/
+ .main {
+     background-color: rgb(255, 245, 228);
+     height: 732px;
+
+ }
+
+ .main-login {
+     background-color: rgb(247, 202, 224);
+
+
+
+ }
+
+ /*ヘッダー*/
+ /*ヘッダー全体のCSS*/
+ .header-login {
+     width: 100%;
+     /* 幅を明示的に全体に */
+     height: 409px;
+     background-color: rgb(255, 245, 228);
+     border-bottom-left-radius: 100% 190px;
+     border-bottom-right-radius: 100% 190px;
+
+ }
+
+ .footer-login{
+    color: rgb(107, 114, 128);
+    font-size: 12px;
+ }
+
+
+
+ /*たらこ様のアイコンに関してのCSS*/
+ .tarako {
+     width: 407px;
+     height: 407px;
+ }
+
+
+ /*たらこ様を真ん中にするCSS*/
+ .center {
+     position: relative;
+     text-align: center;
+     padding-top: 0px;
+ }
+
+ /*.............*/
+
+
+
+ /*メイン全体を真ん中にする*/
+ .container {
+     text-align: center;
+ }
+
+ /*タイトルロゴのサイズ変更*/
+ .title-logo {
+     width: 276px;
+     height: 62px;
+     padding-top: 40px;
+ }
+
+
+ .btn {
+     color: rgb(255, 148, 148);
+ }
+
+
+
+
+ h2 {
+     color: rgb(255, 148, 148);
+     font-size: 12px;
+ }

@@ -1,0 +1,48 @@
+/* フッター */
+footer {
+    padding: 16px;
+    color: white;
+    font-size: 14px;
+    width: 100%;
+    height: 110px;
+    background-color: rgb(255, 148, 148);
+
+    /* 横に画像3つ、各画像下にテキストを表示する配置設定 */
+    display: flex;
+    align-items: center;
+
+    /* 間隔合わせ */
+    justify-content: space-around;
+
+    /*←絶対位置(下)*/
+    position: absolute;
+
+    /*下に固定*/
+    bottom: 0;
+
+}
+
+.footer-item {
+
+    /* 横に画像3つ、各画像下にテキストを表示する配置設定 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.footer-button {
+
+    /* 文字したの線除去 */
+    text-decoration: none;
+
+}
+
+.footer-image {
+
+    height: 60px;
+    width: 60px;
+}
+
+
+/* フッターEND */

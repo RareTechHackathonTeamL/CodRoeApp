@@ -1,29 +1,73 @@
 {% extends 'util/base.html' %} {% block title %}
-<title>Register</title>
-{% endblock title %}
-{% block content %}
-<h1>ユーザ登録してください</h1>
-{% with messages = get_flashed_messages() %}
+<title>新規登録</title>
+{% endblock title %} {% block content %}
+<!----- ヘッダー ----->
+
+<header class="header">
+  <h1>新規作成</h1>
+  <a href="/login" class="back-button">
+    <!-- ファイル統一の為変更 -->
+    <img src="../../static/img/left.png" alt="Parrots" class="header-image" />
+  </a>
+</header>
+<!----- ヘッダー END ----->
+
+{% with messages = get_flashed_messages() %} 
 {% if messages %}
 <ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
+  {% for message in messages %}
+  <li>{{ message }}</li>
+  {% endfor %}
 </ul>
-{% endif %}
-{% endwith %}
-<form action="/register" method="POST">
-    <label for="">ユーザ名</label>
-    <input type="text" name="user_name"><br />
-    <label for="">Eメールアドレス</label>
-    <input type="email" name="email"><br />
-    <label for="">パスワード</label>
-    <input type="password" name="password"><br />
-    <label for="">確認用パスワード</label>
-    <input type="password" name="password-confirmation"><br />
-    <input type="submit" value="登録">
-</form>
-<form action="/login" method="GET">
-    <input type="submit" value="ログイン画面">
-</form>
+{% endif %} {% endwith %}
+
+<!----- メインコンテンツ ----->
+<main class="main">
+  <div class="input-form">
+    <form action="/register" method="POST">
+      <div class="input-box-autu">
+        <div class="font">ユーザー名</div>
+        <div class="search-box">
+          <input type="text" name="user_name" value="" class="text-box" />
+        </div>
+      </div>
+
+      <div class="input-box-autu">
+        <div class="font">メールアドレス</div>
+
+        <div class="search-box1">
+          <input
+            type="email"
+            name="email"
+            value=""
+            placeholder="   xxxx@example.com"
+            class="text-box"
+          />
+        </div>
+      </div>
+
+      <!----- タイプ何？ ----->
+      <div class="input-box-autu">
+        <div class="font">パスワード</div>
+        <div class="search-box2">
+          <input type="password" name="password" value="" class="text-box" />
+        </div>
+      </div>
+
+      <div class="input-box-autu">
+        <div class="font">パスワード（確認）</div>
+        <div class="search-box2">
+          <input
+            type="password"
+            name="password-confirmation"
+            value=""
+            class="text-box"
+          />
+        </div>
+      </div>
+
+      <p><input type="submit" value="登録" class="main-button" /></p>
+    </form>
+  </div>
+</main>
 {% endblock content %}

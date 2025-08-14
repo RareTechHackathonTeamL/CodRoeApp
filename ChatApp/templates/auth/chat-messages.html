@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>全体チャット</title>
+    <link rel="stylesheet" href="../static/gem/bundled.css" />
+
+</head>
+
+<body class="body">
+    <!----- ヘッダー ----->
+    <header class="header">
+        <!-- チャット名はバックエンドと繋ぐ必要があるのでは？ -->
+        <h1>全体チャット</h1>
+        <!-- chatlistが同じファイル内にないため行かない -->
+        <a href="chatlist.html" class="back-button">
+            <img src="../static/img/left.png" alt="Parrots" class="header-image" />
+        </a>
+    </header>
+    <!----- ヘッダーEND ----->
+
+
+
+
+    <!-- メイン -->
+    <main>
+
+        <!--メッセージ（左側）-->
+        <div class="message left">
+            <div class="message-box">
+                <div class="message-content">
+                    <div class="message-text">博多の明太子専門店で新商品を発見！辛さが絶妙でした🌶️</div>
+                </div>
+            </div>
+        </div>
+
+        <!--メッセージ（右側）-->
+        <div class="message right">
+            <div class="message-box">
+                <div class="message-content">
+                    <div class="message-text">それ気になります！お店の名前教えてください✨</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- メインEND -->
+
+
+
+    <!-- フッター -->
+    <footer class="chat-screen">
+
+        <!-- テキストボックス 送信ボタン -->
+        <textarea id="footer-message"></textarea>
+        <!--send-button.pngに変更（見本がケバブケース）-->
+        <input type="image" name="sendbutton" src="../static/img/send-button.png" class="send-button">
+        </div>
+    </footer>
+    <!-- フッターEND -->
+
+
+
+</body>
+
+</html>

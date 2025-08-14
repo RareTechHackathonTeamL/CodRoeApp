@@ -15,9 +15,9 @@
 {% endwith %}
 <div>
     {% for chat in chats %}
-    <h2>{{ chat.chat_name }}</h2>
-    <p>{{ chat.detail }}</p>
-    <p>{{ chat.created_at }}</p>
+    <form action="/chat/{{ chat.id }}/messages" method="GET">
+        <input type="submit" value="{{ chat.chat_name}}">
+    </form>
     {% endfor %}
 </div>
 <form action="/chat/create" method="GET">
@@ -25,5 +25,8 @@
 </form>
 <form action="/logout" method="GET">
     <input type="submit" value="ログアウト">
+</form>
+<form action="/update_user/{{ current_user.user_id }}" method="GET">
+    <input type="submit" value="ユーザ情報更新">
 </form>
 {% endblock content %}

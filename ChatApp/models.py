@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy import Column, String, Integer, DateTime, update
 from flask_login import UserMixin, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
@@ -41,6 +41,69 @@ class User(UserMixin, db.Model):
         finally:
             login_user(new_user)
             db.session.close()
+
+    # ユーザ情報更新(パスワード更新なし)
+    @classmethod
+    def update_nopass(cls, user_id, user_name, email):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.user_name = user_name
+        user.email = email
+        user.update_at = datetime.datetime.now()
+        try:
+            # db.session.merge(user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    # パスワード更新
+    @classmethod
+    def update_password(cls, user_id, password):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.password = generate_password_hash(password)
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    # ユーザ情報更新
+    @classmethod
+    def update_user(cls, user_id, user_name, email, password):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.user_name = user_name
+        user.email = email
+        user.password = generate_password_hash(password)
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.merge(user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    # ユーザ情報削除
+    @classmethod
+    def delete_user(cls, user_id):
+        # user = db.session.query(User).filter(User.user_id == user_id).first()
+        # now = datetime.datetime.now()
+        try:
+            # with db.session.begin(subtransactions=True):
+            db.session.query(User).filter(User.user_id == user_id).delete()
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            # db.session.rollback()
+            # raise
+        finally:
+            db.session.close()
     
     # 登録済みEメールアドレスの確認
     @classmethod
@@ -63,6 +126,7 @@ class User(UserMixin, db.Model):
             print(e)
         finally:
             db.session.close()
+
 
 
 

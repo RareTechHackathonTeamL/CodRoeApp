@@ -37,7 +37,7 @@ def login_process():
     elif user == None:
         flash('Eメールアドレスか、パスワーを間違っタラコ？')
     elif check_password_hash(user.password, password) == False:
-        flash('Eメールアドレスか、パスワーをsが間違っタラコ？')
+        flash('Eメールアドレスか、パスワーを間違っタラコ？')
     else:
         login_user(user)
         user_name = user.user_name
@@ -45,7 +45,7 @@ def login_process():
         return redirect(url_for('chats_view'))
     return render_template('login.html')
             
-
+# ログアウト処理
 @app.route('/logout')
 @login_required
 def logout():
@@ -53,11 +53,12 @@ def logout():
     flash('ログアウトしタラコ！')
     return redirect(url_for('login_view'))
 
-
+# ユーザ登録画面表示
 @app.route('/register', methods=['GET'])
 def register_view():
     return render_template('register.html')
 
+# ユーザ登録処理
 @app.route('/register', methods=['POST'])
 def register_process():
     new_uname = request.form.get('user_name')
@@ -72,15 +73,127 @@ def register_process():
     elif password != passwordConfirmation:
         flash('パスワードが一致しないっタラコ！')
     elif registered_name != None:
-        flash('ごめんたいm(_ _)m このユーザ名は既に登録されタラコ...')  
+        flash('ごめんたい! このユーザ名は既に登録されタラコ...')  
     elif registered_email != None:
-        flash('ごめんたいm(_ _)m このEメールアドレスは既に登録されタラコ...')
+        flash('ごめんたい! このEメールアドレスは既に登録されタラコ...')
     else:
         User.regist(new_uname, new_email, password)
         flash( 'ようこそ！ ' + new_uname + 'さん！')
         return redirect(url_for('chats_view'))
     return render_template('register.html')
-    
+
+# ユーザ情報更新画面表示
+@app.route('/update_user/<user_id>', methods=['GET'])
+@login_required
+def update_user_view(user_id):
+    user = User.query.get(user_id)
+    return render_template('update_user.html')
+
+
+# ユーザ情報更新
+@app.route('/update_user/<user_id>', methods=['POST'])
+@login_required
+def update_user_process(user_id):
+    user = User.query.get(user_id)
+    current_uname = user.user_name
+    current_email = user.email
+    new_uname = request.form.get('user_name')
+    new_email = request.form.get('email')
+    new_password = request.form.get('password')
+    new_passwordConfirmation = request.form.get('password-confirmation')
+
+    if new_uname == '' or new_email =='':
+        flash('空のフォームがあるっタラコ！')
+    elif new_password != new_passwordConfirmation:
+        flash('パスワードが一致しないっタラコ！')
+    elif new_uname == current_uname and new_email == current_email and new_password == '' and new_passwordConfirmation == '':
+        flash('更新する情報がないっタラコ！')
+    # パスワード更新無しの場合
+    elif  new_password == '' and new_passwordConfirmation == '':
+        if new_uname != current_uname and new_email != current_email:
+            registered_name = User.find_by_uname(new_uname)
+            registered_email = User.find_by_email(new_email)
+            if registered_name != None or registered_email != None:
+               flash('他のユーザと同じ情報が含まれるため更新できません。')
+            else:
+                user_name = new_uname
+                email = new_email
+                User.update_nopass(user_id, user_name, email)
+        elif new_uname != current_uname:
+            registered_name = User.find_by_uname(new_uname)
+            if registered_name != None:
+               flash('他のユーザと同じ情報が含まれるため更新できません。')
+            else:
+                user_name = new_uname
+                email = new_email
+                User.update_nopass(user_id, user_name, email)
+                flash('ユーザ情報を更新しタラコ！')
+                return redirect(url_for('chats_view'))
+        else:
+            registered_email = User.find_by_uname(new_email)
+            if registered_email != None:
+               flash('他のユーザと同じ情報が含まれるため更新できません。')
+            else:
+                user_name = new_uname
+                email = new_email
+                User.update_nopass(user_id, user_name, email)
+                flash('ユーザ情報を更新しタラコ！')
+                return redirect(url_for('chats_view'))
+    # パスワード更新ありの場合
+    # パスワードのみ
+    elif new_uname == current_uname and new_email == current_email:
+        User.update_password(user_id, new_password)
+        flash('ユーザ情報を更新しタラコ！')
+        return redirect(url_for('chats_view'))
+    # ユーザ名＆Emailの両方更新
+    elif new_uname != current_uname and new_email != current_email:
+            registered_name = User.find_by_uname(new_uname)
+            registered_email = User.find_by_email(new_email)
+            if registered_name != None or registered_email != None:
+               flash('登録されている情報と一致するため更新できません。')
+            else:
+                user_name = new_uname
+                email = new_email
+                password = new_password
+                User.update_user(user_id, user_name, email, password)
+                flash('ユーザ情報を更新しタラコ！')
+                return redirect(url_for('chats_view'))          
+    # ユーザ名＆パスワード更新
+    elif new_uname != current_uname:
+            registered_name = User.find_by_uname(new_uname)
+            if registered_name != None:
+               flash('登録されている情報と一致するため更新できません。')
+    # Email＆パスワード更新
+    else:
+        registered_email = User.find_by_email(new_email)
+        if registered_email != None:
+            flash('登録されている情報と一致するため更新できません。')
+        else:
+            user_name = new_uname
+            email = new_email
+            password = new_password
+            User.update_user(user_id, user_name, email, password)
+            flash('ユーザ情報を更新しタラコ！')
+            return redirect(url_for('chats_view'))
+    return render_template('update_user.html')
+
+# ユーザ削除
+@app.route('/delete_user/<user_id>', methods=['GET', 'POST'])
+@login_required
+def delete_user(user_id):
+    user = User.query.get(user_id)
+
+    #　GETの場合
+    if request.method == 'GET':
+        return render_template('delete_user.html', user=user)
+    # POSTの場合
+    else:
+        # user = User.query.get(user_id)
+        User.delete_user(user_id)
+        flash('ユーザを削除しタラコ！')
+        return redirect(url_for('login_view'))
+
+# チャット一覧表示
 @app.route('/chats', methods=['GET'])
 @login_required
 def chats_view():

@@ -1,0 +1,45 @@
+{% extends 'util/base.html' %} {% block title %}
+<title>Update User</title>
+{% endblock title %}
+{% block content %}
+<h1>ユーザ情報更新</h1>
+<!-- <h2>{{ current_user.user_name }} さんのユーザ情報を更新します</h2> -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<form action="/update_user/{{ current_user.user_id }}" method="POST">
+    <div>
+        <label for="">ユーザ名</label>
+        <input type="text" name="user_name" value={{ current_user.user_name }}>
+        <!-- <input type="text" name="user_name"></input> -->
+    </div>
+    <div>
+        <label for="">Eメールアドレス</label>
+        <input type="email" name="email" value={{ current_user.email }}>
+        <!-- <input type="email" name="email" -->
+    </div>
+    <div>
+        <label for="">パスワード</label>
+        <input type="password" name="password">
+    </div>
+    <div>
+        <label for="">確認用パスワード</label>
+        <input type="password" name="password-confirmation">
+    </div>
+    <div>
+        <button type="submit">更新</button>
+    </div>
+</form>
+<form action="/chats" method="GET">
+    <input type="submit" value="キャンセル">
+</form>
+<form action="/delete_user/{{ current_user.user_id }}" method="GET">
+    <input type="submit" value="ユーザ登録解除">
+</form>
+{% endblock content %}

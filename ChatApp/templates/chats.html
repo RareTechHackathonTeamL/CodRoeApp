@@ -7,13 +7,13 @@
     <h1>チャット一覧</h1>
   </header>
   <main>
-    <a href="chatscreen.html" class="list">
+    <div class="list">
         {% for chat in chats %}
         <form action="/chat/{{ chat.id }}/messages" method="GET">
         <input type="submit" value="{{ chat.chat_name}}" class="h3-box">
         </form>
         {% endfor %}
-    </a>
+    </div>
   </main>
 
   <footer>

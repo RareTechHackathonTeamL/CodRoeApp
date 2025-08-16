@@ -104,6 +104,48 @@ class User(UserMixin, db.Model):
             # raise
         finally:
             db.session.close()
+
+    # ユーザ名変更**********************************************************
+    @classmethod
+    def change_uname(cls, user_id, user_name):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.user_name = user_name
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    # Eメールアドレス変更**********************************************************
+    @classmethod
+    def change_email(cls, user_id, email):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.email = email
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+     # パスワード変更**********************************************************
+    @classmethod
+    def change_password(cls, user_id, password):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.password = generate_password_hash(password)
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
     
     # 登録済みEメールアドレスの確認
     @classmethod

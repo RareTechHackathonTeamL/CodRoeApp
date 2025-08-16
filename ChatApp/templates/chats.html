@@ -14,6 +14,11 @@
         </form>
         {% endfor %}
     </div>
+    <div>
+      <form action="/profile/{{ current_user.user_id }}" method="GET">
+        <input type="submit" value="プロフィール">
+      </form>
+    </div>
   </main>
 
   <footer>

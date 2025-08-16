@@ -41,6 +41,8 @@ def login_process():
     else:
         login_user(user)
         user_name = user.user_name
+        session['user_id'] = user.user_id
+        user_id = session.get('user_id')
         flash('おかえり！ ' + user_name + 'さん！')
         return redirect(url_for('chats_view'))
     return render_template('login.html')
@@ -82,105 +84,11 @@ def register_process():
         return redirect(url_for('chats_view'))
     return render_template('register.html')
 
-# ユーザ情報更新画面表示
-@app.route('/update_user/<user_id>', methods=['GET'])
-@login_required
-def update_user_view(user_id):
-    user = User.query.get(user_id)
-    return render_template('update_user.html')
-
-
-# ユーザ情報更新
-@app.route('/update_user/<user_id>', methods=['POST'])
-@login_required
-def update_user_process(user_id):
-    user = User.query.get(user_id)
-    current_uname = user.user_name
-    current_email = user.email
-    new_uname = request.form.get('user_name')
-    new_email = request.form.get('email')
-    new_password = request.form.get('password')
-    new_passwordConfirmation = request.form.get('password-confirmation')
-
-    if new_uname == '' or new_email =='':
-        flash('空のフォームがあるっタラコ！')
-    elif new_password != new_passwordConfirmation:
-        flash('パスワードが一致しないっタラコ！')
-    elif new_uname == current_uname and new_email == current_email and new_password == '' and new_passwordConfirmation == '':
-        flash('更新する情報がないっタラコ！')
-    # パスワード更新無しの場合
-    elif  new_password == '' and new_passwordConfirmation == '':
-        if new_uname != current_uname and new_email != current_email:
-            registered_name = User.find_by_uname(new_uname)
-            registered_email = User.find_by_email(new_email)
-            if registered_name != None or registered_email != None:
-               flash('他のユーザと同じ情報が含まれるため更新できません。')
-            else:
-                user_name = new_uname
-                email = new_email
-                User.update_nopass(user_id, user_name, email)
-        elif new_uname != current_uname:
-            registered_name = User.find_by_uname(new_uname)
-            if registered_name != None:
-               flash('他のユーザと同じ情報が含まれるため更新できません。')
-            else:
-                user_name = new_uname
-                email = new_email
-                User.update_nopass(user_id, user_name, email)
-                flash('ユーザ情報を更新しタラコ！')
-                return redirect(url_for('chats_view'))
-        else:
-            registered_email = User.find_by_uname(new_email)
-            if registered_email != None:
-               flash('他のユーザと同じ情報が含まれるため更新できません。')
-            else:
-                user_name = new_uname
-                email = new_email
-                User.update_nopass(user_id, user_name, email)
-                flash('ユーザ情報を更新しタラコ！')
-                return redirect(url_for('chats_view'))
-    # パスワード更新ありの場合
-    # パスワードのみ
-    elif new_uname == current_uname and new_email == current_email:
-        User.update_password(user_id, new_password)
-        flash('ユーザ情報を更新しタラコ！')
-        return redirect(url_for('chats_view'))
-    # ユーザ名＆Emailの両方更新
-    elif new_uname != current_uname and new_email != current_email:
-            registered_name = User.find_by_uname(new_uname)
-            registered_email = User.find_by_email(new_email)
-            if registered_name != None or registered_email != None:
-               flash('登録されている情報と一致するため更新できません。')
-            else:
-                user_name = new_uname
-                email = new_email
-                password = new_password
-                User.update_user(user_id, user_name, email, password)
-                flash('ユーザ情報を更新しタラコ！')
-                return redirect(url_for('chats_view'))          
-    # ユーザ名＆パスワード更新
-    elif new_uname != current_uname:
-            registered_name = User.find_by_uname(new_uname)
-            if registered_name != None:
-               flash('登録されている情報と一致するため更新できません。')
-    # Email＆パスワード更新
-    else:
-        registered_email = User.find_by_email(new_email)
-        if registered_email != None:
-            flash('登録されている情報と一致するため更新できません。')
-        else:
-            user_name = new_uname
-            email = new_email
-            password = new_password
-            User.update_user(user_id, user_name, email, password)
-            flash('ユーザ情報を更新しタラコ！')
-            return redirect(url_for('chats_view'))
-    return render_template('update_user.html')
-
 # ユーザ削除
-@app.route('/delete_user/<user_id>', methods=['GET', 'POST'])
+@app.route('/delete_user', methods=['GET', 'POST'])
 @login_required
-def delete_user(user_id):
+def delete_user():
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
 
     #　GETの場合
@@ -188,30 +96,34 @@ def delete_user(user_id):
         return render_template('delete_user.html', user=user)
     # POSTの場合
     else:
-        # user = User.query.get(user_id)
         User.delete_user(user_id)
         flash('ユーザを削除しタラコ！')
         return redirect(url_for('login_view'))
     
 
 # プロフィール画面表示 *****************************************************
-@app.route('/profile/<user_id>', methods=['GET'])
+@app.route('/profile', methods=['GET'])
 @login_required
-def profile_view(user_id):
+def profile_view():
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
+    # flash('user_id= ' + user_id )
     return render_template('profile.html')
 
 # ユーザ名変更画面表示 *****************************************************
-@app.route('/change_uname/<user_id>', methods=['GET'])
+@app.route('/change_uname', methods=['GET'])
 @login_required
-def change_uname_view(user_id):
+def change_uname_view():
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
+    # flash('user_id= ' + user_id )
     return render_template('change_uname.html')
 
 # ユーザ名変更処理 *****************************************************
-@app.route('/change_uname/<user_id>', methods=['POST'])
+@app.route('/change_uname', methods=['POST'])
 @login_required
-def change_uname(user_id):
+def change_uname():
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
     current_uname = user.user_name
     new_uname = request.form.get('user_name')
@@ -228,20 +140,22 @@ def change_uname(user_id):
             user_name = new_uname
             User.change_uname(user_id, user_name)
             flash('ユーザ情報を更新しタラコ！')
-            return redirect(f'/profile/{user_id}')
+            return redirect(f'/profile')
     return render_template('change_uname.html')
 
 # Eメールアドレス変更画面表示 *****************************************************
-@app.route('/change_email/<user_id>', methods=['GET'])
+@app.route('/change_email', methods=['GET'])
 @login_required
-def change_email_view(user_id):
+def change_email_view():
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
     return render_template('change_email.html')
 
 # Eメールアドレス変更処理 *****************************************************
-@app.route('/change_email/<user_id>', methods=['POST'])
+@app.route('/change_email', methods=['POST'])
 @login_required
-def change_email(user_id):
+def change_email():
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
     current_email = user.email
     new_email = request.form.get('email')
@@ -258,20 +172,22 @@ def change_email(user_id):
             email = new_email
             User.change_email(user_id, email)
             flash('ユーザ情報を更新しタラコ！')
-            return redirect(f'/profile/{user_id}')
+            return redirect(f'/profile')
     return render_template('change_email.html')
 
 # パスワード変更画面表示 *****************************************************
-@app.route('/change_password/<user_id>', methods=['GET'])
+@app.route('/change_password', methods=['GET'])
 @login_required
-def change_password_view(user_id):
+def change_password_view():
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
     return render_template('change_password.html')
 
 # パスワード変更処理 *****************************************************
-@app.route('/change_password/<user_id>', methods=['POST'])
+@app.route('/change_password', methods=['POST'])
 @login_required
-def change_password(user_id):
+def change_password():
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
     current_password = request.form.get('current_password')
     new_password = request.form.get('password')
@@ -286,7 +202,7 @@ def change_password(user_id):
     else:
         User.change_password(user_id, new_password)
         flash('ユーザ情報を更新しタラコ！')
-        return redirect(f'/profile/{user_id}')
+        return redirect(f'/profile')
     return render_template('change_password.html')
 
 

@@ -4,35 +4,26 @@
 {% block content %}
 <h1>ユーザープロフィール</h1>
 
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
 <div>
     <p>ユーザー名： <var>{{ current_user.user_name }}</var></p>
-    <form action="/change_uname/{{ current_user.user_id }}" method="GET">
+    <form action="/change_uname" method="GET">
     <input type="submit" value="変更">
     </form>
 </div>
 <div>
     <p>Eメールアドレス： <var>{{ current_user.email }}</var></p>
-    <form action="/change_email/{{ current_user.user_id }}" method="GET">
+    <form action="/change_email" method="GET">
         <input type="submit" value="変更">
     </form>
 </div>
 <div>
     <p>パスワード： ・・・・</p>
-    <form action="/change_password/{{ current_user.user_id }}" method="GET">
+    <form action="/change_password" method="GET">
         <input type="submit" value="変更">
     </form>
 </div>
 
-<form action="/delete_user/{{ current_user.user_id }}" method="GET">
+<form action="/delete_user" method="GET">
     <input type="submit" value="ユーザ登録解除">
 </form>
 <form action="/chats" method="GET">

@@ -13,7 +13,7 @@
 </ul>
 {% endif %}
 {% endwith %}
-<form action="/change_email/{{ current_user.user_id }}" method="POST">
+<form action="/change_email" method="POST">
 
     <div>
         <p>現在： <var>{{ current_user.email }}</var></p
@@ -24,7 +24,7 @@
         <input type="submit" value="更新"></button>
     </div>
 </form> 
-<form action="/profile/{{ current_user.user_id }}" method="GET">
+<form action="/profile" method="GET">
     <input type="submit" value="キャンセル">
 </form>
 {% endblock content %}

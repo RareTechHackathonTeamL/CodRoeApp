@@ -1,0 +1,33 @@
+{% extends 'util/base.html' %} {% block title %}
+<title>プロフィール</title>
+{% endblock title %}
+{% block content %}
+<h1>ユーザープロフィール</h1>
+
+<div>
+    <p>ユーザー名： <var>{{ current_user.user_name }}</var></p>
+    <form action="/change_uname" method="GET">
+    <input type="submit" value="変更">
+    </form>
+</div>
+<div>
+    <p>Eメールアドレス： <var>{{ current_user.email }}</var></p>
+    <form action="/change_email" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+<div>
+    <p>パスワード： ・・・・</p>
+    <form action="/change_password" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+
+<form action="/delete_user" method="GET">
+    <input type="submit" value="ユーザ登録解除">
+</form>
+<form action="/chats" method="GET">
+    <input type="submit" value="戻る">
+</form>
+
+{% endblock content %}

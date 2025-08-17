@@ -36,6 +36,28 @@ h1 {
 
 }
 
+/*「編集」*/
+.setting-button {
+
+    position: absolute;
+    right: 17px;
+
+    /* 余白指定 */
+    margin-top: 75px;
+
+}
+
+/*「ゴミ箱」*/
+.deletebox-button {
+
+    position: absolute;
+    right: 17px;
+
+    /* 余白指定 */
+    margin-top: 75px;
+
+}
+
 .header-image {
 
     height: 24px;

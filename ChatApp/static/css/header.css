@@ -15,6 +15,11 @@
     /* 矢印マークがチャット作成と同じ高さで配置される */
     align-items: center;
 
+    position: sticky;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+
 }
 
 /* 「チャット作成」 */

@@ -26,6 +26,9 @@ def create_app():
         'db_name':DB_DATABASE,
         })
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['ICON_FOLDER'] = 'static/img/user_icons'
+    app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024
+
 
     login_manager.init_app(app)
     db.init_app(app)

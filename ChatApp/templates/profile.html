@@ -4,6 +4,16 @@
 {% block content %}
 <h1>ユーザープロフィール</h1>
 
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
 <div>
     <p>ユーザー名： <var>{{ current_user.user_name }}</var></p>
     <form action="/change_uname" method="GET">
@@ -22,6 +32,16 @@
         <input type="submit" value="変更">
     </form>
 </div>
+
+<!-- 検証中　ここから -->
+<div>
+    <h1>アイコン画像</h1>
+    <img src={{ current_user.icon_img }} alt="アイコン画像" width="150" height="00">
+    <form action="/change_icon" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+      <!-- 検証中　ここまで -->
 
 <form action="/delete_user" method="GET">
     <input type="submit" value="ユーザ登録解除">

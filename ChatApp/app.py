@@ -2,8 +2,9 @@ from flask import render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from models import User, Chat, Message
 import pymysql
-import uuid
+import uuid, os
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 from __init__ import create_app, login_manager, db
 
@@ -13,6 +14,12 @@ app = create_app()
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+# アップロードファイル形式確認
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ルートパスへのアクセスをログインページへリダイレクト
 @app.route('/', methods=['GET'])
@@ -107,7 +114,8 @@ def delete_user():
 def profile_view():
     user_id = session.get('user_id')
     user = User.query.get(user_id)
-    # flash('user_id= ' + user_id )
+    user.icon_img = app.config['ICON_FOLDER']+'/'+str(user.icon_img)
+    flash('user_id= ' + user_id + ', icon_img= ' + user.icon_img)
     return render_template('profile.html')
 
 # ユーザ名変更画面表示 *****************************************************
@@ -205,6 +213,40 @@ def change_password():
         return redirect(f'/profile')
     return render_template('change_password.html')
 
+# アイコン変更画面表示 *****************************************************
+@app.route('/change_icon', methods=['GET'])
+@login_required
+def change_icon_view():
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    flash('user_id= ' + str(user_id))
+    return render_template('change_icon.html')
+
+# アイコン変更処理 *****************************************************
+@app.route('/change_icon', methods=['POST'])
+@login_required
+def change_icon():
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    file = request.files['icon_file']
+    filetype = request.files['icon_file'].content_type
+    origin_filename = file.filename
+
+    if 'icon_file' not in request.files:
+        flash('ファイルが選択されていません！')
+    elif origin_filename == '':
+        flash('ファイル名がありません！')
+    elif file and allowed_file(origin_filename):
+        secure_fname = secure_filename(origin_filename)
+        filename = str(user_id) + '__' + str(secure_fname)
+        file.save(os.path.join(app.config['ICON_FOLDER'], filename))
+        icon_img = filename
+        User.change_icon(user_id, icon_img)
+        flash( 'アイコン画像を変更しタラコ！' + str(filetype))
+        return redirect(url_for('profile_view'))
+    else:
+        flash('許可されていないファイルファイル形式です！') 
+    return render_template('change_icon.html')
 
 # チャット一覧表示
 @app.route('/chats', methods=['GET'])

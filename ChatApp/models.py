@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     user_name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    # icon_img = db.Column(db.String(255))
+    icon_img = db.Column(db.String(255))
     # company_id = db.Column(db.Integer, db.schema.ForeignKey("companies.id", name="?????", nullable=False))
     # nickname = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, nullable=False)
@@ -146,6 +146,22 @@ class User(UserMixin, db.Model):
             print(e)
         finally:
             db.session.close()
+
+    # ユーザアイコン変更**********************************************************
+    @classmethod
+    def change_icon(cls, user_id, icon_img):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.icon_img = icon_img
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    
     
     # 登録済みEメールアドレスの確認
     @classmethod

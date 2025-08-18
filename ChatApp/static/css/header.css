@@ -15,6 +15,11 @@
     /* 矢印マークがチャット作成と同じ高さで配置される */
     align-items: center;
 
+    position: sticky;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+
 }
 
 /* 「チャット作成」 */
@@ -32,6 +37,28 @@ h1 {
     left: 17px;
 
     /* 矢印上の余白指定 */
+    margin-top: 75px;
+
+}
+
+/*「編集」*/
+.setting-button {
+
+    position: absolute;
+    right: 17px;
+
+    /* 余白指定 */
+    margin-top: 75px;
+
+}
+
+/*「ゴミ箱」*/
+.deletebox-button {
+
+    position: absolute;
+    right: 17px;
+
+    /* 余白指定 */
     margin-top: 75px;
 
 }

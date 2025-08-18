@@ -15,16 +15,16 @@
         </form>
         
         {% if chat.user_id == user_id %}
-        <form action="/chat/{{ chat.id }}/detail" method="GET">
+        <form action="/chat/{{ chat.id }}/detail" method="GET" class="setting-button">
             <input type="image" src="{{ url_for('static', filename='img/setting.png') }}" alt="編集" class="header-image" />
         </form>
         {% endif %}
     </header>
 
     <!-- メイン -->
-    <main>
+    <main class="messages">
         {% for message in messages %}
-        <div class="message {{ 'right' if message.user_id == current_user.id else 'left' }}">
+        <div class="message {{ 'right' if message.user_id == user_id else 'left' }}">
             <div class="message-box">
                 <div class="message-content">
                     <div class="message-text">{{ message.message }}</div>

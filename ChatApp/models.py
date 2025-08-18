@@ -19,9 +19,30 @@ class User(UserMixin, db.Model):
 
     chat = db.relationship('Chat', backref='users')
     messages = db.relationship('Message', backref='users')
+    members = db.relationship('Member', backref='users')
 
     def get_id(self):
-        return self.user_id  
+        return self.user_id
+    
+    @classmethod
+    def get_user_id_by_user_name(cls, user_name):
+        try:
+            result = db.session.query(User).filter(User.user_name == user_name).first()
+            return result.user_id
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def get_user_name_by_user_id(cls, user_id):
+        try:
+            result = db.session.query(User).filter(User.user_id == user_id).first()
+            return result.user_name
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
 
 
 
@@ -39,11 +60,12 @@ class Chat(db.Model):
     latest_messages = db.Column(db.DateTime, nullable=False)    # チャット一覧で最新のメッセージが来ているものを上に表示させたいため、新規メッセージ・チャット新規作成のみでupdateする
 
     messages = db.relationship('Message', backref='chat')
+    members = db.relationship('Member', backref='chat')
 
     @classmethod
-    def create(cls, chat_id, user_id, chat_name, detail):
+    def create(cls, chat_id, user_id, chat_name, chat_type, detail):
         now = datetime.datetime.now()
-        chat_new = Chat(id=chat_id, user_id=user_id, chat_name=chat_name, chat_type=1, detail=detail, created_at=now, update_at=now, latest_messages=now)
+        chat_new = Chat(id=chat_id, user_id=user_id, chat_name=chat_name, chat_type=chat_type, detail=detail, created_at=now, update_at=now, latest_messages=now)
         try:
             db.session.add(chat_new)
             db.session.commit()
@@ -105,16 +127,39 @@ class Chat(db.Model):
     def find_by_chat_info(cls, reserch_chat_id):
         try:
             result = db.session.query(Chat).filter(Chat.id == reserch_chat_id).first()
-            return {"id": result.id, "user_id": result.user_id, "chat_name": result.chat_name, "detail": result.detail}
+            return {"id": result.id, "user_id": result.user_id, "chat_name": result.chat_name, "detail": result.detail, 'chat_type': result.chat_type}
         except Exception as e:
             print(e)
         finally:
             db.session.close()
 
     @classmethod
-    def get_chat_latest(cls):
+    def search_chat_exist(cls, user_id, friend_id, user_name, friend_name):
         try:
-            chats = db.session.query(Chat).order_by(Chat.latest_messages.desc()).all()
+            result1 = db.session.query(Chat).filter(Chat.chat_type == 2, Chat.user_id == user_id, Chat.chat_name == friend_name).first()
+            result2 = db.session.query(Chat).filter(Chat.chat_type == 2, Chat.user_id == friend_id, Chat.chat_name == user_name).first()
+            print('===============')    # TODO: 全部のパターンを確認してから消す
+            print(result1, result2)
+            if (result1 == None) and (result2 == None):
+                return False
+            else:
+                return True
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+
+    @classmethod
+    def get_chat_belong_to(cls, user_id):
+        try:
+            open_chats = db.session.query(Chat).filter(Chat.chat_type == 0).all()
+            group_chats = db.session.query(Chat, Member).join(Chat, Chat.id == Member.chat_id).filter(Chat.chat_type == 1, Member.user_id == user_id).all()
+            print('0==============')
+            print(open_chats)
+            print('1.=============')
+            print(group_chats)
+            chats = open_chats
             return chats
         except Exception as e:
             print(e)
@@ -171,3 +216,35 @@ class Message(db.Model):
             print(e)
         finally:
             db.session.close()  # TODO: flask_sqlalchemyでは必要ないというものを見た（公式ドキュメントには書いていない）必要か聞く
+
+# Memberテーブル
+class Member(db.Model):
+    __tablename__ = 'members'
+
+    id = db.Column(db.String(255), nullable=False, primary_key=True)
+    user_id = db.Column(db.ForeignKey('users.user_id'), nullable=False)
+    chat_id = db.Column(db.ForeignKey('chat.id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+    update_at = db.Column(db.DateTime)
+
+    @classmethod
+    def search_in_chat(cls, chat_id, user_id):
+        try:
+            chat_in = db.session.query(Member).filter(Member.chat_id == chat_id, Member.user_id == user_id).first()
+            return chat_in
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def add_member(cls, id, chat_id, user_id):
+        try:
+            now = datetime.datetime.now()
+            insert_member = Member(id=id, chat_id=chat_id, user_id=user_id, created_at=now)
+            db.session.add(insert_member)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()

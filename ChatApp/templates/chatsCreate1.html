@@ -11,9 +11,16 @@
     <h3>{{ error }}</h3>
 </div>
 {% endif %}
+<!-- TODO: プライベート以外を選択したら入力フォームが出てくるようにする -->
 <form action="/chat/create" method="post">
+    <input type="radio" id="open" name="chat_type" value="open"><label for="open">オープンチャット</label><br />
+    <input type="radio" id="group" name="chat_type" value="group"><label for="group">グループチャット</label><br />
+    <input type="radio" id="private" name="chat_type" value="private"><label for="private">プライベートチャット</label><br />
     <input name="chat_name" placeholder="name">
-    <input name="detail">
+    <input name="detail"><br />
     <button type="submmit">チャット作成</button>
+</form>
+<form action="/test" method='get'>
+    <input type="submit" value="getボタン">
 </form>
 {% endblock content %}

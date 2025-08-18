@@ -304,8 +304,8 @@ def update_chat(chat_id):
         return render_template('ChatsUpdate.html', chat=chat_info)
     elif chat_info != None:
         Chat.update(chat_id, new_name, new_detail)
-        message = 'チャット情報が更新されました！'
-    return render_template('ChatsUpdate.html', chat=chat_info, message=message)
+        flash('チャット情報が更新されました！')
+    return redirect(f'/chat/{ chat_id }/detail')
 
 # チャット削除
 @app.route('/chat/delete/<chat_id>', methods=['POST'])

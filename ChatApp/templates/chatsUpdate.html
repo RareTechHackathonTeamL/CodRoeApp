@@ -30,11 +30,15 @@
                     <h3>{{ error }}</h3>
                 </div>
                 {% endif %}
-                {% if message %}
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
                 <div>
                     <h3>{{ message }}</h3>
                 </div>
+                {% endfor %}
                 {% endif %}
+                {% endwith %}
                
 
                 <div class="input-box-child">

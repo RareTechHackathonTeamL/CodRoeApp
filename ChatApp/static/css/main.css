@@ -1,16 +1,17 @@
  /*メインCSS*/
+ .main-login {
+     background-color: rgb(247, 202, 224);
+     height: 732px;
+
+ }
+
  .main {
      background-color: rgb(255, 245, 228);
      height: 732px;
 
  }
 
- .main-login {
-     background-color: rgb(247, 202, 224);
 
-
-
- }
 
  /*ヘッダー*/
  /*ヘッダー全体のCSS*/
@@ -24,9 +25,9 @@
 
  }
 
- .footer-login{
-    color: rgb(107, 114, 128);
-    font-size: 12px;
+ .footer-login {
+     color: rgb(107, 114, 128);
+     font-size: 12px;
  }
 
 
@@ -57,7 +58,6 @@
  /*タイトルロゴのサイズ変更*/
  .title-logo {
      width: 276px;
-     height: 62px;
      padding-top: 40px;
  }
 

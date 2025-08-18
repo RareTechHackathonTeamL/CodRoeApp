@@ -12,14 +12,6 @@
 </header>
 <!----- ヘッダー END ----->
 
-{% with messages = get_flashed_messages() %} 
-{% if messages %}
-<ul>
-  {% for message in messages %}
-  <li>{{ message }}</li>
-  {% endfor %}
-</ul>
-{% endif %} {% endwith %}
 
 <!----- メインコンテンツ ----->
 <main class="main">
@@ -36,13 +28,7 @@
         <div class="font">メールアドレス</div>
 
         <div class="search-box1">
-          <input
-            type="email"
-            name="email"
-            value=""
-            placeholder="   xxxx@example.com"
-            class="text-box"
-          />
+          <input type="email" name="email" value="" placeholder="   xxxx@example.com" class="text-box" />
         </div>
       </div>
 
@@ -57,12 +43,7 @@
       <div class="input-box-autu">
         <div class="font">パスワード（確認）</div>
         <div class="search-box2">
-          <input
-            type="password"
-            name="password-confirmation"
-            value=""
-            class="text-box"
-          />
+          <input type="password" name="password-confirmation" value="" class="text-box" />
         </div>
       </div>
 

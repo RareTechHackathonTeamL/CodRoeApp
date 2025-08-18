@@ -16,14 +16,13 @@
 <form action="/change_email" method="POST">
 
     <div>
-        <p>現在： <var>{{ current_user.email }}</var></p
-        <label for="">新規</label>
+        <p>現在： <var>{{ current_user.email }}</var></p <label for="">新規</label>
         <input type="text" name="email">
     </div>
     <div>
         <input type="submit" value="更新"></button>
     </div>
-</form> 
+</form>
 <form action="/profile" method="GET">
     <input type="submit" value="キャンセル">
 </form>

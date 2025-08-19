@@ -14,6 +14,16 @@
 {% endif %}
 {% endwith %}
 
+<!--  -->
+<div>
+    <p>カレンとユーザーID： <var>{{ current_user.user_id }}</var></p>
+    <form action="/change_uname" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+<!--  -->
+
+
 <div>
     <p>ユーザー名： <var>{{ current_user.user_name }}</var></p>
     <form action="/change_uname" method="GET">

@@ -27,11 +27,11 @@ class User(UserMixin, db.Model):
 
     # ユーザ登録
     @classmethod
-    def regist(cls, user_name, email, password):
+    def regist(cls, user_name, email, password, icon_img):
         user_id=uuid.uuid4()
         now = datetime.datetime.now()
         password = generate_password_hash(password)
-        new_user = User(user_id=user_id, user_name=user_name, email=email, password=password, created_at=now)
+        new_user = User(user_id=user_id, user_name=user_name, email=email, password=password, icon_img = icon_img, created_at=now)
         try:
             db.session.add(new_user)
             db.session.commit()

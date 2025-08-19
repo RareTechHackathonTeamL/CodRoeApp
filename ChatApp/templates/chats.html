@@ -2,6 +2,18 @@
 <title>チャット一覧</title>
 {% endblock title %} {% block content %}
 
+<!-- ロベ検証用 ここから-->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<!-- ロベ検証用　ここまで -->
+
 <body class="body">
   <header class="header">
     <h1>チャット一覧</h1>

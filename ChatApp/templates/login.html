@@ -5,17 +5,18 @@
 {% endblock title %}
 
 {% block content %}
+<main class="main-login">
 
-<body class="loguin">
-    <!----- ヘッダー ----->
+    <body class="loguin">
+        <!----- ヘッダー ----->
 
-    <header class="header-login">
-        <div class="center">
-            <img src="../../static/img/main-character.png" class="tarako">
-        </div>
-    </header>
-    <!----- ヘッダー END ----->
-
+        <header class="header-login">
+            <div class="center">
+                <img src="../../static/img/main-character.png" class="tarako">
+            </div>
+        </header>
+        <!----- ヘッダー END ----->
+        <!----- いらなくね？
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <ul>
@@ -25,47 +26,47 @@
 </ul>
 {% endif %}
 {% endwith %}
-
-    <!----- メインコンテンツ ----->
-    <main class="main-login">
-        <div class="container">
-            <img src="../../static/img/title-logo.png" class="title-logo">
-            <h2>明太子好きのためのコミュニティ</h2>
-        </div>
-        <div class="container">
-            <div class="input-form">
-                <form action="/login" method="POST">
-
-                    <div class="input-box-login">
-                        <div class="font">
-                            メールアドレス
-                        </div>
-
-                        <div class="search-box1">
-                            <input type="email" name="email" value="" placeholder="   xxxx@example.com"
-                                class="text-box">
-                        </div>
+ ----->
+        <!----- メインコンテンツ ----->
+        <main class="main-login">
+            <div class="container">
+                <img src="../../static/img/title-logo.png" class="title-logo">
+                <h2>明太子好きのためのコミュニティ</h2>
+            </div>
+            <div class="container">
+                <div class="input-form">
+                    <form action="/login" method="POST">
 
                         <div class="input-box-login">
                             <div class="font">
-                                パスワード
+                                メールアドレス
                             </div>
-                            <div class="search-box2">
-                                <input type="password" name="password" value="" class="text-box">
-                            </div>
-                        </div>
-                        <p><input type="submit" value="ログイン" class="main-button-login"></p>
-                </form>
 
-                <div class="container">
-                    <div class="footer-login">
-                        アカウントをお持ちでない方は
-                            <a href="/register" class="btn" >
-                             こちら
+                            <div class="search-box1">
+                                <input type="email" name="email" value="" placeholder="   xxxx@example.com"
+                                    class="text-box">
+                            </div>
+
+                            <div class="input-box-login">
+                                <div class="font">
+                                    パスワード
+                                </div>
+                                <div class="search-box2">
+                                    <input type="password" name="password" value="" class="text-box">
+                                </div>
+                            </div>
+                            <p><input type="submit" value="ログイン" class="main-button-login"></p>
+                    </form>
+
+                    <div class="container">
+                        <div class="footer-login">
+                            アカウントをお持ちでない方は
+                            <a href="/register" class="btn">
+                                こちら
                             </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-    {% endblock content %}
+        </main>
+        {% endblock content %}

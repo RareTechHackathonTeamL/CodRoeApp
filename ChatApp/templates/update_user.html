@@ -20,8 +20,8 @@
         <!-- <input type="text" name="user_name" value={{ current_user.user_name }}> -->
         <!-- <input type="text" name="user_name"></input> -->
         <form action="/change_uname/{{ current_user.user_id }}" method="GET">
-        <input type="submit" value="変更">
-</form>
+            <input type="submit" value="変更">
+        </form>
     </div>
     <div>
         <p>Eメールアドレス： <var>{{ current_user.email }}</var></p>
@@ -41,18 +41,18 @@
         <!-- <input type="password" name="password"> -->
     </div>
     <!-- <div> -->
-        <!-- <label for="">確認用パスワード</label> -->
-        <!-- <input type="password" name="password-confirmation"> -->
+    <!-- <label for="">確認用パスワード</label> -->
+    <!-- <input type="password" name="password-confirmation"> -->
     <!-- </div> -->
     <!-- <div> -->
-        <!-- <button type="submit">更新</button> -->
+    <!-- <button type="submit">更新</button> -->
     <!-- </div> -->
-<!-- </form> -->
-<form action="/delete_user/{{ current_user.user_id }}" method="GET">
-    <input type="submit" value="ユーザ登録解除">
-</form>
-<form action="/chats" method="GET">
-    <input type="submit" value="戻る">
-</form>
+    <!-- </form> -->
+    <form action="/delete_user/{{ current_user.user_id }}" method="GET">
+        <input type="submit" value="ユーザ登録解除">
+    </form>
+    <form action="/chats" method="GET">
+        <input type="submit" value="戻る">
+    </form>
 
-{% endblock content %}
+    {% endblock content %}

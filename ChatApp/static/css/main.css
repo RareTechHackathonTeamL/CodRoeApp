@@ -1,9 +1,5 @@
- 
-
  .main-login {
-     background-color: rgb(247, 202, 224);
-
-
+     background-color: rgb(255, 227, 225);
 
  }
 
@@ -19,9 +15,9 @@
 
  }
 
- .footer-login{
-    color: rgb(107, 114, 128);
-    font-size: 12px;
+ .footer-login {
+     color: rgb(107, 114, 128);
+     font-size: 12px;
  }
 
 

@@ -1,34 +1,7 @@
 {% extends 'util/base.html' %} {% block title %}
 <title>プロフィール</title>
 {% endblock title %} {% block content %}
-<!----- ヘッダー ----->
-
-<header class="header">
-  <h1>プロフィール</h1>
-  <form action="/chats" method="GET" class="back-button">
-    <input
-      type="image"
-      src="{{ url_for('static', filename='img/left.png') }}"
-      alt="戻る"
-      class="header-image"
-    />
-  </form>
-
-  <!-- JavaScript？ -->
-  <form
-    action="/chat/delete/{{ chat.id }}"
-    method="POST"
-    class="deletebox-button"
-  >
-    <input
-      type="image"
-      src="{{ url_for('static', filename='img/delete.png') }}"
-      alt="削除"
-      class="header-image"
-    />
-  </form>
-</header>
-<!----- ヘッダー END ----->
+<h1>ユーザープロフィール</h1>
 
 {% with messages = get_flashed_messages() %} {% if messages %}
 <ul>
@@ -38,45 +11,24 @@
 </ul>
 {% endif %} {% endwith %}
 
-<!----- メインコンテンツ ----->
-<main class="main">
-  <div class="input-form">
-    <form action="/register" method="POST">
-      <div class="input-box-autu">
-        <div class="font">ユーザー名</div>
-        <var>{{ current_user.user_name }}</var>
-        <div class="search-box">
-          <input type="text" name="user_name" value="変更" class="text-box" />
-        </div>
-      </div>
-    </form>
-
-    <form action="/change_email" method="GET">
-      <div class="input-box-autu">
-        <div class="font">メールアドレス</div>
-        <var>{{ current_user.email }}</var>
-        <div class="search-box1">
-          <input
-            type="email"
-            name="email"
-            value="変更"
-            placeholder="   xxxx@example.com"
-            class="text-box"
-          />
-        </div>
-      </div>
-    </form>
-
-    <form action="/change_password" method="GET">
-      <div class="input-box-autu">
-        <div class="font">パスワード</div>
-        <div class="search-box2">
-          <input type="password" name="password" value="" class="text-box" />
-        </div>
-      </div>
-    </form>
-  </div>
-</main>
+<div>
+  <p>ユーザー名： <var>{{ current_user.user_name }}</var></p>
+  <form action="/change_uname" method="GET">
+    <input type="submit" value="変更" />
+  </form>
+</div>
+<div>
+  <p>Eメールアドレス： <var>{{ current_user.email }}</var></p>
+  <form action="/change_email" method="GET">
+    <input type="submit" value="変更" />
+  </form>
+</div>
+<div>
+  <p>パスワード： ・・・・</p>
+  <form action="/change_password" method="GET">
+    <input type="submit" value="変更" />
+  </form>
+</div>
 
 <!-- 検証中　ここから -->
 <div>

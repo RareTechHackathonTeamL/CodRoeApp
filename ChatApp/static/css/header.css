@@ -63,6 +63,17 @@ h1 {
 
 }
 
+/*「チャット作成」*/
+.chatcreation-button {
+
+    position: absolute;
+    right: 17px;
+
+    /* 余白指定 */
+    margin-top: 75px;
+
+}
+
 .header-image {
 
     height: 24px;

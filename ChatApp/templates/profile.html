@@ -17,7 +17,7 @@
 <div>
     <p>ユーザー名： <var>{{ current_user.user_name }}</var></p>
     <form action="/change_uname" method="GET">
-    <input type="submit" value="変更">
+        <input type="submit" value="変更">
     </form>
 </div>
 <div>
@@ -41,7 +41,7 @@
         <input type="submit" value="変更">
     </form>
 </div>
-      <!-- 検証中　ここまで -->
+<!-- 検証中　ここまで -->
 
 <form action="/delete_user" method="GET">
     <input type="submit" value="ユーザ登録解除">
@@ -49,5 +49,56 @@
 <form action="/chats" method="GET">
     <input type="submit" value="戻る">
 </form>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ユーザー削除のJS関係　ここから -->
+ここは吉田将貴がテストしております<br>
+
+<!-- 起動ボタン -->
+<button class="btn" onclick="openModal()">アカウント削除</button>
+
+<!-- モーダル -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img src="js-userdelet.png" class="js-userdele-img" alt="注意">
+        <div class="font">アカウントを削除しますか？</div>
+        <!-- アカウント削除ボタン -->
+        <form action="/delete_user" method="POST">
+            <input type="submit" class="js-btn delete" value="はい">
+        </form>
+        <!-- キャンセルボタン -->
+        <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
+
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById("myModal").style.display = "flex";
+    }
+    function closeModal() {
+        document.getElementById("myModal").style.display = "none";
+    }
+
+    // 背景クリックで閉じる
+    window.onclick = function (event) {
+        const modal = document.getElementById("myModal");
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+<!-- ユーザー削除のJS関係　ここまで -->
 
 {% endblock content %}

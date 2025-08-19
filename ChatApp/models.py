@@ -136,10 +136,8 @@ class Chat(db.Model):
     @classmethod
     def search_chat_exist(cls, user_id, friend_id, user_name, friend_name):
         try:
-            result1 = db.session.query(Chat).filter(Chat.chat_type == 2, Chat.user_id == user_id, Chat.chat_name == friend_name).first()
-            result2 = db.session.query(Chat).filter(Chat.chat_type == 2, Chat.user_id == friend_id, Chat.chat_name == user_name).first()
-            print('===============')    # TODO: 全部のパターンを確認してから消す
-            print(result1, result2)
+            result1 = db.session.query(Chat).filter(Chat.chat_type == 2, Chat.user_id == user_id, Chat.chat_name == f'{friend_name}と{user_name}のプライベートチャット').first()
+            result2 = db.session.query(Chat).filter(Chat.chat_type == 2, Chat.user_id == friend_id, Chat.chat_name == f'{user_name}と{friend_name}のプライベートチャット').first()
             if (result1 == None) and (result2 == None):
                 return False
             else:
@@ -154,12 +152,11 @@ class Chat(db.Model):
     def get_chat_belong_to(cls, user_id):
         try:
             open_chats = db.session.query(Chat).filter(Chat.chat_type == 0).all()
-            group_chats = db.session.query(Chat, Member).join(Chat, Chat.id == Member.chat_id).filter(Chat.chat_type == 1, Member.user_id == user_id).all()
-            print('0==============')
-            print(open_chats)
-            print('1.=============')
-            print(group_chats)
-            chats = open_chats
+            group_chats = db.session.query(Chat, Member).outerjoin(Member, Chat.id == Member.chat_id).filter(Chat.chat_type == 1, Member.user_id == user_id).all()
+            private_chats = db.session.query(Chat, Member).outerjoin(Member, Chat.id == Member.chat_id).filter(Chat.chat_type == 2, Member.user_id == user_id).all()
+            groups = [g[0] for g in group_chats]
+            privates = [g[0] for g in private_chats]
+            chats = open_chats + groups + privates
             return chats
         except Exception as e:
             print(e)

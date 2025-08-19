@@ -124,7 +124,7 @@ def create_chat():
 
     new_chat_name = request.form.get('chat_name')
     if new_chat_name == '':
-        return redirect(url_for('chat_create_open_view'))
+        return redirect(url_for('chat_create_view'))
 
     # オープン・グループチャットの場合
     chat_exist = Chat.find_by_name(new_chat_name)
@@ -140,6 +140,8 @@ def create_chat():
         elif chat_type == 'group':
             chat_type = 1
             Chat.create(chat_id, user_id, new_chat_name, chat_type, chat_detail)
+            id = uuid.uuid4()
+            Member.add_member(id, chat_id, user_id)
             return redirect(f'/chat/{ chat_id }/add_member')
     else:
         error = 'すでに同じ名前のチャンネルが存在しています'
@@ -204,11 +206,10 @@ def chat_add_member(chat_id):
     results = []
     for friend in friend_list:
         # 追加するメンバーの名前を検索
-        friend_info = User.get_user_info_by_user_name(friend)
-        if friend_info['user_id'] == None:
+        friend_id = User.get_user_id_by_user_name(friend)
+        if friend_id == None:
             results.append(f'{friend}さんが見つかりませんでした')
         # メンバーがそのチャットに参加しているか検索
-        friend_id = friend_info['user_id']
         chat_in = Member.search_in_chat(chat_id, friend_id)
         if chat_in != None:
             results.append(f'{friend}さんは既にチャットに参加しています')
@@ -216,6 +217,7 @@ def chat_add_member(chat_id):
         id = uuid.uuid4()
         Member.add_member(id, chat_id, friend_id)
     if results == None:
+        flash('メンバー追加できました！')
         return redirect(f'/chat/{chat_id}/messages')
     else:
         # エラーが起こった場合があるときはグループメンバー追加画面に戻る
@@ -242,13 +244,16 @@ def chat_select_private():
     # 自分と相手とのチャットがすでにできていないか検索
     user_id = current_user.get_id()
     user_name = User.get_user_name_by_user_id(user_id)
+    if friend_name == user_name:
+        flash('友達を入力してください')
+        return redirect(url_for('chat_select_private'))
     chat_exist = Chat.search_chat_exist(user_id, friend_id, user_name, friend_name)
     if chat_exist == True:
         flash('入力された友達とのチャットは存在します')
         return redirect(url_for('chat_select_private'))
     # チャットテーブル作成
     chat_id = uuid.uuid4()
-    new_chat_name = friend_name
+    new_chat_name = f'{friend_name}と{user_name}のプライベートチャット'
     chat_type = 2
     chat_detail = ''
     Chat.create(chat_id, user_id, new_chat_name, chat_type, chat_detail)

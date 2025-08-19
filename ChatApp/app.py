@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
-from models import User, Chat, Message
+from models import User, Chat, Message, Stamp
 import pymysql
 import uuid, os
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -327,19 +327,24 @@ def messages_view(chat_id):
     user_id = current_user.get_id()
     chat_room = Chat.find_by_chat_info(chat_id)
     messages = Message.get_messages(chat_id)
+    stamps = Stamp.get_stamps()
 
-    return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages)
+    return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps)
 
 # メッセージ作成
 @app.route('/chat/<chat_id>/messages', methods=['POST'])
 @login_required
 def create_message(chat_id):
     message = request.form.get('message')
+    stamp = request.form.get('stamp')
     id = uuid.uuid4()
     user_id = current_user.get_id() # TODO:session.get('id')では行かない理由を調べる・聞く
     # TODO: 追加機能・メッセージではなくスタンプの場合用
     if message:
         Message.create(id, user_id, chat_id, message)
+        Chat.update_latest(chat_id)
+    elif stamp:
+        Message.send_stamp(id, user_id, chat_id, stamp)
         Chat.update_latest(chat_id)
     return redirect(f'/chat/{chat_id}/messages')
 

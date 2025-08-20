@@ -88,23 +88,12 @@ def register_process():
         return redirect(url_for('chats_view'))
     return render_template('register.html')
 
-# テスト実装    # TODO:確認したら消す
-@app.route('/test', methods=['GET'])
-@login_required
-def test():
-    user_id = current_user.get_id()
-    chats = Chat.get_chat_belong_to(user_id)
-    return redirect(url_for('chat_create_view'))
-
 # チャット一覧遷移
 @app.route('/chats', methods=['GET'])
 @login_required
 def chats_view():
     user_id = current_user.get_id()
     chats = Chat.get_chat_belong_to(user_id)
-    # TODO: chat_type==0,else:自分のidが入っているチャット（メンバー）をとってくる
-    # chat_type==0の時は全クエリ取得,chat_type==1,2の時は、メンバーDBに自分のidが入っているクエリを取得
-    # chats = Chat.query.filter_by(Chat.user_id == current_user.get_id()).order_by(Chat.created_at).all()
     return render_template('chats.html', chats=chats)
 
 # チャット作成画面遷移

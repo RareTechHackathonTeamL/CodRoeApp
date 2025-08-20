@@ -1,17 +1,18 @@
-from sqlalchemy import Column, String, Integer, DateTime
-from flask_login import UserMixin
+from sqlalchemy import Column, String, Integer, DateTime, update
+from flask_login import UserMixin, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
+import uuid
 from __init__ import db
 
-
+# Userテーブル
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.String(255), primary_key=True)
     user_name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    # icon_img = db.Column(db.String(255))
+    icon_img = db.Column(db.String(255))
     # company_id = db.Column(db.Integer, db.schema.ForeignKey("companies.id", name="?????", nullable=False))
     # nickname = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, nullable=False)
@@ -21,6 +22,7 @@ class User(UserMixin, db.Model):
     messages = db.relationship('Message', backref='users')
     members = db.relationship('Member', backref='users')
 
+    # ユーザーIDの取得
     def get_id(self):
         return self.user_id
     
@@ -44,6 +46,165 @@ class User(UserMixin, db.Model):
         finally:
             db.session.close()
 
+    # ユーザ登録
+    @classmethod
+    def regist(cls, user_name, email, password, icon_img):
+        user_id=uuid.uuid4()
+        now = datetime.datetime.now()
+        password = generate_password_hash(password)
+        new_user = User(user_id=user_id, user_name=user_name, email=email, password=password, icon_img = icon_img, created_at=now)
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            login_user(new_user)
+            db.session.close()
+
+    # ユーザ情報更新(パスワード更新なし)
+    @classmethod
+    def update_nopass(cls, user_id, user_name, email):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.user_name = user_name
+        user.email = email
+        user.update_at = datetime.datetime.now()
+        try:
+            # db.session.merge(user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    # ユーザ情報更新(パスワード更新あり)
+    @classmethod
+    def update_user(cls, user_id, user_name, email, password):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.user_name = user_name
+        user.email = email
+        user.password = generate_password_hash(password)
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.merge(user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    #  ユーザ情報更新(パスワード更新のみ)
+    @classmethod
+    def update_password(cls, user_id, password):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.password = generate_password_hash(password)
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    # ユーザ情報削除
+    @classmethod
+    def delete_user(cls, user_id):
+        # user = db.session.query(User).filter(User.user_id == user_id).first()
+        # now = datetime.datetime.now()
+        try:
+            # with db.session.begin(subtransactions=True):
+            db.session.query(User).filter(User.user_id == user_id).delete()
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            # db.session.rollback()
+            # raise
+        finally:
+            db.session.close()
+
+    # ユーザ名変更**********************************************************
+    @classmethod
+    def change_uname(cls, user_id, user_name):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.user_name = user_name
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    # Eメールアドレス変更**********************************************************
+    @classmethod
+    def change_email(cls, user_id, email):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.email = email
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+     # パスワード変更**********************************************************
+    @classmethod
+    def change_password(cls, user_id, password):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.password = generate_password_hash(password)
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    # ユーザアイコン変更**********************************************************
+    @classmethod
+    def change_icon(cls, user_id, icon_img):
+        user = db.session.query(User).filter(User.user_id == user_id).first()
+        user.icon_img = icon_img
+        user.update_at = datetime.datetime.now()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    
+    
+    # 登録済みEメールアドレスの確認
+    @classmethod
+    def find_by_email(cls, reserch_email):
+        try:
+            result = db.session.query(User).filter(User.email == reserch_email).first()
+            return result
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    # 登録済みユーザ名の確認
+    @classmethod
+    def find_by_uname(cls, reserch_name):
+        try:
+            result = db.session.query(User).filter(User.user_name == reserch_name).first()
+            return result
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()  
 
 
 # Chatテーブル
@@ -172,7 +333,7 @@ class Message(db.Model):
     user_id = db.Column(db.String(255), db.ForeignKey('users.user_id'), nullable=False)
     chat_id = db.Column(db.String(255), db.ForeignKey('chat.id'), nullable=False)
     message = db.Column(db.Text)
-    # stamp_id = db.Column(db.String(255))
+    stamp_id = db.Column(db.ForeignKey('stamps.id'))
     created_at = db.Column(db.DateTime, nullable=False)
     update_at = db.Column(db.DateTime)
 
@@ -180,6 +341,18 @@ class Message(db.Model):
     def create(cls, id, uid, cid, message):
         now = datetime.datetime.now()
         insert_message = Message(id=id, user_id=uid, chat_id=cid, message=message, created_at=now)
+        try:
+            db.session.add(insert_message)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def send_stamp(cls, id, uid, cid, stamp_id):
+        now = datetime.datetime.now()
+        insert_message = Message(id=id, user_id=uid, chat_id=cid, stamp_id=stamp_id, created_at=now)
         try:
             db.session.add(insert_message)
             db.session.commit()
@@ -201,13 +374,25 @@ class Message(db.Model):
     @classmethod
     def get_messages(cls, cid):
         try:
-            messages = db.session.query(Message).filter(Message.chat_id == cid).order_by(Message.created_at).all()
-            result = [{
-                'id': m.id,
-                'user_id': m.user_id,
-                'message': m.message,
-                'created_at': m.created_at,
-                } for m in messages]
+            messages = db.session.query(Message, Stamp).outerjoin(Stamp, Message.stamp_id == Stamp.id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
+            result = []
+            for message in messages:
+                if message[1] == None:
+                    result.append({
+                    'id': message[0].id,
+                    'user_id': message[0].user_id,
+                    'message': message[0].message,
+                    'created_at': message[0].created_at,
+                    })
+                else:
+                    result.append({
+                    'id': message[0].id,
+                    'user_id': message[0].user_id,
+                    'message': message[0].message,
+                    'created_at': message[0].created_at,
+                    'title': message[1].title,
+                    'stamp_path': message[1].stamp_path,
+                    })
             return result
         except Exception as e:
             print(e)
@@ -241,6 +426,36 @@ class Member(db.Model):
             insert_member = Member(id=id, chat_id=chat_id, user_id=user_id, created_at=now)
             db.session.add(insert_member)
             db.session.commit()
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+# Stampテーブル
+class Stamp(db.Model):
+    __tablename__ = 'stamps'
+
+    id = db.Column(db.String(255), nullable=False, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    stamp_path = db.Column(db.String(255), nullable=False)
+    # move_stamp = db.Column(Boolean)
+    created_at = db.Column(db.DateTime, nullable=False)
+    update_at = db.Column(db.DateTime)
+
+    messages = db.relationship('Message', backref='stamps')
+
+    @classmethod
+    def get_stamps(cls):
+        try:
+            stamps = db.session.query(Stamp).all()
+            result = [{
+                'id': s.id,
+                'title': s.title,
+                'stamp_path': s.stamp_path,
+                'created_at': s.created_at,
+                'update_at': s.update_at,
+            } for s in stamps]
+            return result
         except Exception as e:
             print(e)
         finally:

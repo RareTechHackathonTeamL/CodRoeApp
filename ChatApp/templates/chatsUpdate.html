@@ -2,26 +2,94 @@
 <title>Update Chat</title>
 {% endblock title %}
 {% block content %}
-<div>チャット編集</div>
-<form action="/chat/{{ chat.id }}/messages" method="GET">
-    <input type="submit" value="チャットへ">
-</form>
-{% if error %}
-<div>
-    <h3>{{ error }}</h3>
-</div>
-{% endif %}
-{% if message %}
-<div>
-    <h3>{{ message }}</h3>
-</div>
-{% endif %}
-<form action="/chat/update/{{ chat.id }}" method="post">
-    <input name="chat_name" placeholder="name">
-    <input name="detail">
-    <button type="submmit">チャット更新</button>
-</form>
-<form action="/chat/delete/{{ chat.id }}" method="POST">
-    <input type="submit" value="削除">
-</form>
-{% endblock content %}
+
+
+
+<body class="body">
+    <!----- ヘッダー ----->
+    <header class="header">
+        <h1>{{ chat.chat_name }}</h1>
+        <form action="/chats" method="GET" class="back-button">
+            <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
+        </form>
+        
+        <form action="/chat/delete/{{ chat.id }}" method="POST" class="deletebox-button">
+            <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
+        </form>
+    
+    </header>
+    <!----- ヘッダーEND ----->
+
+    <!-- メイン -->
+    <main class="main">
+        <form action="/chat/update/{{chat.id}}" method="post">
+            <div class="input-box-list">
+
+                {% if error %}
+                <div>
+                    <h3>{{ error }}</h3>
+                </div>
+                {% endif %}
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                <div>
+                    <h3>{{ message }}</h3>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+               
+
+                <div class="input-box-child">
+                    <div>チャット名</div>
+                    <input type="text" name="chat_name" value="{{chat.chat_name}}" class="chat-name" />
+                </div>
+
+                <div class="input-box-child" >
+                    <div class="chatexplanation-label">説明</div>
+                    <input type="text" name="detail" value="" class="chatexplanation" />
+                </div>
+
+                
+                <input name="chat_name" placeholder="name" type="submit" value="チャット更新" class="main-button">
+
+
+            </div>
+        </form>
+    </main>
+    <!-- メインEND -->
+
+    <!-- フッター -->
+    <footer>
+        <div class="footer-button">
+            <div class="footer-item">
+                <!-- src="chatcreate(2).png"を変更-->
+                <!-- chat-create-create.pngを変更-->
+                <img src="{{ url_for('static', filename='img/chat-create-create.png') }}" alt="チャット作成" class="footer-image" />
+                チャット作成
+            </div>
+        </div>
+
+        <a href="/chats" class="footer-button">
+            <div class="footer-item">
+                <!-- src="chatlist(2).png"を変更-->
+                <!-- chat-list-create.pngを変更-->
+                <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
+                チャット一覧
+            </div>
+        </a>
+
+        <a href="/logout" class="footer-button">
+            <div class="footer-item">
+                <!-- src="logout(2).png"を変更-->
+                <!-- logout-create.pngを変更-->
+                <img src="{{ url_for('static', filename='img/logout-create.png') }}" alt="ログアウト" class="footer-image" />
+                ログアウト
+            </div>
+        </a>
+    </footer>
+    <!-- フッターEND -->
+
+  {% endblock content %}
+</body>

@@ -1,0 +1,34 @@
+{% extends 'util/base.html' %} {% block title %}
+<title>アイコン変更</title>
+{% endblock title %}
+{% block content %}
+<h1>アイコン変更</h1>
+
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<div>
+    <h1>アイコン画像変更</h1>
+    <p>ファイル形式は、'png', 'jpg', 'jpeg', 'gif'、<BR>
+    ファイルサイズは、４MBまでアップロード可能です。
+    </p>
+    <form action="change_icon" method="POST" enctype="multipart/form-data">
+        <input type="file" name="icon_file">
+        <input type="submit" value="アップロード">
+    </form>
+    <br>
+    <form action="/profile" method="GET">
+    <input type="submit" value="キャンセル">
+    </form>
+
+</div>
+
+{% endblock content %}

@@ -18,18 +18,19 @@
   <main class="main">
     <form action="/chat/create" method="post">
       <div class="input-box-list">
-        <div>チャット名</div>
 
-        <input type="text" name="chat_name" value="" class="chat-name" />
+        <div class="input-box-child">
+          <div>チャット名</div>
+          <input type="text" name="chat_name" value="" class="chat-name" />
+        </div>
 
-        <div>説明</div>
+        <div class="input-box-child" >
+          <div class="chatexplanation-label">説明</div>
+          <input type="text" name="name" value="" class="chatexplanation" />
+        </div>
 
-        <input type="text" name="name" value="" class="chatexplanation" />
+      <input type="submit" value="登録" class="main-button" />
 
-        <a href="chatlist.html" class="main-button">
-          <!----- main-buttonをケバブケースに統一する為変更----->
-          <input type="submit" value="登録" class="main-button" />
-        </a>
       </div>
     </form>
   </main>
@@ -37,20 +38,20 @@
 
   <!-- フッター -->
   <footer>
-    <a href="top.html" class="footer-button">
+    <div class="footer-button">
       <div class="footer-item">
         <!-- src="chatcreate(2).png"を変更-->
         <!-- chat-create-create.pngを変更-->
-        <img src="../static/img/chat-create-create.png" alt="チャット作成" class="footer-image" />
+        <img src="{{ url_for('static', filename='img/chat-create-create.png') }}" alt="チャット作成" class="footer-image" />
         チャット作成
       </div>
-    </a>
+    </div>
 
-    <a href="/register" class="footer-button">
+    <a href="/chats" class="footer-button">
       <div class="footer-item">
         <!-- src="chatlist(2).png"を変更-->
         <!-- chat-list-create.pngを変更-->
-        <img src="../static/img/chat-list-create.png" alt="チャット一覧" class="footer-image" />
+        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
         チャット一覧
       </div>
     </a>
@@ -59,7 +60,7 @@
       <div class="footer-item">
         <!-- src="logout(2).png"を変更-->
         <!-- logout-create.pngを変更-->
-        <img src="../static/img/logout-create.png" alt="ログアウト" class="footer-image" />
+         <img src="{{ url_for('static', filename='img/logout-create.png') }}" alt="ログアウト" class="footer-image" />
         ログアウト
       </div>
     </a>

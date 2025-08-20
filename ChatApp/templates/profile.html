@@ -1,0 +1,114 @@
+{% extends 'util/base.html' %} {% block title %}
+<title>プロフィール</title>
+{% endblock title %}
+{% block content %}
+<h1>ユーザープロフィール</h1>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+<!--  -->
+<div>
+    <p>カレンとユーザーID： <var>{{ current_user.user_id }}</var></p>
+    <form action="/change_uname" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+<!--  -->
+
+
+<div>
+    <p>ユーザー名： <var>{{ current_user.user_name }}</var></p>
+    <form action="/change_uname" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+<div>
+    <p>Eメールアドレス： <var>{{ current_user.email }}</var></p>
+    <form action="/change_email" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+<div>
+    <p>パスワード： ・・・・</p>
+    <form action="/change_password" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+
+<!-- 検証中　ここから -->
+<div>
+    <h1>アイコン画像</h1>
+    <img src={{ current_user.icon_img }} alt="アイコン画像" width="150" height="00">
+    <form action="/change_icon" method="GET">
+        <input type="submit" value="変更">
+    </form>
+</div>
+<!-- 検証中　ここまで -->
+
+<form action="/delete_user" method="GET">
+    <input type="submit" value="ユーザ登録解除">
+</form>
+<form action="/chats" method="GET">
+    <input type="submit" value="戻る">
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ユーザー削除のJS関係　ここから -->
+ここは吉田将貴がテストしております<br>
+
+<!-- 起動ボタン -->
+<button class="btn" onclick="openModal()">アカウント削除</button>
+
+<!-- モーダル -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img src="js-userdelet.png" class="js-userdele-img" alt="注意">
+        <div class="font">アカウントを削除しますか？</div>
+        <!-- アカウント削除ボタン -->
+        <form action="/delete_user" method="POST">
+            <input type="submit" class="js-btn delete" value="はい">
+        </form>
+        <!-- キャンセルボタン -->
+        <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
+
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById("myModal").style.display = "flex";
+    }
+    function closeModal() {
+        document.getElementById("myModal").style.display = "none";
+    }
+
+    // 背景クリックで閉じる
+    window.onclick = function (event) {
+        const modal = document.getElementById("myModal");
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+<!-- ユーザー削除のJS関係　ここまで -->
+
+{% endblock content %}

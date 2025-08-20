@@ -5,36 +5,45 @@
 {% endblock title %}
 
 {% block content %}
+<main class="main-login">
 
-<body class="body">
-    <!-- ヘッダー -->
-    <header class="header">
-        <h1>全体チャット</h1>
-        <a href="{{ url_for('chat_list') }}" class="back-button">
-            <img src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
-        </a>
-    </header>
+    <body class="body">
+        <!-- ヘッダー -->
+        <header class="header">
+            <h1>{{ chat.chat_name }}</h1>
+            <form action="/chats" method="GET" class="back-button">
+                <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る"
+                    class="header-image" />
+            </form>
 
-    <!-- メイン -->
-    <main>
-        {% for message in messages %}
-        <div class="message {{ 'right' if message.user_id == current_user.id else 'left' }}">
-            <div class="message-box">
-                <div class="message-content">
-                    <div class="message-text">{{ message.content }}</div>
+            {% if chat.user_id == user_id %}
+            <form action="/chat/{{ chat.id }}/detail" method="GET" class="setting-button">
+                <input type="image" src="{{ url_for('static', filename='img/setting.png') }}" alt="編集"
+                    class="header-image" />
+            </form>
+            {% endif %}
+        </header>
+
+        <!-- メイン -->
+        <main class="messages">
+            {% for message in messages %}
+            <div class="message {{ 'right' if message.user_id == user_id else 'left' }}">
+                <div class="message-box">
+                    <div class="message-content">
+                        <div class="message-text">{{ message.message }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endfor %}
-    </main>
+            {% endfor %}
+        </main>
 
-    <!-- フッター（メッセージ送信フォーム）-->
-    <footer class="chat-screen">
-        <form action="{{ url_for('send_message') }}" method="POST" class="chat-form">
-            <textarea id="footer-message" name="message" placeholder="メッセージを入力" required></textarea>
-            <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信"
-                class="send-button">
-        </form>
-    </footer>
-</body>
-{% endblock content %}
+        <!-- フッター（メッセージ送信フォーム）-->
+        <footer class="chat-screen">
+            <form action="/chat/{{ chat.id }}/messages" method="POST" class="chat-form">
+                <textarea id="footer-message" name="message" placeholder="メッセージを入力" required></textarea>
+                <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信"
+                    class="send-button">
+            </form>
+        </footer>
+    </body>
+    {% endblock content %}

@@ -58,7 +58,7 @@ def login_process():
 @app.route('/logout')
 @login_required
 def logout():
-    session.pop('user_id', None)
+    # session.pop('user_id', None)
     logout_user()
     flash('ログアウトしタラコ！')
     return redirect(url_for('login_view'))
@@ -88,8 +88,10 @@ def register_process():
     elif registered_email != None:
         flash('ごめんたい! このEメールアドレスは既に登録されタラコ...')
     else:
-
         User.regist(new_uname, new_email, password, icon_img)
+        user = User.find_by_email(new_email)
+        login_user(user)
+        session['user_id'] = user.user_id
         flash( 'ようこそ！ ' + new_uname + 'さん！')
         return redirect(url_for('chats_view'))
     return render_template('register.html')
@@ -115,11 +117,6 @@ def delete_user():
 @app.route('/profile', methods=['GET'])
 @login_required
 def profile_view():
-    # user_id = session.get('user_id')
-    # user = User.query.get(user_id)
-    # user.icon_img = User.query.get(user_id)
-    # icon_img = app.config['ICON_FOLDER']+'/'+str(user.icon_img)
-    # flash('user_id= ' + user_name )
     user_id = session.get('user_id')
     user = User.query.get(user_id)  
     return render_template(f'profile.html')

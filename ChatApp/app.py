@@ -58,7 +58,6 @@ def login_process():
 @app.route('/logout')
 @login_required
 def logout():
-    # session.pop('user_id', None)
     logout_user()
     flash('ログアウトしタラコ！')
     return redirect(url_for('login_view'))
@@ -77,7 +76,8 @@ def register_process():
     passwordConfirmation = request.form.get('password-confirmation') 
     registered_email= User.find_by_email(new_email)
     registered_name = User.find_by_uname(new_uname)
-    icon_img = app.config['ICON_FOLDER']+'default_image.png'
+    # icon_img = '../' + app.config['ICON_FOLDER'] + 'default_image.png'
+    icon_img = 'default_image.png'
 
     if new_uname == '' or new_email =='' or password == '' or passwordConfirmation == '':
         flash('空のフォームがあるっタラコ！')
@@ -118,8 +118,10 @@ def delete_user():
 @login_required
 def profile_view():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)  
-    return render_template(f'profile.html')
+    user = User.query.get(user_id)
+    icon_img = user.icon_img
+    icon_img = '../' + app.config['ICON_FOLDER'] + str(user.icon_img)
+    return render_template('profile.html', icon_img=icon_img)
 
 # ユーザ名変更画面表示 *****************************************************
 @app.route('/change_uname', methods=['GET'])
@@ -127,7 +129,6 @@ def profile_view():
 def change_uname_view():
     user_id = session.get('user_id')
     user = User.query.get(user_id)
-    # flash('user_id= ' + user_id )
     return render_template('change_uname.html')
 
 # ユーザ名変更処理 *****************************************************
@@ -222,8 +223,10 @@ def change_password():
 def change_icon_view():
     user_id = session.get('user_id')
     user = User.query.get(user_id)
+    icon_img = user.icon_img
+    icon_img = app.config['ICON_FOLDER'] + str(user.icon_img)
     flash('user_id= ' + str(user_id))
-    return render_template('change_icon.html')
+    return render_template('change_icon.html', icon_img=icon_img)
 
 # アイコン変更処理 *****************************************************
 @app.route('/change_icon', methods=['POST'])
@@ -232,26 +235,26 @@ def change_icon():
     user_id = session.get('user_id')
     user = User.query.get(user_id)
     file = request.files['icon_file']
-    filetype = request.files['icon_file'].content_type
     origin_filename = file.filename
-    split_fname = origin_filename.rsplit('.', 1)
-    file_ext = split_fname[1]
 
     if 'icon_file' not in request.files:
         flash('ファイルが選択されていません！')
     elif origin_filename == '':
-        flash('ファイル名がありません！')
+        flash('ファイル名が無いか新しいファイルが選択されてません！')
     elif file and allowed_file(origin_filename):
+        split_fname = origin_filename.rsplit('.', 1)
+        file_ext = split_fname[1]
         filename = str(user_id) + '.' + str(file_ext)
         secure_fname = secure_filename(filename)
-        file.save(os.path.join(app.config['ICON_FOLDER'], secure_fname))
+        file.save(app.config['ICON_FOLDER'] + secure_fname)
         icon_img = filename
         User.change_icon(user_id, icon_img)
-        flash( 'アイコン画像を変更しタラコ！' + str(filetype) + str(file_ext))
-        return redirect(url_for('profile_view'))
+        flash( 'アイコン画像を変更しタラコ！' + str(file_ext))
+        return redirect(f'/profile')
     else:
-        flash('許可されていないファイルファイル形式です！') 
-    return render_template('change_icon.html')
+        flash('許可されていないファイルファイル形式です！')
+    icon_img = app.config['ICON_FOLDER'] + str(user.icon_img)
+    return render_template('change_icon.html', icon_img=icon_img)
 
 # チャット一覧表示
 @app.route('/chats', methods=['GET'])

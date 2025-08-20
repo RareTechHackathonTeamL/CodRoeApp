@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
-from models import User, Chat, Message, Stamp
+from models import User, Chat, Message, Member, Stamp
 import pymysql
 import uuid, os
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -260,8 +260,8 @@ def change_icon():
 @app.route('/chats', methods=['GET'])
 @login_required
 def chats_view():
-    chats = Chat.get_chat_latest()
-    # chats = Chat.query.filter_by(Chat.user_id == current_user.get_id()).order_by(Chat.created_at).all()
+    user_id = current_user.get_id()
+    chats = Chat.get_chat_belong_to(user_id)
     return render_template('chats.html', chats=chats)
 
 # チャット作成画面遷移
@@ -270,22 +270,36 @@ def chats_view():
 def chat_create_view():
     return render_template('chatsCreate.html')
 
-# チャットルーム作成
+# チャットルーム作成    NOTE:フロントエンドで入力フォームを制御してもらい、titleとメンバー追加を分ける
 @app.route('/chat/create', methods=['POST'])
 @login_required
 def create_chat():
+    chat_type = request.form.get('chat_type')
+    # 個人チャットの場合
+    if chat_type == 'private':
+        return redirect(f'/chat/create/select_private')
+
     new_chat_name = request.form.get('chat_name')
     if new_chat_name == '':
         return redirect(url_for('chat_create_view'))
-    chat_exist = Chat.find_by_name(new_chat_name)
 
-    if chat_exist == None:
+    # オープン・グループチャットの場合
+    chat_exist = Chat.find_by_name(new_chat_name)
+    if chat_exist != True:
         chat_id = uuid.uuid4()
         user_id = current_user.get_id()
         chat_detail = request.form.get('detail')
-        # TODO: 追加機能用 chat_type = request.form.get('chat_type')
-        Chat.create(chat_id, user_id, new_chat_name, chat_detail)
-        return redirect(url_for('chats_view'))
+
+        if chat_type == 'open':
+            chat_type = 0
+            Chat.create(chat_id, user_id, new_chat_name, chat_type, chat_detail)
+            return redirect(url_for('chats_view'))
+        elif chat_type == 'group':
+            chat_type = 1
+            Chat.create(chat_id, user_id, new_chat_name, chat_type, chat_detail)
+            id = uuid.uuid4()
+            Member.add_member(id, chat_id, user_id)
+            return redirect(f'/chat/{ chat_id }/add_member')
     else:
         error = 'すでに同じ名前のチャンネルが存在しています'
         return render_template('chatsCreate.html', error=error)
@@ -328,6 +342,86 @@ def delete_chat(chat_id):
         Chat.delete(chat_id)
     return redirect(url_for('chats_view'))
 
+# グループメンバー追加画面遷移
+@app.route('/chat/<chat_id>/add_member', methods=['GET'])
+@login_required
+def chat_add_member_view(chat_id):
+    # 自分がこのチャットに入っているかを検索
+    user_id = current_user.get_id()
+    in_chat = Member.search_in_chat(chat_id, user_id)
+    if in_chat == False:
+        flash('このチャットにアクセスできません')
+        return redirect(url_for('chats_view'))
+    chat_room = Chat.find_by_chat_info(chat_id)
+    return render_template('chatsAddMember.html', chat=chat_room)
+
+# グループメンバー追加  TODO:複数のメンバーをリストとして受け入れるようにフロントで設定する
+@app.route('/chat/<chat_id>/add_member', methods=['POST'])
+@login_required
+def chat_add_member(chat_id):
+    friend_list = request.form.getlist('friends_name')
+    results = []
+    for friend in friend_list:
+        # 追加するメンバーの名前を検索
+        friend_id = User.get_user_id_by_user_name(friend)
+        if friend_id == None:
+            results.append(f'{friend}さんが見つかりませんでした')
+        # メンバーがそのチャットに参加しているか検索
+        chat_in = Member.search_in_chat(chat_id, friend_id)
+        if chat_in != None:
+            results.append(f'{friend}さんは既にチャットに参加しています')
+        # メンバーDBに追加
+        id = uuid.uuid4()
+        Member.add_member(id, chat_id, friend_id)
+    if results == None:
+        flash('メンバー追加できました！')
+        return redirect(f'/chat/{chat_id}/messages')
+    else:
+        # エラーが起こった場合があるときはグループメンバー追加画面に戻る
+        for result in results:
+            flash(result)
+        return redirect(f'/chat/{chat_id}/add_member')
+
+# プライベートメンバー選択画面遷移
+@app.route('/chat/create/select_private', methods=['GET'])
+@login_required
+def chat_select_private_view():
+    return render_template('chatsSlelctPrivate.html')
+
+# プライベートメンバー選択
+@app.route('/chat/create/select_private', methods=['POST'])
+@login_required
+def chat_select_private():
+    # プライベートするメンバーの名前を検索
+    friend_name = request.form.get('friend_name')
+    friend_id = User.get_user_id_by_user_name(friend_name)
+    if friend_id == None:
+        flash('入力された友達が見つかりません')
+        return redirect(url_for('chat_select_private'))
+    # 自分と相手とのチャットがすでにできていないか検索
+    user_id = current_user.get_id()
+    user_name = User.get_user_name_by_user_id(user_id)
+    if friend_name == user_name:
+        flash('友達を入力してください')
+        return redirect(url_for('chat_select_private'))
+    chat_exist = Chat.search_chat_exist(user_id, friend_id, user_name, friend_name)
+    if chat_exist == True:
+        flash('入力された友達とのチャットは存在します')
+        return redirect(url_for('chat_select_private'))
+    # チャットテーブル作成
+    chat_id = uuid.uuid4()
+    new_chat_name = f'{friend_name}と{user_name}のプライベートチャット'
+    chat_type = 2
+    chat_detail = ''
+    Chat.create(chat_id, user_id, new_chat_name, chat_type, chat_detail)
+    # メンバーテーブルに追加
+    id = uuid.uuid4()
+    Member.add_member(id, chat_id, user_id)
+    id = uuid.uuid4()
+    Member.add_member(id, chat_id, friend_id)
+    # そのチャットに遷移
+    return redirect(f'/chat/{chat_id}/messages')
+
 # チャットへ遷移
 @app.route('/chat/<chat_id>/messages', methods=['GET'])
 @login_required
@@ -346,7 +440,7 @@ def create_message(chat_id):
     message = request.form.get('message')
     stamp = request.form.get('stamp')
     id = uuid.uuid4()
-    user_id = current_user.get_id() # TODO:session.get('id')では行かない理由を調べる・聞く
+    user_id = current_user.get_id()
     # TODO: 追加機能・メッセージではなくスタンプの場合用
     if message:
         Message.create(id, user_id, chat_id, message)

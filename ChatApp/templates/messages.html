@@ -30,6 +30,7 @@
             <div class="message {{ 'right' if message.user_id == user_id else 'left' }}">
                 <div class="message-box">
                     <div class="message-content">
+                        <div class="user-name">{{ message.user_name }}</div>
                         <div class="message-text">{{ message.message }}</div>
                     </div>
                 </div>

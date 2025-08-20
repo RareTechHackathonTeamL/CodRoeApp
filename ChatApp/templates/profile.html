@@ -46,7 +46,7 @@
 <!-- 検証中　ここから -->
 <div>
     <h1>アイコン画像</h1>
-    <img src={{ current_user.icon_img }} alt="アイコン画像" width="150" height="00">
+    <img src="{{ icon_img }}" alt="アイコン画像" width="150" height="150">
     <form action="/change_icon" method="GET">
         <input type="submit" value="変更">
     </form>

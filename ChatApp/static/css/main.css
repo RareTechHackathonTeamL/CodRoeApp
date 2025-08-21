@@ -64,3 +64,24 @@
      color: rgb(255, 148, 148);
      font-size: 12px;
  }
+
+ .transitionplaceholder {
+
+     text-decoration: none;
+     color: rgb(255, 148, 148);
+ }
+
+ .arrow {
+
+     width: 24px;
+     height: 24px;
+     margin-left: auto;
+     margin-right: 16px;
+
+ }
+
+ .placeholder {
+
+     margin-left: 50px;
+
+ }

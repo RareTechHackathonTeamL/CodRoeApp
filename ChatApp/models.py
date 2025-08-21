@@ -26,6 +26,23 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return self.user_id
     
+    #ユーザアイコンの取得 ****************************
+    @classmethod
+    def get_icons(cls):
+        try:
+            user_icons = db.session.query(User).all()
+            result = [{
+                'user_id': u.user_id,
+                'icon_img': u.icon_img,
+                'created_at': u.created_at,
+                'update_at': u.update_at
+            } for u in user_icons]
+            return result
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+    
     @classmethod
     def get_user_id_by_user_name(cls, user_name):
         try:
@@ -181,8 +198,6 @@ class User(UserMixin, db.Model):
             print(e)
         finally:
             db.session.close()
-
-    
     
     # 登録済みEメールアドレスの確認
     @classmethod
@@ -204,7 +219,9 @@ class User(UserMixin, db.Model):
         except Exception as e:
             print(e)
         finally:
-            db.session.close()  
+            db.session.close()
+
+
 
 
 # Chatテーブル
@@ -398,6 +415,7 @@ class Message(db.Model):
             print(e)
         finally:
             db.session.close()  # TODO: flask_sqlalchemyでは必要ないというものを見た（公式ドキュメントには書いていない）必要か聞く
+
 
 # Memberテーブル
 class Member(db.Model):

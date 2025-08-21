@@ -24,7 +24,8 @@
 <form method="POST">
     <ul>
         {% for stamp in stamps %}
-        <li><input type="radio" id="{{ stamp.id }}" name="stamp" value="{{ stamp.id }}"><label for="{{ stamp.id }}"><img src="{{ url_for('static', filename=stamp.stamp_path) }}"></label></li>
+        <li><input type="radio" id="{{ stamp.id }}" name="stamp" value="{{ stamp.id }}"><label for="{{ stamp.id }}"><img
+                    src="{{ url_for('static', filename=stamp.stamp_path) }}"></label></li>
         {% endfor %}
     </ul>
     <input type="submit" value="スタンプ送信">

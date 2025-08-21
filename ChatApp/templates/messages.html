@@ -41,7 +41,7 @@
         <!-- フッター（メッセージ送信フォーム）-->
         <footer class="chat-screen">
             <form action="/chat/{{ chat.id }}/messages" method="POST" class="chat-form">
-                <textarea id="footer-message" name="message" placeholder="メッセージを入力" required></textarea>
+                <textarea id="footer-message" name="message"a placeholder="メッセージを入力" required></textarea>
                 <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信"
                     class="send-button">
             </form>

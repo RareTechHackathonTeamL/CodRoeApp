@@ -3,15 +3,13 @@
 {% endblock title %} {% block content %}
 
 <!-- ロベ検証用 ここから-->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
+{% with messages = get_flashed_messages() %} {% if messages %}
 <ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
+  {% for message in messages %}
+  <li>{{ message }}</li>
+  {% endfor %}
 </ul>
-{% endif %}
-{% endwith %}
+{% endif %} {% endwith %}
 <!-- ロベ検証用　ここまで -->
 
 <body class="body">
@@ -19,12 +17,7 @@
     <h1>チャット一覧</h1>
 
     <form action="/chat/create" method="get" class="chatcreation-button">
-      <input
-        type="image"
-        src="{{ url_for('static', filename='img/chatcreation.png') }}"
-        alt="チャット作成"
-        class="header-image"
-      />
+      <input type="image" src="{{ url_for('static', filename='img/chatcreation.png') }}" alt="チャット作成" class="header-image" />
     </form>
   </header>
 
@@ -41,33 +34,21 @@
   <footer>
     <a href="/profile" method="GET" class="footer-button">
       <div class="footer-item">
-        <img
-          src="{{ url_for('static', filename='img/profile.png') }}"
-          alt="プロフィール"
-          class="footer-image"
-        />
+        <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />
         プロフィール
       </div>
     </a>
 
     <div class="footer-button">
       <div class="footer-item">
-        <img
-          src="{{ url_for('static', filename='img/chat-list-create.png') }}"
-          alt="チャット一覧"
-          class="footer-image"
-        />
+        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
         チャット一覧
       </div>
     </div>
 
     <a href="/logout" class="footer-button">
       <div class="footer-item">
-        <img
-          src="{{ url_for('static', filename='img/logout-create.png') }}"
-          alt="ログアウト"
-          class="footer-image"
-        />
+        <img src="{{ url_for('static', filename='img/logout-create.png') }}" alt="ログアウト" class="footer-image" />
         ログアウト
       </div>
     </a>

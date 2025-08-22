@@ -7,25 +7,11 @@
   <header class="header">
     <h1>{{ chat.chat_name }}</h1>
     <form action="/chats" method="GET" class="back-button">
-      <input
-        type="image"
-        src="{{ url_for('static', filename='img/left.png') }}"
-        alt="戻る"
-        class="header-image"
-      />
+      <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
 
-    <form
-      action="/chat/delete/{{ chat.id }}"
-      method="POST"
-      class="deletebox-button"
-    >
-      <input
-        type="image"
-        src="{{ url_for('static', filename='img/delete.png') }}"
-        alt="削除"
-        class="header-image"
-      />
+    <form action="/chat/delete/{{ chat.id }}" method="POST" class="deletebox-button">
+      <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
     </form>
   </header>
   <!----- ヘッダーEND ----->
@@ -38,8 +24,7 @@
         <div>
           <h3>{{ error }}</h3>
         </div>
-        {% endif %} {% with messages = get_flashed_messages() %} {% if messages
-        %} {% for message in messages %}
+        {% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
         <div>
           <h3>{{ message }}</h3>
         </div>
@@ -47,26 +32,24 @@
 
         <div class="input-box-child">
           <div>チャット名</div>
-          <input
-            type="text"
-            name="chat_name"
-            value="{{chat.chat_name}}"
-            class="chat-name"
-          />
+          <a href="/change_uname" class="transitionplaceholder">
+            <div class="text-box">
+              <div class="placeholder">{{chat.chat_name}}</div>
+              <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
+            </div>
+          </a>
         </div>
 
         <div class="input-box-child">
           <div class="chatexplanation-label">説明</div>
-          <input type="text" name="detail" value="" class="chatexplanation" />
+          <a href="/change_uname" class="transitionplaceholder">
+            <div class="chatexplanation">
+              <div class="placeholder">{{ current_user.user_name }}</div>
+              <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
+            </div>
+          </a>
+          <input name="chat_name" placeholder="name" type="submit" value="チャット更新" class="main-button" />
         </div>
-
-        <input
-          name="chat_name"
-          placeholder="name"
-          type="submit"
-          value="チャット更新"
-          class="main-button"
-        />
       </div>
     </form>
   </main>
@@ -76,33 +59,21 @@
   <footer>
     <a href="/profile" method="GET" class="footer-button">
       <div class="footer-item">
-        <img
-          src="{{ url_for('static', filename='img/profile.png') }}"
-          alt="プロフィール"
-          class="footer-image"
-        />
+        <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />
         プロフィール
       </div>
     </a>
 
     <a href="/chats" class="footer-button">
       <div class="footer-item">
-        <img
-          src="{{ url_for('static', filename='img/chat-list-create.png') }}"
-          alt="チャット一覧"
-          class="footer-image"
-        />
+        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
         チャット一覧
       </div>
     </a>
 
     <a href="/logout" class="footer-button">
       <div class="footer-item">
-        <img
-          src="{{ url_for('static', filename='img/logout-create.png') }}"
-          alt="ログアウト"
-          class="footer-image"
-        />
+        <img src="{{ url_for('static', filename='img/logout-create.png') }}" alt="ログアウト" class="footer-image" />
         ログアウト
       </div>
     </a>

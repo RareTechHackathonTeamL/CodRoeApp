@@ -1,35 +1,64 @@
 {% extends 'util/base.html' %} {% block title %}
 <title>アイコン変更</title>
-{% endblock title %}
-{% block content %}
-<h1>アイコン変更</h1>
+{% endblock title %} {% block content %}
 
+<body class="body">
+  <!----- ヘッダー ----->
 
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul>
+  <header class="header">
+    <h1>アイコン変更</h1>
+    <a href="/profile" class="back-button">
+      <!-- ファイル統一の為変更 -->
+      <img src="{{ url_for('static', filename='img/left.png') }}" alt="Parrots" class="header-image" />
+    </a>
+  </header>
+  <!----- ヘッダー END ----->
+  <!-- <h2>{{ current_user.user_name }} さんのユーザ情報を更新します</h2> -->
+  {% with messages = get_flashed_messages() %} {% if messages %}
+  <ul>
     {% for message in messages %}
     <li>{{ message }}</li>
     {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
+  </ul>
+  {% endif %} {% endwith %}
 
-<div>
-    <h1>アイコン画像変更</h1>
-    <p>ファイル形式は、'png', 'jpg', 'jpeg', 'gif'、<BR>
-    ファイルサイズは、４MBまでアップロード可能です。
-    </p>
-    <img src="{{ icon_img }}" alt="アイコン画像" width="150" height="150">
-    <form action="change_icon" method="POST" enctype="multipart/form-data">
-        <input type="file" name="icon_file">
-        <input type="submit" value="アップロード">
+  <!----- メインコンテンツ ----->
+  <main class="main">
+    <form action="/change_icon" method="POST" enctype="multipart/form-data">
+      <div class="input-form">
+        <div class="icon icon-large">
+          <img src="{{ icon_img }}" alt="アイコン画像" class="icon-img" />
+        </div>
+
+        <input id="icon_file" type="file" name="icon_file" accept=".png,.jpg,.jpeg,.gif" hidden />
+        <label for="icon_file">
+          <img src="{{ url_for('static', filename='img/change.png') }}" alt="アイコン画像選択" class="iconchange" />
+        </label>
+
+        <div id="fileName" class="text-box">選択したファイル名が表示されます</div>
+
+        <p>
+          ファイル形式は、'png', 'jpg', 'jpeg', 'gif'、<br />
+          ファイルサイズは、4MBまでアップロード可能です。
+        </p>
+      </div>
+
+      <p><input type="submit" value="アップロード" class="main-button" /></p>
     </form>
-    <br>
-    <form action="/profile" method="GET">
-    <input type="submit" value="キャンセル">
-    </form>
+  </main>
 
-</div>
+  <!-- メッセージ表示 -->
 
-{% endblock content %}
+  <script>
+    document.getElementById("icon_file").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById("fileName").textContent = file.name;
+      } else {
+        document.getElementById("fileName").textContent = "";
+      }
+    });
+  </script>
+
+  {% endblock content %}
+</body>

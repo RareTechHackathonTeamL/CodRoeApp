@@ -29,33 +29,28 @@
   <!----- メインコンテンツ ----->
   <main class="main">
     <div class="input-form">
-      <!-- 検証中　ここから -->
-      <div>
-        <img src="{{ icon_img }}" alt="アイコン画像" width="150" height="150" />
-        <form action="/change_icon" method="GET">
-          <input type="submit" value="変更" />
-        </form>
-      </div>
-      <!-- 検証中　ここまで -->
-      <!--  -->
-      <div>
-        <p>カレンとユーザーID： <var>{{ current_user.user_id }}</var></p>
-        <form action="/change_uname" method="GET">
-          <input type="submit" value="変更" />
-        </form>
-      </div>
-      <!--  -->
-      <form action="/change_uname" method="GET">
-        <div class="input-box-autu">
-          <div class="font">ユーザー名</div>
-          <div class="search-box">
-            <div class="text-box">
-              <var>{{ current_user.user_name }}</var>
-            </div>
-            <input type="submit" value="変更" />
+      <a href="/change_icon" class="footer-button">
+        <div class="icon-wrap">
+          <div class="icon">
+            <img src="{{ icon_img }}" alt="アイコン画像" class="icon-img" />
+          </div>
+          <div class="camera-badge">
+            <img src="{{ url_for('static', filename='img/camera-badge.png') }}" class="camera-icon" />
           </div>
         </div>
-      </form>
+      </a>
+
+      <div class="input-box-autu">
+        <div class="font">ユーザー名</div>
+        <a href="/change_uname" class="transitionplaceholder">
+          <div class="search-box">
+            <div class="text-box">
+              <div class="placeholder">{{ current_user.user_name }}</div>
+              <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
+            </div>
+          </div>
+        </a>
+      </div>
 
       <div class="input-box-autu">
         <div class="font">メールアドレス</div>

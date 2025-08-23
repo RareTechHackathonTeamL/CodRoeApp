@@ -434,7 +434,7 @@ def messages_view(chat_id):
     # return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps)
 
 # メッセージ作成
-# @app.route('/chat/<chat_id>/messages', methods=['POST'])
+@app.route('/chat/<chat_id>/messages', methods=['POST'])
 @login_required
 def create_message(chat_id):
     message = request.form.get('message')

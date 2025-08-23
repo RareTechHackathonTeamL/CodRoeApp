@@ -418,6 +418,7 @@ class Message(db.Model):
                     'user_id': message[0].user_id,
                     'message': message[0].message,
                     'created_at': message[0].created_at,
+                    'user_name': message[2].user_name,
                     'icon_img': message[2].icon_img,
                     })
                 else:
@@ -428,6 +429,7 @@ class Message(db.Model):
                     'created_at': message[0].created_at,
                     'title': message[1].title,
                     'stamp_path': message[1].stamp_path,
+                    'user_name': message[2].user_name,
                     'icon_img': message[2].icon_img,
                     })
             return result

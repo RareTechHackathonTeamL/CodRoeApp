@@ -28,11 +28,12 @@
         <div class="message {{ 'right' if message.user_id == user_id else 'left' }}">
             <div class="message-box">
                 <div class="message-content">
-                    <p>{{ message.icon_img }}</p>
                     <div class="user-name">{{ message.user_name }}</div>
                     <div class="message-text">{{ message.message }}</div>
+                    <div>
+                        <img src="{{ url_for('static', filename='img/user_icons/' + message.icon_img) }}" width="40", height="40">
+                    </div>
                 </div>
-                <img src="{{ url_for('static', filename='img/user_icons/' + message.icon_img) }}" width="40", height="40">
             </div>
         </div>
         {% endfor %}

@@ -1,8 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from models import User, Chat, Message, Member, Stamp
-import pymysql
-import uuid, os
+import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -435,7 +434,7 @@ def messages_view(chat_id):
     # return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps)
 
 # メッセージ作成
-@app.route('/chat/<chat_id>/messages', methods=['POST'])
+# @app.route('/chat/<chat_id>/messages', methods=['POST'])
 @login_required
 def create_message(chat_id):
     message = request.form.get('message')

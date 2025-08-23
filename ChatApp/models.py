@@ -34,9 +34,26 @@ class User(UserMixin, db.Model):
             result = [{
                 'user_id': u.user_id,
                 'icon_img': u.icon_img,
-                'created_at': u.created_at,
-                'update_at': u.update_at
+                # 'created_at': u.created_at,
+                # 'update_at': u.update_at
             } for u in user_icons]
+            return result
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def get_stamps(cls):
+        try:
+            stamps = db.session.query(Stamp).all()
+            result = [{
+                'id': s.id,
+                'title': s.title,
+                'stamp_path': s.stamp_path,
+                'created_at': s.created_at,
+                'update_at': s.update_at,
+            } for s in stamps]
             return result
         except Exception as e:
             print(e)
@@ -391,7 +408,8 @@ class Message(db.Model):
     @classmethod
     def get_messages(cls, cid):
         try:
-            messages = db.session.query(Message, Stamp).outerjoin(Stamp, Message.stamp_id == Stamp.id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
+            # messages = db.session.query(Message, Stamp).outerjoin(Stamp, Message.stamp_id == Stamp.id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
+            messages = db.session.query(Message, Stamp, User).outerjoin(Stamp, Message.stamp_id == Stamp.id).outerjoin(User, Message.user_id == User.user_id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
             result = []
             for message in messages:
                 if message[1] == None:
@@ -400,6 +418,7 @@ class Message(db.Model):
                     'user_id': message[0].user_id,
                     'message': message[0].message,
                     'created_at': message[0].created_at,
+                    'icon_img': message[2].icon_img,
                     })
                 else:
                     result.append({
@@ -409,6 +428,7 @@ class Message(db.Model):
                     'created_at': message[0].created_at,
                     'title': message[1].title,
                     'stamp_path': message[1].stamp_path,
+                    'icon_img': message[2].icon_img,
                     })
             return result
         except Exception as e:

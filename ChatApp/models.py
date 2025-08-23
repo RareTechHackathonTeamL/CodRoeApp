@@ -271,11 +271,22 @@ class Chat(db.Model):
             db.session.close()
 
     @classmethod
-    def update(cls, chat_id, new_name, new_detail):
+    def update_name(cls, chat_id, new_name):
         try:
             chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
             if new_name != '':
                 chat_info.chat_name = new_name
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def update_detail(cls, chat_id, new_detail):
+        try:
+            chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
             if new_detail != '':
                 chat_info.detail = new_detail
             db.session.commit()
@@ -466,6 +477,16 @@ class Member(db.Model):
             insert_member = Member(id=id, chat_id=chat_id, user_id=user_id, created_at=now)
             db.session.add(insert_member)
             db.session.commit()
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def get_chat_member(cls, chat_id):
+        try:
+            members = db.session.query(Member).filter(Member.chat_id == chat_id).all()
+            return members
         except Exception as e:
             print(e)
         finally:

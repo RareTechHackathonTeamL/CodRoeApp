@@ -428,10 +428,10 @@ def messages_view(chat_id):
     user_id = current_user.get_id()
     chat_room = Chat.find_by_chat_info(chat_id)
     messages = Message.get_messages(chat_id)
-    user_icons = User.get_icons()
+    # user_icons = User.get_icons()
     stamps = Stamp.get_stamps()
-    return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps, user_icons=user_icons)
-    # return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps)
+    # return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps, user_icons=user_icons)
+    return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps)
 
 # メッセージ作成
 @app.route('/chat/<chat_id>/messages', methods=['POST'])

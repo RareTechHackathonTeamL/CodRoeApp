@@ -3,8 +3,8 @@
 {% endblock title %}
 {% block content %}
 <div>メンバー追加画面</div>
-<form action="/chat/{{ chat.id }}/messages" method="GET">
-    <input type="submit" value="チャットへ">
+<form action="/chat/{{ chat.id }}/detail" method="GET">
+    <input type="submit" value="チャット編集へ">
 </form>
 {% with messages = get_flashed_messages() %}
 {% if messages %}
@@ -16,8 +16,19 @@
 {% endif %}
 {% endwith %}
 <form action="/chat/{{ chat.id }}/add_member" method="post">
-    <input type="text" name="friends_name">
+    <div id="add_member_form">
+        <input type="text" name="friends_name">
+        <input type="button" value="+" onclick="addForm()">
+    </div>
     <button type="submmit">友達追加</button>
 </form>
-<!-- TODO: プラスボタンを作り、JSでinputを増加させられるようにする -->
+<script>
+    const addForm = () => {
+        const input_data = document.createElement('input');
+        input_data.type = 'text';
+        input_data.name = 'friends_name';
+        const parent = document.getElementById('add_member_form');
+        parent.appendChild(input_data);
+    }
+</script>
 {% endblock content %}

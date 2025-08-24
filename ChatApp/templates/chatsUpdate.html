@@ -57,18 +57,20 @@
           </div>
         </div>
       </div>
-        {% if chat.chat_type == 1 %}
+      {% if chat.chat_type == 1 %}
+      <div class="chatexplanation-label">グループメンバー</div>
+      <ul class="memberul">
+        {% for member in chat_member%}
 
-        <ul>
-          {% for member in chat_member%}
-          <li>{{ member }}</li>
-          {% endfor %}
-        </ul>
-        <form action="/chat/{{ chat.id }}/add_member" method="GET">
-          <input type="submit" value="メンバー追加へ" />
-        </form>
-        {% endif %}
-      {% else %}
+        <li class="memberlist">
+          <div class="text-box">{{ member }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      <form action="/chat/{{ chat.id }}/add_member" method="GET">
+        <input type="submit" value="メンバー追加へ" class="main-button-login chatcreatesubmit" />
+      </form>
+      {% endif %} {% else %}
 
       <div class="input-box-child">
         <div>チャット名</div>
@@ -90,23 +92,22 @@
         </a>
       </div>
 
-        <!-- グループに所属しているか -->
-        {% if chat.chat_type == 1 %}
-        <ul>
-          {% for member in chat_member%}
-          <li>{{ member }}</li>
-          {% endfor %}
-        </ul>
-        <form action="/chat/{{ chat.id }}/add_member" method="GET">
-          <input type="submit" value="メンバー追加へ" />
-        </form>
-        {% endif %}
-      {% endif %}
+      <!-- グループに所属しているか -->
+      {% if chat.chat_type == 1 %}
+      <ul>
+        {% for member in chat_member%}
+        <li>{{ member }}</li>
+        {% endfor %}
+      </ul>
+      <form action="/chat/{{ chat.id }}/add_member" method="GET">
+        <input type="submit" value="メンバー追加へ" />
+      </form>
+      {% endif %} {% endif %}
     </div>
   </main>
   <!-- メインEND -->
 
-  <footer>
+  <footer class="footer-button_chatscreate">
     <a href="/profile" method="GET" class="footer-button">
       <div class="footer-item">
         <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />

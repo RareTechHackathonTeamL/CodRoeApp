@@ -213,3 +213,12 @@
  .add_member_title {
      margin-top: 30px;
  }
+
+ .memberlist {
+     list-style: none;
+     margin-bottom: 10px;
+ }
+
+ .memberul {
+     padding-left: 0;
+ }

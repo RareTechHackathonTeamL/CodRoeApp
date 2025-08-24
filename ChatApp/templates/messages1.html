@@ -12,11 +12,6 @@
     <input type="submit" value="チャット編集へ">
 </form>
 {% endif %}
-{% if chat.chat_type == 1 %}
-<form action="/chat/{{ chat.id }}/add_member" method="GET">
-    <input type="submit" value="メンバー追加へ">
-</form>
-{% endif %}
 <form method="post">
     <input name="message" placeholder="メッセージを入力">
     <button type="submmit">送信</button>
@@ -24,7 +19,8 @@
 <form method="POST">
     <ul>
         {% for stamp in stamps %}
-        <li><input type="radio" id="{{ stamp.id }}" name="stamp" value="{{ stamp.id }}"><label for="{{ stamp.id }}"><img src="{{ url_for('static', filename=stamp.stamp_path) }}"></label></li>
+        <li><input type="radio" id="{{ stamp.id }}" name="stamp" value="{{ stamp.id }}"><label for="{{ stamp.id }}"><img
+                    src="{{ url_for('static', filename=stamp.stamp_path) }}"></label></li>
         {% endfor %}
     </ul>
     <input type="submit" value="スタンプ送信">

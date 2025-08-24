@@ -9,10 +9,15 @@
     <form action="/chats" method="GET" class="back-button">
       <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
-
-    <form action="/chat/delete/{{ chat.id }}" method="POST" class="deletebox-button">
+    <!----- 試験 
+        <form action="/chat/delete/{{ chat.id }}" method="POST" class="deletebox-button">
+            <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除"
+                class="header-image" />
+        </form>
+        ----->
+    <a onclick="openModal()" class="deletebox-button">
       <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
-    </form>
+    </a>
   </header>
   <!----- ヘッダーEND ----->
 
@@ -79,6 +84,43 @@
     </a>
   </footer>
   <!-- フッターEND -->
+
+  <!-- ログアウトのJSテスト　ここから -->
+
+  <!-- モーダル -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img src="../../static/img/chat-delete.png" class="js-logout-img" alt="注意" />
+      <div class="font">チャット削除しますか？</div>
+      <!-- ログアウト用フォーム -->
+
+      <form action="/chat/delete/{{ chat.id }}" method="POST">
+        <input type="submit" class="js-btn delete" value="はい" />
+      </form>
+
+      <!-- キャンセルボタン -->
+      <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
+    </div>
+  </div>
+
+  <script>
+    // モーダルを表示する関数
+    function openModal() {
+      // id="myModal" の要素を取得して display を "flex" に変更
+      // これによりモーダルが画面に表示される
+      document.getElementById("myModal").style.display = "flex";
+    }
+
+    // モーダルを非表示にする関数
+    function closeModal() {
+      // id="myModal" の要素を取得して display を "none" に変更
+      // これによりモーダルが閉じられる
+      document.getElementById("myModal").style.display = "none";
+    }
+  </script>
+
+  <!-- ログアウトのJSテスト　ここまで -->
 
   {% endblock content %}
 </body>

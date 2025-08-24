@@ -26,6 +26,40 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return self.user_id
     
+    #ユーザアイコンの取得 ****************************
+    @classmethod
+    def get_icons(cls):
+        try:
+            user_icons = db.session.query(User).all()
+            result = [{
+                'user_id': u.user_id,
+                'icon_img': u.icon_img,
+                # 'created_at': u.created_at,
+                # 'update_at': u.update_at
+            } for u in user_icons]
+            return result
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def get_stamps(cls):
+        try:
+            stamps = db.session.query(Stamp).all()
+            result = [{
+                'id': s.id,
+                'title': s.title,
+                'stamp_path': s.stamp_path,
+                'created_at': s.created_at,
+                'update_at': s.update_at,
+            } for s in stamps]
+            return result
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+    
     @classmethod
     def get_user_id_by_user_name(cls, user_name):
         try:
@@ -181,8 +215,6 @@ class User(UserMixin, db.Model):
             print(e)
         finally:
             db.session.close()
-
-    
     
     # 登録済みEメールアドレスの確認
     @classmethod
@@ -204,7 +236,9 @@ class User(UserMixin, db.Model):
         except Exception as e:
             print(e)
         finally:
-            db.session.close()  
+            db.session.close()
+
+
 
 
 # Chatテーブル
@@ -237,11 +271,22 @@ class Chat(db.Model):
             db.session.close()
 
     @classmethod
-    def update(cls, chat_id, new_name, new_detail):
+    def update_name(cls, chat_id, new_name):
         try:
             chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
             if new_name != '':
                 chat_info.chat_name = new_name
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def update_detail(cls, chat_id, new_detail):
+        try:
+            chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
             if new_detail != '':
                 chat_info.detail = new_detail
             db.session.commit()
@@ -374,7 +419,8 @@ class Message(db.Model):
     @classmethod
     def get_messages(cls, cid):
         try:
-            messages = db.session.query(Message, Stamp).outerjoin(Stamp, Message.stamp_id == Stamp.id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
+            # messages = db.session.query(Message, Stamp).outerjoin(Stamp, Message.stamp_id == Stamp.id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
+            messages = db.session.query(Message, Stamp, User).outerjoin(Stamp, Message.stamp_id == Stamp.id).outerjoin(User, Message.user_id == User.user_id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
             result = []
             for message in messages:
                 if message[1] == None:
@@ -383,6 +429,8 @@ class Message(db.Model):
                     'user_id': message[0].user_id,
                     'message': message[0].message,
                     'created_at': message[0].created_at,
+                    'user_name': message[2].user_name,
+                    'icon_img': message[2].icon_img,
                     })
                 else:
                     result.append({
@@ -392,12 +440,15 @@ class Message(db.Model):
                     'created_at': message[0].created_at,
                     'title': message[1].title,
                     'stamp_path': message[1].stamp_path,
+                    'user_name': message[2].user_name,
+                    'icon_img': message[2].icon_img,
                     })
             return result
         except Exception as e:
             print(e)
         finally:
             db.session.close()  # TODO: flask_sqlalchemyでは必要ないというものを見た（公式ドキュメントには書いていない）必要か聞く
+
 
 # Memberテーブル
 class Member(db.Model):
@@ -426,6 +477,16 @@ class Member(db.Model):
             insert_member = Member(id=id, chat_id=chat_id, user_id=user_id, created_at=now)
             db.session.add(insert_member)
             db.session.commit()
+        except Exception as e:
+            print(e)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def get_chat_member(cls, chat_id):
+        try:
+            members = db.session.query(Member).filter(Member.chat_id == chat_id).all()
+            return members
         except Exception as e:
             print(e)
         finally:

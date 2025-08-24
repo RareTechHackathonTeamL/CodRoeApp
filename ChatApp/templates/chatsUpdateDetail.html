@@ -1,0 +1,18 @@
+{% extends 'util/base.html' %} {% block title %}
+<title>Update Chat Detail</title>
+{% endblock title %}
+{% block content %}
+<div>チャット説明変更</div>
+<form action="/chat/{{ chat.id }}/detail" method="GET">
+    <input type="submit" value="チャット編集へ">
+</form>
+{% if error %}
+<div>
+    <h3>{{ error }}</h3>
+</div>
+{% endif %}
+<form action="/chat/update_detail/{{ chat.id }}" method="post">
+    <input name="detail">
+    <button type="submmit">チャット説明更新</button>
+</form>
+{% endblock content %}

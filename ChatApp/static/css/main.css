@@ -64,3 +64,20 @@
      color: rgb(255, 148, 148);
      font-size: 12px;
  }
+
+/*===下記コードはおとちゃん実装であるため、コード整理の時に自由に動かして大丈夫です===*/
+
+.member-add-list {
+    margin-bottom: 10px;
+}
+
+.member-add-button {
+    width: 288px;
+    height: 30px;
+    font-size: 16px;
+    color: #FFF;
+    background: #ff9494;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: none;
+}

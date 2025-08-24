@@ -8,6 +8,12 @@
     text-decoration: none;
 }
 
+.list-margin-top {
+
+    margin-top: 30px;
+
+}
+
 /*ボックス内の表示*/
 .h3-box {
 
@@ -141,11 +147,8 @@
     width: 320px;
     height: 150px;
     border-radius: 10px;
-    border-top: 1px solid #ff9494;
-    border-left: 1px solid #ff9494;
-    border-right: 2px solid #ff9494;
-    border-bottom: 2px solid #ff9494;
     font-size: 16px;
+    border: 1px solid rgb(255, 148, 148);
     background-color: white;
     display: flex;
     justify-content: center;

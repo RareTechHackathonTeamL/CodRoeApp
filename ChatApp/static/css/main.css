@@ -143,3 +143,82 @@
      max-width: 300px;
      width: 90%;
  }
+
+ /*===下記コードはおとちゃん実装であるため、コード整理の時に自由に動かして大丈夫です===*/
+
+ .member-add-list {
+     margin-bottom: 10px;
+ }
+
+ .member-add-button {
+     width: 320px;
+     height: 30px;
+     font-size: 16px;
+     color: #FFF;
+     background: #ff9494;
+     border-radius: 12px;
+     margin-top: 10px;
+     border: none;
+ }
+
+ .select-chat_type {
+     width: 90px;
+     height: 90px;
+     border: 1px solid #ff9494;
+     border-radius: 15px;
+ }
+
+ .select-chat_typeimg {
+     object-fit: cover;
+     width: 100%;
+     height: 100%;
+ }
+
+ .select-chat_typeradio {
+     display: none;
+ }
+
+ .checked {
+     border: 5px solid #ff9494;
+ }
+
+ .select-chat_types {
+     display: flex;
+     flex-direction: row;
+     gap: 10px;
+     justify-content: center;
+     margin-bottom: 45px;
+ }
+
+
+
+ h3 {
+     color: #ff9494;
+     font-size: 14px;
+     display: flex;
+     justify-content: center;
+ }
+
+
+ .footer-button_chatscreate {
+     position: fixed;
+     bottom: 0;
+     display: flex;
+ }
+
+ .chatcreatesubmit {
+     margin-bottom: 110px;
+ }
+
+ .add_member_title {
+     margin-top: 30px;
+ }
+
+ .memberlist {
+     list-style: none;
+     margin-bottom: 10px;
+ }
+
+ .memberul {
+     padding-left: 0;
+ }

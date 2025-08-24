@@ -2,16 +2,6 @@
 <title>チャット一覧</title>
 {% endblock title %} {% block content %}
 
-<!-- ロベ検証用 ここから-->
-{% with messages = get_flashed_messages() %} {% if messages %}
-<ul>
-  {% for message in messages %}
-  <li>{{ message }}</li>
-  {% endfor %}
-</ul>
-{% endif %} {% endwith %}
-<!-- ロベ検証用　ここまで -->
-
 <body class="body">
   <header class="header">
     <h1>チャット一覧</h1>
@@ -21,8 +11,18 @@
     </form>
   </header>
 
+  {% if error %}
+  <div>
+    <h3>{{ error }}</h3>
+  </div>
+  {% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+  <div>
+    <h3>{{ message }}</h3>
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+
   <main>
-    <div class="list">
+    <div class="list list-margin-top chatcreatesubmit">
       {% for chat in chats %}
       <form action="/chat/{{ chat.id }}/messages" method="GET">
         <input type="submit" value="{{ chat.chat_name}}" class="h3-box" />

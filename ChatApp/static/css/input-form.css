@@ -107,10 +107,7 @@
      width: 320px;
      height: 50px;
      border-radius: 10px;
-     border-top: 1px solid #ff9494;
-     border-left: 1px solid #ff9494;
-     border-right: 2px solid #ff9494;
-     border-bottom: 2px solid #ff9494;
+     border: 1px solid #ff9494;
      font-size: 16px;
      background-color: white;
      display: flex;

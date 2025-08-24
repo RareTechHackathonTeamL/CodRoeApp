@@ -18,30 +18,81 @@
   <main class="main">
     <form action="/chat/create" method="post">
       <div class="input-box-list">
-        <div class="input-box-child">
+        <!-- チャットタイプ選択 -->
+        <h3>グループタイプ選択</h3>
+        <div class="select-chat_types">
+          <!-- オープンチャット -->
+          <input type="radio" id="open" name="chat_type" value="open" onclick="checkRadio()" checked class="select-chat_typeradio" />
+          <label for="open">
+            <div id="open_div" class="select-chat_type">
+              <img src="{{ url_for('static', filename='img/openform.png') }}" class="select-chat_typeimg" />
+            </div>
+          </label>
+          <!-- グループチャット -->
+          <input type="radio" id="group" name="chat_type" value="group" onclick="checkRadio()" class="select-chat_typeradio" />
+          <label for="group">
+            <div id="group_div" class="select-chat_type">
+              <img src="{{ url_for('static', filename='img/groupform.png') }}" class="select-chat_typeimg" />
+            </div>
+          </label>
+
+          <!-- プライベートチャット -->
+          <input type="radio" id="private" name="chat_type" value="private" onclick="checkRadio()" class="select-chat_typeradio" />
+          <label for="private">
+            <div id="private_div" class="select-chat_type">
+              <img src="{{ url_for('static', filename='img/privateform.png') }}" class="select-chat_typeimg" />
+            </div>
+          </label>
+        </div>
+        <!-- オープン選択 -->
+        <div class="input-box-child" id="openForm">
           <div>チャット名</div>
-          <input type="text" name="chat_name" value="" class="chat-name" />
+          <input type="text" name="open_chat_name" value="" class="chat-name" placeholder="例：明太子レシピ" />
+
+          <div class="input-box-child">
+            <div class="chatexplanation-label">説明</div>
+            <input type="text" name="open_detail" value="" class="chatexplanation" placeholder="例：明太子レシピを共有しましょう" />
+          </div>
         </div>
 
-        <div class="input-box-child">
-          <div class="chatexplanation-label">説明</div>
-          <input type="text" name="name" value="" class="chatexplanation" />
+        <!-- グループチャット選択 -->
+        <div class="input-box-child" id="groupForm">
+          <div>チャット名</div>
+          <input type="text" name="group_chat_name" value="" class="chat-name" placeholder="例：明太子レシピ" />
+          <div class="input-box-child">
+            <div class="chatexplanation-label">説明</div>
+            <input type="text" name="group_detail" value="" class="chatexplanation" placeholder="例：明太子レシピを共有しましょう" />
+          </div>
+          <div class="input-box-child">
+            <div class="add_member_title">グループメンバー追加</div>
+            <div class="list">
+              <div id="add_member_form" class="list">
+                <input type="text" name="friends_name" class="chat-name member-add-list" placeholder="例：めんたいちゃん" />
+              </div>
+              <input type="button" value="+" onclick="addForm()" class="member-add-button" />
+            </div>
+          </div>
+        </div>
+        <!-- プライベートチャット選択 -->
+        <div class="input-box-child" id="privateForm">
+          <div>プライベート</div>
+          <input type="text" name="private_friend_name" class="chat-name" placeholder="例：めんたいちゃん" />
         </div>
 
-        <input type="submit" value="登録" class="main-button" />
+        <input type="submit" value="登録" class="main-button chatcreatesubmit" />
       </div>
     </form>
   </main>
   <!-- メインEND -->
 
   <!-- フッター -->
-  <footer>
+  <footer class="footer-button_chatscreate">
     <div class="footer-button">
       <div class="footer-item">
         <!-- src="chatcreate(2).png"を変更-->
         <!-- chat-create-create.pngを変更-->
-        <img src="{{ url_for('static', filename='img/chat-create-create.png') }}" alt="チャット作成" class="footer-image" />
-        チャット作成
+        <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />
+        プロフィール
       </div>
     </div>
 
@@ -98,6 +149,60 @@
   </script>
 
   <!-- ログアウトのJSテスト　ここまで -->
+  <script>
+    const elements = document.getElementsByName("chat_type");
+    const openForm = document.getElementById("openForm");
+    const groupForm = document.getElementById("groupForm");
+    const privateForm = document.getElementById("privateForm");
+    const openDiv = document.getElementById("open_div");
+    const groupDiv = document.getElementById("group_div");
+    const privateDiv = document.getElementById("private_div");
+
+    openForm.style.display = "block";
+    groupForm.style.display = "none";
+    privateForm.style.display = "none";
+    openDiv.classList.add("checked");
+
+    const checkRadio = () => {
+      let checkValue = "";
+      for (let i = 0; i < elements.length; i++) {
+        if (elements.item(i).checked) {
+          checkValue = elements.item(i).value;
+        }
+      }
+      if (checkValue == "open") {
+        openForm.style.display = "block";
+        groupForm.style.display = "none";
+        privateForm.style.display = "none";
+        openDiv.classList.add("checked");
+        groupDiv.classList.remove("checked");
+        privateDiv.classList.remove("checked");
+      } else if (checkValue == "group") {
+        openForm.style.display = "none";
+        groupForm.style.display = "block";
+        privateForm.style.display = "none";
+        openDiv.classList.remove("checked");
+        groupDiv.classList.add("checked");
+        privateDiv.classList.remove("checked");
+      } else if (checkValue == "private") {
+        openForm.style.display = "none";
+        groupForm.style.display = "none";
+        privateForm.style.display = "block";
+        openDiv.classList.remove("checked");
+        groupDiv.classList.remove("checked");
+        privateDiv.classList.add("checked");
+      }
+    };
+    const addForm = () => {
+      const input_data = document.createElement("input");
+      input_data.type = "text";
+      input_data.name = "friends_name";
+      input_data.classList.add("chat-name");
+      input_data.classList.add("member-add-list");
+      const parent = document.getElementById("add_member_form");
+      parent.appendChild(input_data);
+    };
+  </script>
 
   {% endblock content %}
 </body>

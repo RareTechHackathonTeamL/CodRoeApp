@@ -178,7 +178,7 @@
      display: none;
  }
 
- .select-chat_type:checked {
+ .checked {
      border: 5px solid #ff9494;
  }
 

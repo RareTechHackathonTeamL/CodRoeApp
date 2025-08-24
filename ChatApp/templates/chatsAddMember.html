@@ -6,7 +6,7 @@
     <header class="header">
         <h1>メンバー追加</h1>
         <a href="/chat/{{ chat.id }}/detail" class="back-button">
-          <img src="../static/img/left.png" alt="Parrots" class="header-image" />
+          <img src="{{ url_for('static', filename='img/left.png') }}" alt="Parrots" class="header-image" />
         </a>
     </header>
     <main>
@@ -21,7 +21,7 @@
             {% endif %}
         {% endwith %}
         </div>
-        
+        <h3>グループメンバー追加</h3>
         <form action="/chat/{{ chat.id }}/add_member" method="post" class="list">
             <div class="list">
                 <div id="add_member_form" class="list">
@@ -29,7 +29,7 @@
                 </div>
                 <input type="button" value="+" onclick="addForm()" class="member-add-button">
             </div>
-            <button type="submmit" class="main-button">友達追加</button>
+            <button type="submmit" class="main-button">追加</button>
         </form>
     </main>
     <!-- <form action="/chat/{{ chat.id }}/detail" method="GET">

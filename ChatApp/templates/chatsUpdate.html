@@ -1,145 +1,126 @@
 {% extends 'util/base.html' %} {% block title %}
 <title>Update Chat</title>
-{% endblock title %}
-{% block content %}
-
-
+{% endblock title %} {% block content %}
 
 <body class="body">
-    <!----- ヘッダー ----->
-    <header class="header">
-        <h1>{{ chat.chat_name }}</h1>
-        <form action="/chats" method="GET" class="back-button">
-            <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
-        </form>
-        <!----- 試験 
+  <!----- ヘッダー ----->
+  <header class="header">
+    <h1>{{ chat.chat_name }}</h1>
+    <form action="/chats" method="GET" class="back-button">
+      <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
+    </form>
+    <!----- 試験 
         <form action="/chat/delete/{{ chat.id }}" method="POST" class="deletebox-button">
             <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除"
                 class="header-image" />
         </form>
         ----->
-        <a onclick="openModal()" class="deletebox-button">
+    <a onclick="openModal()" class="deletebox-button">
+      <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
+    </a>
+  </header>
+  <!----- ヘッダーEND ----->
 
-            <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除"
-                class="header-image" />
-        </a>
+  <!-- メイン -->
+  <main class="main">
+    <form action="/chat/update/{{chat.id}}" method="post">
+      <div class="input-box-list">
+        {% if error %}
+        <div>
+          <h3>{{ error }}</h3>
+        </div>
+        {% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+        <div>
+          <h3>{{ message }}</h3>
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
 
-
-    </header>
-    <!----- ヘッダーEND ----->
-
-    <!-- メイン -->
-    <main class="main">
-        <form action="/chat/update/{{chat.id}}" method="post">
-            <div class="input-box-list">
-                <!----- これいるの 
-                {% if error %}
-                <div>
-                    <h3>{{ error }}</h3>
-                </div>
-                {% endif %}
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                {% for message in messages %}
-                <div>
-                    <h3>{{ message }}</h3>
-                </div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
-                ----->
-
-                <div class="input-box-child">
-                    <div>チャット名</div>
-                    <input type="text" name="chat_name" value="{{chat.chat_name}}" class="chat-name" />
-                </div>
-
-                <div class="input-box-child">
-                    <div class="chatexplanation-label">説明</div>
-                    <input type="text" name="detail" value="" class="chatexplanation" />
-                </div>
-
-
-                <input name="chat_name" placeholder="name" type="submit" value="チャット更新" class="main-button">
-
-
+        <div class="input-box-child">
+          <div>チャット名</div>
+          <a href="/change_uname" class="transitionplaceholder">
+            <div class="text-box">
+              <div class="placeholder">{{chat.chat_name}}</div>
+              <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
             </div>
-        </form>
-    </main>
-    <!-- メインEND -->
-
-    <!-- フッター -->
-    <footer>
-        <div class="footer-button">
-            <div class="footer-item">
-                <!-- src="chatcreate(2).png"を変更-->
-                <!-- chat-create-create.pngを変更-->
-                <img src="{{ url_for('static', filename='img/chat-create-create.png') }}" alt="チャット作成"
-                    class="footer-image" />
-                チャット作成
-            </div>
+          </a>
         </div>
 
-        <a href="/chats" class="footer-button">
-            <div class="footer-item">
-                <!-- src="chatlist(2).png"を変更-->
-                <!-- chat-list-create.pngを変更-->
-                <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧"
-                    class="footer-image" />
-                チャット一覧
+        <div class="input-box-child">
+          <div class="chatexplanation-label">説明</div>
+          <a href="/change_uname" class="transitionplaceholder">
+            <div class="chatexplanation">
+              <div class="placeholder">{{ current_user.user_name }}</div>
+              <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
             </div>
-        </a>
-
-        <a href="/logout" class="footer-button">
-            <div class="footer-item">
-                <!-- src="logout(2).png"を変更-->
-                <!-- logout-create.pngを変更-->
-                <img src="{{ url_for('static', filename='img/logout-create.png') }}" alt="ログアウト" class="footer-image" />
-                ログアウト
-            </div>
-        </a>
-    </footer>
-    <!-- フッターEND -->
-
-
-
-
-    <!-- ログアウトのJSテスト　ここから -->
-
-    <!-- モーダル -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <img src="../../static/img/chat-delete.png" class="js-logout-img" alt="注意">
-            <div class="font">チャット削除しますか？</div>
-            <!-- ログアウト用フォーム -->
-
-            <form action="/chat/delete/{{ chat.id }}" method="POST">
-                <input type="submit" class="js-btn delete" value="はい">
-            </form>
-
-            <!-- キャンセルボタン -->
-            <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
+          </a>
+          <input name="chat_name" placeholder="name" type="submit" value="チャット更新" class="main-button" />
         </div>
+      </div>
+    </form>
+  </main>
+  <!-- メインEND -->
+
+  <!-- フッター -->
+  <footer>
+    <a href="/profile" method="GET" class="footer-button">
+      <div class="footer-item">
+        <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />
+        プロフィール
+      </div>
+    </a>
+
+    <a href="/chats" class="footer-button">
+      <div class="footer-item">
+        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
+        チャット一覧
+      </div>
+    </a>
+
+    <a href="/logout" class="footer-button">
+      <div class="footer-item">
+        <img src="{{ url_for('static', filename='img/logout-create.png') }}" alt="ログアウト" class="footer-image" />
+        ログアウト
+      </div>
+    </a>
+  </footer>
+  <!-- フッターEND -->
+
+  <!-- ログアウトのJSテスト　ここから -->
+
+  <!-- モーダル -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img src="../../static/img/chat-delete.png" class="js-logout-img" alt="注意" />
+      <div class="font">チャット削除しますか？</div>
+      <!-- ログアウト用フォーム -->
+
+      <form action="/chat/delete/{{ chat.id }}" method="POST">
+        <input type="submit" class="js-btn delete" value="はい" />
+      </form>
+
+      <!-- キャンセルボタン -->
+      <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
     </div>
+  </div>
 
-    <script>
-        // モーダルを表示する関数
-        function openModal() {
-            // id="myModal" の要素を取得して display を "flex" に変更
-            // これによりモーダルが画面に表示される
-            document.getElementById("myModal").style.display = "flex";
-        }
+  <script>
+    // モーダルを表示する関数
+    function openModal() {
+      // id="myModal" の要素を取得して display を "flex" に変更
+      // これによりモーダルが画面に表示される
+      document.getElementById("myModal").style.display = "flex";
+    }
 
-        // モーダルを非表示にする関数
-        function closeModal() {
-            // id="myModal" の要素を取得して display を "none" に変更
-            // これによりモーダルが閉じられる
-            document.getElementById("myModal").style.display = "none";
-        }
-    </script>
+    // モーダルを非表示にする関数
+    function closeModal() {
+      // id="myModal" の要素を取得して display を "none" に変更
+      // これによりモーダルが閉じられる
+      document.getElementById("myModal").style.display = "none";
+    }
+  </script>
 
-    <!-- ログアウトのJSテスト　ここまで -->
+  <!-- ログアウトのJSテスト　ここまで -->
 
-    {% endblock content %}
+  {% endblock content %}
 </body>

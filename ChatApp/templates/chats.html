@@ -2,32 +2,40 @@
 <title>チャット一覧</title>
 {% endblock title %} {% block content %}
 
-
+<!-- ロベ検証用 ここから-->
+{% with messages = get_flashed_messages() %} {% if messages %}
+<ul>
+  {% for message in messages %}
+  <li>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %} {% endwith %}
+<!-- ロベ検証用　ここまで -->
 
 <body class="body">
   <header class="header">
     <h1>チャット一覧</h1>
+
+    <form action="/chat/create" method="get" class="chatcreation-button">
+      <input type="image" src="{{ url_for('static', filename='img/chatcreation.png') }}" alt="チャット作成" class="header-image" />
+    </form>
   </header>
+
   <main>
     <div class="list">
       {% for chat in chats %}
       <form action="/chat/{{ chat.id }}/messages" method="GET">
-        <input type="submit" value="{{ chat.chat_name}}" class="h3-box">
+        <input type="submit" value="{{ chat.chat_name}}" class="h3-box" />
       </form>
       {% endfor %}
-    </div>
-    <div>
-      <form action="/profile" method="GET">
-        <input type="submit" value="プロフィール">
-      </form>
     </div>
   </main>
 
   <footer>
-    <a href="/chat/create" class="footer-button">
+    <a href="/profile" method="GET" class="footer-button">
       <div class="footer-item">
-        <img src="{{ url_for('static', filename='img/chat-create-create.png') }}" alt="チャット作成" class="footer-image" />
-        チャット作成
+        <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />
+        プロフィール
       </div>
     </a>
 
@@ -46,19 +54,18 @@
     </a>
   </footer>
 
-
   <!-- ログアウトのJSテスト　ここから -->
 
   <!-- モーダル -->
   <div id="myModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <img src="../../static/img/logout-icon.png" class="js-logout-img" alt="注意">
+      <img src="js-logout.png" class="js-logout-img" alt="注意" />
       <div class="font">ログアウトしますか？</div>
       <!-- ログアウト用フォーム -->
 
       <form action="/logout">
-        <input type="submit" class="js-btn delete" value="はい">
+        <input type="submit" class="js-btn delete" value="はい" />
       </form>
 
       <!-- キャンセルボタン -->
@@ -80,6 +87,14 @@
       // これによりモーダルが閉じられる
       document.getElementById("myModal").style.display = "none";
     }
+
+    // 背景クリックで閉じる
+    window.onclick = function (event) {
+      const modal = document.getElementById("myModal");
+      if (event.target === modal) {
+        closeModal();
+      }
+    };
   </script>
 
   <!-- ログアウトのJSテスト　ここまで -->

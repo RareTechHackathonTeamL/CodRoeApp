@@ -94,14 +94,19 @@
 
       <!-- グループに所属しているか -->
       {% if chat.chat_type == 1 %}
-      <ul>
+      <div class="chatexplanation-label">グループメンバー</div>
+      <ul class="memberul">
         {% for member in chat_member%}
-        <li>{{ member }}</li>
+
+        <li class="memberlist">
+          <div class="text-box">{{ member }}</div>
+        </li>
         {% endfor %}
       </ul>
       <form action="/chat/{{ chat.id }}/add_member" method="GET">
-        <input type="submit" value="メンバー追加へ" />
+        <input type="submit" value="メンバー追加へ" class="main-button-login chatcreatesubmit" />
       </form>
+
       {% endif %} {% endif %}
     </div>
   </main>

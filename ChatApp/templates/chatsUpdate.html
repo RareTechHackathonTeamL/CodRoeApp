@@ -15,47 +15,94 @@
                 class="header-image" />
         </form>
         ----->
+
+    {% if chat.user_id == user_id %}
     <a onclick="openModal()" class="deletebox-button">
       <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
     </a>
+    {% endif %}
   </header>
   <!----- ヘッダーEND ----->
 
   <!-- メイン -->
   <main class="main">
-    <form action="/chat/update/{{chat.id}}" method="post">
-      <div class="input-box-list">
-        {% if error %}
-        <div>
-          <h3>{{ error }}</h3>
-        </div>
-        {% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
-        <div>
-          <h3>{{ message }}</h3>
-        </div>
-        {% endfor %} {% endif %} {% endwith %}
+    <div class="input-box-list">
+      {% if error %}
+      <div>
+        <h3>{{ error }}</h3>
+      </div>
+      {% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+      <div>
+        <h3>{{ message }}</h3>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
 
-        <div class="input-box-child">
-          <div>チャット名</div>
-          <a href="/chat/update_name/{{ chat.id }}" class="transitionplaceholder">
-            <div class="text-box">
-              <div class="placeholder">{{chat.chat_name}}</div>
-              <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
-            </div>
-          </a>
-        </div>
+      <!-- 作成者であるのか -->
+      {% if chat.user_id == user_id %}
 
-        <div class="input-box-child">
-          <div class="chatexplanation-label">説明</div>
-          <a href="/chat/update_detail/{{ chat.id }}" class="transitionplaceholder">
-            <div class="chatexplanation">
-              <div class="placeholder">{{chat.detail}}</div>
-              <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
-            </div>
-          </a>
+      <div class="input-box-child">
+        <div>チャット名</div>
+        <div class="transitionplaceholder">
+          <div class="text-box">
+            <div class="placeholder">{{chat.chat_name}}</div>
+          </div>
         </div>
       </div>
-    </form>
+
+      <div class="input-box-child">
+        <div class="chatexplanation-label">説明</div>
+        <div class="transitionplaceholder">
+          <div class="chatexplanation">
+            <div class="placeholder">{{chat.detail}}</div>
+          </div>
+        </div>
+      </div>
+      {% if chat.chat_type == 1 %}
+
+      <ul>
+        {% for member in chat_member%}
+        <li>{{ member }}</li>
+        {% endfor %}
+      </ul>
+      <form action="/chat/{{ chat.id }}/add_member" method="GET">
+        <input type="submit" value="メンバー追加へ" />
+      </form>
+
+      {% endif %} {% else %}
+
+      <div class="input-box-child">
+        <div>チャット名</div>
+        <a href="/chat/update_name/{{ chat.id }}" class="transitionplaceholder">
+          <div class="text-box">
+            <div>{{chat.chat_name}}</div>
+            <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
+          </div>
+        </a>
+      </div>
+
+      <div class="input-box-child">
+        <div class="chatexplanation-label">説明</div>
+        <a href="/chat/update_detail/{{ chat.id }}" class="transitionplaceholder">
+          <div class="chatexplanation">
+            <div>{{chat.detail}}</div>
+            <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
+          </div>
+        </a>
+      </div>
+
+      <!-- グループに所属しているか -->
+      {% if chat.chat_type == 1 %}
+      <ul>
+        {% for member in chat_member%}
+        <li>{{ member }}</li>
+        {% endfor %}
+      </ul>
+      <form action="/chat/{{ chat.id }}/add_member" method="GET">
+        <input type="submit" value="メンバー追加へ" />
+      </form>
+
+      {% endif %}{% endif %}
+    </div>
   </main>
   <!-- メインEND -->
 

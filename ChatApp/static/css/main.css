@@ -151,7 +151,7 @@
  }
 
  .member-add-button {
-     width: 288px;
+     width: 320px;
      height: 30px;
      font-size: 16px;
      color: #FFF;
@@ -197,4 +197,19 @@
      font-size: 14px;
      display: flex;
      justify-content: center;
+ }
+
+
+ .footer-button_chatscreate {
+     position: fixed;
+     bottom: 0;
+     display: flex;
+ }
+
+ .chatcreatesubmit {
+     margin-bottom: 110px;
+ }
+
+ .add_member_title {
+     margin-top: 30px;
  }

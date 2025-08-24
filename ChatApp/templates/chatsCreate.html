@@ -44,43 +44,49 @@
             </div>
           </label>
         </div>
-        <div class="input-box-child">
+        <!-- オープン選択 -->
+        <div class="input-box-child" id="openForm">
           <div>チャット名</div>
-          <input type="text" name="chat_name" value="" class="chat-name" />
+          <input type="text" name="open_chat_name" value="" class="chat-name" placeholder="例：明太子レシピ" />
+
+          <div class="input-box-child">
+            <div class="chatexplanation-label">説明</div>
+            <input type="text" name="open_detail" value="" class="chatexplanation" placeholder="例：明太子レシピを共有しましょう" />
+          </div>
         </div>
 
-        <div class="input-box-child">
-          <div class="chatexplanation-label">説明</div>
-          <input type="text" name="name" value="" class="chatexplanation" />
-        </div>
-        <!-- オープンチャット選択 -->
-        <div id="openForm">
-          <input name="open_chat_name" placeholder="name" />
-          <input name="open_detail" /><br />
-        </div>
         <!-- グループチャット選択 -->
-        <div id="groupForm">
-          <input name="group_chat_name" placeholder="name" />
-          <input name="group_detail" /><br />
-          <div id="add_member_form">
-            <input type="text" name="friends_name" />
-            <input type="button" value="+" onclick="addForm()" />
+        <div class="input-box-child" id="groupForm">
+          <div>チャット名</div>
+          <input type="text" name="group_chat_name" value="" class="chat-name" placeholder="例：明太子レシピ" />
+          <div class="input-box-child">
+            <div class="chatexplanation-label">説明</div>
+            <input type="text" name="group_detail" value="" class="chatexplanation" placeholder="例：明太子レシピを共有しましょう" />
+          </div>
+          <div class="input-box-child">
+            <div class="add_member_title">グループメンバー追加</div>
+            <div class="list">
+              <div id="add_member_form" class="list">
+                <input type="text" name="friends_name" class="chat-name member-add-list" placeholder="例：めんたいちゃん" />
+              </div>
+              <input type="button" value="+" onclick="addForm()" class="member-add-button" />
+            </div>
           </div>
         </div>
         <!-- プライベートチャット選択 -->
-        <div id="privateForm">
+        <div class="input-box-child" id="privateForm">
           <div>プライベート</div>
-          <input name="private_friend_name" />
+          <input type="text" name="private_friend_name" class="chat-name" placeholder="例：めんたいちゃん" />
         </div>
 
-        <input type="submit" value="登録" class="main-button" />
+        <input type="submit" value="登録" class="main-button chatcreatesubmit" />
       </div>
     </form>
   </main>
   <!-- メインEND -->
 
   <!-- フッター -->
-  <footer>
+  <footer class="footer-button_chatscreate">
     <div class="footer-button">
       <div class="footer-item">
         <!-- src="chatcreate(2).png"を変更-->
@@ -155,6 +161,7 @@
     openForm.style.display = "block";
     groupForm.style.display = "none";
     privateForm.style.display = "none";
+    openDiv.classList.add("checked");
 
     const checkRadio = () => {
       let checkValue = "";
@@ -167,29 +174,31 @@
         openForm.style.display = "block";
         groupForm.style.display = "none";
         privateForm.style.display = "none";
-        openDiv.classList.add('checked');
-        groupDiv.classList.remove('checked');
-        groupDiv.classList.remove('checked');
+        openDiv.classList.add("checked");
+        groupDiv.classList.remove("checked");
+        privateDiv.classList.remove("checked");
       } else if (checkValue == "group") {
         openForm.style.display = "none";
         groupForm.style.display = "block";
         privateForm.style.display = "none";
-        openDiv.classList.remove('checked');
-        groupDiv.classList.add('checked');
-        privateDiv.classList.remove('checked');
+        openDiv.classList.remove("checked");
+        groupDiv.classList.add("checked");
+        privateDiv.classList.remove("checked");
       } else if (checkValue == "private") {
         openForm.style.display = "none";
         groupForm.style.display = "none";
         privateForm.style.display = "block";
-        openDiv.classList.remove('checked');
-        groupDiv.classList.remove('checked');
-        privateDiv.classList.add('checked');
+        openDiv.classList.remove("checked");
+        groupDiv.classList.remove("checked");
+        privateDiv.classList.add("checked");
       }
-    }
+    };
     const addForm = () => {
       const input_data = document.createElement("input");
       input_data.type = "text";
       input_data.name = "friends_name";
+      input_data.classList.add("chat-name");
+      input_data.classList.add("member-add-list");
       const parent = document.getElementById("add_member_form");
       parent.appendChild(input_data);
     };

@@ -6,7 +6,7 @@
   <!----- ヘッダー ----->
   <header class="header">
     <h1>{{ chat.chat_name }}</h1>
-    <form action="/chats" method="GET" class="back-button">
+    <form action="/chat/{{ chat.id }}/messages" method="GET" class="back-button">
       <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
     <!----- 試験 
@@ -37,7 +37,7 @@
 
         <div class="input-box-child">
           <div>チャット名</div>
-          <a href="/change_uname" class="transitionplaceholder">
+          <a href="/chat/update_name/{{ chat.id }}" class="transitionplaceholder">
             <div class="text-box">
               <div class="placeholder">{{chat.chat_name}}</div>
               <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
@@ -47,13 +47,12 @@
 
         <div class="input-box-child">
           <div class="chatexplanation-label">説明</div>
-          <a href="/change_uname" class="transitionplaceholder">
+          <a href="/chat/update_detail/{{ chat.id }}" class="transitionplaceholder">
             <div class="chatexplanation">
-              <div class="placeholder">{{ current_user.user_name }}</div>
+              <div class="placeholder">{{chat.detail}}</div>
               <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
             </div>
           </a>
-          <input name="chat_name" placeholder="name" type="submit" value="チャット更新" class="main-button" />
         </div>
       </div>
     </form>

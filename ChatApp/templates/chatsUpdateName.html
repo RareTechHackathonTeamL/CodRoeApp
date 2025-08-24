@@ -1,18 +1,42 @@
+<!-- いずれチャット名編集となるHTML -->
+
 {% extends 'util/base.html' %} {% block title %}
-<title>Update Chat Name</title>
-{% endblock title %}
-{% block content %}
-<div>チャット名変更</div>
-<form action="/chat/{{ chat.id }}/detail" method="GET">
-    <input type="submit" value="チャット編集へ">
-</form>
-{% if error %}
-<div>
-    <h3>{{ error }}</h3>
-</div>
-{% endif %}
-<form action="/chat/update_name/{{ chat.id }}" method="post">
-    <input name="chat_name" placeholder="name">
-    <button type="submmit">チャット名更新</button>
-</form>
-{% endblock content %}
+<title>チャット名変更</title>
+{% endblock title %} {% block content %}
+
+<body class="body">
+  <!----- ヘッダー ----->
+
+  <header class="header">
+    <h1>チャット名変更</h1>
+    <a href="/chat/<chat_id>/detail" class="back-button">
+      <!-- ファイル統一の為変更 -->
+      <img src="{{ url_for('static', filename='img/left.png') }}" alt="Parrots" class="header-image" />
+    </a>
+  </header>
+  <!----- ヘッダー END ----->
+  <!-- <h2>{{ current_user.user_name }} さんのユーザ情報を更新します</h2> -->
+  {% with messages = get_flashed_messages() %} {% if messages %}
+  <ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %} {% endwith %}
+
+  <!----- メインコンテンツ ----->
+  <main class="main">
+    <form action="/chat/update_name/{{ chat.id }}" method="POST">
+      <div class="input-form">
+        <div class="input-box-autu">
+          <div class="font">チャット名</div>
+          <input type="text" name="chat_name" placeholder="{{chat.chat_name}}" class="text-box" />
+        </div>
+      </div>
+
+      <p><input type="submit" value="保存" class="main-button" /></p>
+    </form>
+    <img src="{{ url_for('static', filename='img/change_chatroom.png') }}" class="backgroundimage" />
+  </main>
+  {% endblock content %}
+</body>

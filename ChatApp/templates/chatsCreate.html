@@ -18,6 +18,32 @@
   <main class="main">
     <form action="/chat/create" method="post">
       <div class="input-box-list">
+        <!-- チャットタイプ選択 -->
+        <h3>グループタイプ選択</h3>
+        <div class="select-chat_types">
+          <!-- オープンチャット -->
+          <input type="radio" id="open" name="chat_type" value="open" onclick="checkRadio()" checked class="select-chat_typeradio" />
+          <label for="open">
+            <div class="select-chat_type">
+              <img src="{{ url_for('static', filename='img/openform.png') }}" class="select-chat_typeimg" />
+            </div>
+          </label>
+          <!-- グループチャット -->
+          <input type="radio" id="group" name="chat_type" value="group" onclick="checkRadio()" class="select-chat_typeradio" />
+          <label for="group">
+            <div class="select-chat_type">
+              <img src="{{ url_for('static', filename='img/groupform.png') }}" class="select-chat_typeimg" />
+            </div>
+          </label>
+
+          <!-- プライベートチャット -->
+          <input type="radio" id="private" name="chat_type" value="private" onclick="checkRadio()" class="select-chat_typeradio" />
+          <label for="private">
+            <div class="select-chat_type">
+              <img src="{{ url_for('static', filename='img/privateform.png') }}" class="select-chat_typeimg" />
+            </div>
+          </label>
+        </div>
         <div class="input-box-child">
           <div>チャット名</div>
           <input type="text" name="chat_name" value="" class="chat-name" />
@@ -98,6 +124,47 @@
   </script>
 
   <!-- ログアウトのJSテスト　ここまで -->
+  <script>
+    const elements = document.getElementsByName("chat_type");
+    const openForm = document.getElementById("openForm");
+    const groupForm = document.getElementById("groupForm");
+    const privateForm = document.getElementById("privateForm");
+    openForm.style.display = "block";
+    groupForm.style.display = "none";
+    privateForm.style.display = "none";
+    const checkRadio = () => {
+      let checkValue = "";
+      for (let i = 0; i < elements.length; i++) {
+        if (elements.item(i).checked) {
+          checkValue = elements.item(i).value;
+        }
+      }
+      if (checkValue == "open") {
+        openForm.style.display = "block";
+        groupForm.style.display = "none";
+        privateForm.style.display = "none";
+      } else if (checkValue == "group") {
+        openForm.style.display = "none";
+        groupForm.style.display = "block";
+        privateForm.style.display = "none";
+      } else if (checkValue == "private") {
+        openForm.style.display = "none";
+        groupForm.style.display = "none";
+        privateForm.style.display = "block";
+      } else {
+        openForm.style.display = "none";
+        groupForm.style.display = "none";
+        privateForm.style.display = "none";
+      }
+    };
+    const addForm = () => {
+      const input_data = document.createElement("input");
+      input_data.type = "text";
+      input_data.name = "friends_name";
+      const parent = document.getElementById("add_member_form");
+      parent.appendChild(input_data);
+    };
+  </script>
 
   {% endblock content %}
 </body>

@@ -459,9 +459,10 @@ def chat_add_member(chat_id):
             chat_in = Member.search_in_chat(chat_id, friend_id)
             if chat_in != None:
                 results.append(f'{friend}さんは既にチャットに参加しています')
-            # メンバーDBに追加
-            id = uuid.uuid4()
-            Member.add_member(id, chat_id, friend_id)
+            else:
+                # メンバーDBに追加
+                id = uuid.uuid4()
+                Member.add_member(id, chat_id, friend_id)
     if results == None:
         flash('メンバー追加できました！')
         return redirect(f'/chat/{chat_id}/messages')

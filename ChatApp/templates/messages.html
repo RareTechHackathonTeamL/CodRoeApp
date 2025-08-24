@@ -10,15 +10,21 @@
       <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
 
-    {% if chat.chat_type == 2 %}
-    <a onclick="openModal()" class="deletebox-button">
-      <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
-    </a>
-    {% else %} {% if chat.user_id == user_id %}
+    {% if chat.chat_type == 0 %}
+    {% if chat.user_id == user_id %}
     <form action="/chat/{{ chat.id }}/detail" method="GET" class="setting-button">
       <input type="image" src="{{ url_for('static', filename='img/setting.png') }}" alt="編集" class="header-image" />
     </form>
-    {% endif %} {% endif %}
+    {% endif %} 
+    {% elif chat.chat_type == 1 %}
+    <form action="/chat/{{ chat.id }}/detail" method="GET" class="setting-button">
+      <input type="image" src="{{ url_for('static', filename='img/setting.png') }}" alt="編集" class="header-image" />
+    </form>
+    {% elif chat.chat_type == 2 %}
+    <a onclick="openModal()" class="deletebox-button">
+      <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
+    </a>
+    {% endif %}
   </header>
 
   <!-- メイン -->
@@ -54,7 +60,7 @@
       <div class="font">チャット削除しますか？</div>
       <!-- ログアウト用フォーム -->
 
-      <form action="/chat/delete/{{ chat.id }}" method="POST">
+      <form action="/chat/delete/private/{{ chat.id }}" method="POST">
         <input type="submit" class="js-btn delete" value="はい" />
       </form>
 

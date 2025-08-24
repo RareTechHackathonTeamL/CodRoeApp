@@ -329,8 +329,6 @@ def create_chat():
                         results.append(f'{friend}さんは既にチャットに参加しています')
                     member_gid2 = uuid.uuid4()
                     Member.add_member(member_gid2, chat_id, friend_id)
-            print('=============')
-            print(results)
             if results:
                 flash('以下のメンバーが登録できませんでした')
                 for result in results:
@@ -420,6 +418,16 @@ def delete_chat(chat_id):
         return render_template('ChatsUpdate.html', chat=chat_info, error=error)
     elif chat_info != None:
         Chat.delete(chat_id)
+    return redirect(url_for('chats_view'))
+
+# プライベートチャット削除
+@app.route('/chat/delete/private/<chat_id>', methods=['POST'])
+@login_required
+def delete_private_chat(chat_id):
+    chat_info = Chat.find_by_chat_info(chat_id)
+    if chat_info['chat_type'] != 2:
+        return redirect(f'/chat/{chat_id}/messages')
+    Chat.delete(chat_id)
     return redirect(url_for('chats_view'))
 
 # グループメンバー追加画面遷移

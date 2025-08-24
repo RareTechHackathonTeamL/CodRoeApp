@@ -1,51 +1,83 @@
-{% extends 'util/base.html' %}
-
-{% block title %}
+{% extends 'util/base.html' %} {% block title %}
 <title>全体チャット</title>
-{% endblock title %}
-
-{% block content %}
+{% endblock title %} {% block content %}
 
 <body class="body">
-    <!-- ヘッダー -->
-    <header class="header">
-        <h1>{{ chat.chat_name }}</h1>
-        <form action="/chats" method="GET" class="back-button">
-            <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
-        </form>
+  <!-- ヘッダー -->
+  <header class="header">
+    <h1>{{ chat.chat_name }}</h1>
+    <form action="/chats" method="GET" class="back-button">
+      <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
+    </form>
 
-        {% if chat.user_id == user_id %}
-        <form action="/chat/{{ chat.id }}/detail" method="GET" class="setting-button">
-            <input type="image" src="{{ url_for('static', filename='img/setting.png') }}" alt="編集"
-                class="header-image" />
-        </form>
-        {% endif %}
-    </header>
+    {% if chat.chat_type == 2 %}
+    <a onclick="openModal()" class="deletebox-button">
+      <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
+    </a>
+    {% else %} {% if chat.user_id == user_id %}
+    <form action="/chat/{{ chat.id }}/detail" method="GET" class="setting-button">
+      <input type="image" src="{{ url_for('static', filename='img/setting.png') }}" alt="編集" class="header-image" />
+    </form>
+    {% endif %} {% endif %}
+  </header>
 
-    <!-- メイン -->
-    <main class="messages">
-        {% for message in messages %}
-        <div class="message {{ 'right' if message.user_id == user_id else 'left' }}">
-            <div class="message-box">
-                <div class="message-content">
-                    <div class="user-name">{{ message.user_name }}</div>
-                    <div class="message-text">{{ message.message }}</div>
-                    <div>
-                        <img src="{{ url_for('static', filename='img/user_icons/' + message.icon_img) }}" width="40", height="40">
-                    </div>
-                </div>
-            </div>
+  <!-- メイン -->
+  <main class="messages">
+    {% for message in messages %}
+    <div class="message {{ 'right' if message.user_id == user_id else 'left' }}">
+      <div class="message-box">
+        <div class="message-content">
+          <div class="user-name">{{ message.user_name }}</div>
+          <div class="message-text">{{ message.message }}</div>
+          <div>
+            <img src="{{ url_for('static', filename='img/user_icons/' + message.icon_img) }}" width="40" , height="40" />
+          </div>
         </div>
-        {% endfor %}
-    </main>
+      </div>
+    </div>
+    {% endfor %}
+  </main>
 
-    <!-- フッター（メッセージ送信フォーム）-->
-    <footer class="chat-screen">
-        <form action="/chat/{{ chat.id }}/messages" method="POST" class="chat-form">
-            <textarea id="footer-message" name="message" placeholder="メッセージを入力" required></textarea>
-            <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信"
-                class="send-button">
-        </form>
-    </footer>
+  <!-- フッター（メッセージ送信フォーム）-->
+  <footer class="chat-screen">
+    <form action="/chat/{{ chat.id }}/messages" method="POST" class="chat-form">
+      <textarea id="footer-message" name="message" placeholder="メッセージを入力" required></textarea>
+      <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信" class="send-button" />
+    </form>
+  </footer>
+
+  <!-- モーダル -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img src="../../static/img/chat-delete.png" class="js-logout-img" alt="注意" />
+      <div class="font">チャット削除しますか？</div>
+      <!-- ログアウト用フォーム -->
+
+      <form action="/chat/delete/{{ chat.id }}" method="POST">
+        <input type="submit" class="js-btn delete" value="はい" />
+      </form>
+
+      <!-- キャンセルボタン -->
+      <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
+    </div>
+  </div>
+
+  <script>
+    // モーダルを表示する関数
+    function openModal() {
+      // id="myModal" の要素を取得して display を "flex" に変更
+      // これによりモーダルが画面に表示される
+      document.getElementById("myModal").style.display = "flex";
+    }
+
+    // モーダルを非表示にする関数
+    function closeModal() {
+      // id="myModal" の要素を取得して display を "none" に変更
+      // これによりモーダルが閉じられる
+      document.getElementById("myModal").style.display = "none";
+    }
+  </script>
 </body>
+
 {% endblock content %}

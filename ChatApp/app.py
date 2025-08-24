@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from models import User, Chat, Message, Member, Stamp
-import uuid
+import uuid, re
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -82,6 +82,10 @@ def register_process():
         flash('空のフォームがあるっタラコ！')
     elif password != passwordConfirmation:
         flash('パスワードが一致しないっタラコ！')
+    # elif len(password) < 8:
+    #     flash('パスワードは８文字以上でお願いしまスケトウダラm(_ _)m🐟')
+    # elif re.search(r'\d', password) == None or re.search(r'[a-z]', password) == None or re.search(r'[A-Z]', password) == None:
+    #     flash('パスワードはアルファベット大文字小文字と数字が含まれている必要がありまスケトウダラm(_ _)m🐟')
     elif registered_name != None:
         flash('ごめんたい! このユーザ名は既に登録されタラコ...')  
     elif registered_email != None:
@@ -210,6 +214,10 @@ def change_password():
         flash('現在のパスワードを間違っタラコ？')
     elif new_password != new_passwordConfirmation:
         flash('パスワードが一致しません！')
+    # elif len(new_password) < 8:
+        # flash('パスワードは８文字以上でお願いしまスケトウダラm(_ _)m🐟')
+    # elif re.search(r'\d', new_password) == None or re.search(r'[a-z]', new_password) == None or re.search(r'[A-Z]', new_password) == None:
+        # flash('パスワードはアルファベット大文字小文字と数字が含まれている必要がありまスケトウダラm(_ _)m🐟')
     else:
         User.change_password(user_id, new_password)
         flash('ユーザ情報を更新しタラコ！')
@@ -274,9 +282,10 @@ def chat_create_view():
 @login_required
 def create_chat():
     chat_type = request.form.get('chat_type')
+
     # 個人チャットの場合
-    if chat_type == 'private':
-        return redirect(f'/chat/create/select_private')
+    # if chat_type == 'private':
+        # return redirect(f'/chat/create/select_private')
 
     new_chat_name = request.form.get('chat_name')
     if new_chat_name == '':

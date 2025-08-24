@@ -106,7 +106,6 @@
   </main>
   <!-- メインEND -->
 
-  <!-- フッター -->
   <footer>
     <a href="/profile" method="GET" class="footer-button">
       <div class="footer-item">
@@ -115,21 +114,20 @@
       </div>
     </a>
 
-    <a href="/chats" class="footer-button">
+    <div class="footer-button">
       <div class="footer-item">
         <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
         チャット一覧
       </div>
-    </a>
+    </div>
 
-    <a href="/logout" class="footer-button">
+    <a onclick="openModal()" class="footer-button">
       <div class="footer-item">
         <img src="{{ url_for('static', filename='img/logout-create.png') }}" alt="ログアウト" class="footer-image" />
         ログアウト
       </div>
     </a>
   </footer>
-  <!-- フッターEND -->
 
   <!-- ログアウトのJSテスト　ここから -->
 

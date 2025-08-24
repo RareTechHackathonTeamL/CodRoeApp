@@ -1,5 +1,5 @@
 {% extends 'util/base.html' %} {% block title %}
-<title>チャット作成</title>
+<title>Create Chat</title>
 {% endblock title %} {% block content %}
 
 <body class="body">
@@ -18,7 +18,6 @@
   <main class="main">
     <form action="/chat/create" method="post">
       <div class="input-box-list">
-
         <div class="input-box-child">
           <div>チャット名</div>
           <input type="text" name="chat_name" value="" class="chat-name" />
@@ -30,7 +29,6 @@
         </div>
 
         <input type="submit" value="登録" class="main-button" />
-
       </div>
     </form>
   </main>
@@ -70,13 +68,12 @@
   <div id="myModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <img src="../../static/img/logout-icon.png" class="js-logout-img" alt="注意">
+      <img src="../../static/img/logout-icon.png" class="js-logout-img" alt="注意" />
       <div class="font">ログアウトしますか？</div>
       <!-- ログアウト用フォーム -->
 
-
       <form action="/logout">
-        <input type="submit" class="js-btn delete" value="はい">
+        <input type="submit" class="js-btn delete" value="はい" />
       </form>
 
       <!-- キャンセルボタン -->

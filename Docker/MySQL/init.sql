@@ -70,7 +70,7 @@ CREATE TABLE stamps (
     update_at DATETIME
 );
 
-INSERT INTO users(user_id, user_name, email, icon_img,  password, created_at) VALUES('a', 'テスト', 'demota@gmail.com', 'default_image.png' 'a', '2025-07-01');
+INSERT INTO users(user_id, user_name, email, icon_img,  password, icon_img, created_at) VALUES('a', 'テスト', 'demota@gmail.com', 'default_image.png' 'a', 'default_image.png', '2025-07-01');
 INSERT INTO chat(id, user_id, chat_name, detail, chat_type, created_at, latest_messages) VALUES('aaaaaaaaaa', 'a', '明太子を語る会', "明太子について語りましょう！！", 0, '2025-07-01','2025-07-01');
 INSERT INTO chat(id, user_id, chat_name, detail, chat_type, created_at, latest_messages) VALUES('bbbbbbbbbb', 'a', 'スケトウダラを語る会', "スケトウダラについてダラダラ語りましょう！！", 0, '2025-07-02', '2025-07-02');
 INSERT INTO messages(id, user_id, chat_id, message, created_at) VALUES('c', 'a', 'aaaaaaaaaa', '私は辛さ控えめかつ、塩味が強めが好きだなぁ', '2025-07-01');

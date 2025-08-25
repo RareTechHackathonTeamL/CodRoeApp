@@ -8,6 +8,12 @@
     text-decoration: none;
 }
 
+.list-margin-top {
+
+    margin-top: 30px;
+
+}
+
 /*ボックス内の表示*/
 .h3-box {
 
@@ -19,13 +25,13 @@
     background: white;
     color: rgb(255, 148, 148);
     font-size: 14px;
-    
+
 }
 
 .messages {
 
-  /* ← フッター高さ(94) + 余白 */
-  padding-bottom: 110px;           
+    /* ← フッター高さ(94) + 余白 */
+    padding-bottom: 110px;
 }
 
 .message {
@@ -46,8 +52,8 @@
     font-size: 14px;
 
     /*単語の途中でも改行*/
-    overflow-wrap: break-word;  
-    
+    overflow-wrap: break-word;
+
 }
 
 
@@ -62,8 +68,8 @@
 .left .message-box {
 
     /*左寄せ*/
-    align-self: flex-start; 
-    margin-left: 24px; 
+    align-self: flex-start;
+    margin-left: 24px;
     line-height: 1.3em;
 
     /* 文字・字背景色指定 */
@@ -79,8 +85,8 @@
 .right .message-box {
 
     /*右寄せ*/
-    align-self: flex-end;   
-    margin-right: 24px; 
+    align-self: flex-end;
+    margin-right: 24px;
     line-height: 1.3em;
 
     /* 文字・字背景色指定 */
@@ -119,7 +125,7 @@
     align-items: stretch;
 }
 
-.input-box-child{
+.input-box-child {
     width: 100%;
 }
 
@@ -132,7 +138,7 @@
 
 }
 
-.chatexplanation-label{
+.chatexplanation-label {
     margin-top: 45px;
 }
 
@@ -140,8 +146,13 @@
 
     width: 320px;
     height: 150px;
+    border-radius: 10px;
+    font-size: 16px;
     border: 1px solid rgb(255, 148, 148);
-    border-radius: 12px;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
 }
 

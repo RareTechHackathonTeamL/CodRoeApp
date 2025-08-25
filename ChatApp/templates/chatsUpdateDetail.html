@@ -1,7 +1,7 @@
-<!-- 本当のユーザ名変更HTML -->
+<!-- いずれチャット説明変更になるHTML -->
 
 {% extends 'util/base.html' %} {% block title %}
-<title>ユーザ名変更</title>
+<title>チャット説明変更</title>
 {% endblock title %} {% block content %}
 
 <body class="body">
@@ -16,8 +16,8 @@
   <!----- ヘッダー ----->
 
   <header class="header">
-    <h1>ユーザ名変更</h1>
-    <a href="/profile" method="get" class="back-button">
+    <h1>チャット説明変更</h1>
+    <a href="/chat/{{ chat.id }}/detail" class="back-button">
       <!-- ファイル統一の為変更 -->
       <img src="../../static/img/left.png" alt="Parrots" class="header-image" />
     </a>
@@ -34,19 +34,17 @@
 
   <!----- メインコンテンツ ----->
   <main class="main">
-    <form action="/change_uname" method="POST">
+    <form action="/chat/update_detail/{{ chat.id }}" method="POST">
       <div class="input-form">
         <div class="input-box-autu">
-          <div class="font">ユーザ名変更</div>
-          <div class="search-box">
-            <input type="text" name="user_name" placeholder="{{ current_user.user_name }}" class="text-box" />
-          </div>
+          <div class="font">説明</div>
+          <input type="text" name="detail" placeholder="{{chat.detail}}" class="text-box" />
         </div>
-
-        <p><input type="submit" value="更新" class="main-button" /></p>
       </div>
+
+      <p><input type="submit" value="保存" class="main-button" /></p>
     </form>
-    <img src="{{ url_for('static', filename='img/change_uname.png') }}" class="backgroundimage" />
+    <img src="{{ url_for('static', filename='img/change_explanation.png') }}" class="backgroundimage" />
   </main>
   {% endblock content %}
 </body>

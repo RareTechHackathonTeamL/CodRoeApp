@@ -1,6 +1,7 @@
  /*入力ホーム全体のCSSについて*/
  .input-form {
      display: flex;
+     flex-direction: column;
      justify-content: center;
      align-items: center;
  }
@@ -32,7 +33,7 @@
 
  /*入力の画像を真ん中にするため*/
  .search-box input {
-     padding: 3px 0 3px 2em;
+     padding: 3px 0 3px 3em;
  }
 
  /*入力欄の画像の変更*/
@@ -56,7 +57,7 @@
 
  /*入力の画像を真ん中にするため*/
  .search-box1 input {
-     padding: 3px 0 3px 2em;
+     padding: 3px 0 3px 3em;
  }
 
  /*入力欄の画像の変更*/
@@ -81,7 +82,7 @@
 
  /*入力の画像を真ん中にするため*/
  .search-box2 input {
-     padding: 3px 0 3px 2em;
+     padding: 3px 0 3px 3em;
  }
 
  /*入力欄の画像の変更*/
@@ -102,15 +103,14 @@
 
  /*入力欄の枠について*/
  .text-box {
-     /*↓枠のサイズがfigmaでの表記がわからないので後日*/
+
      width: 320px;
      height: 50px;
      border-radius: 10px;
-     border-top: 1px solid rgb(255, 148, 148);
-     border-left: 1px solid rgb(255, 148, 148);
-     border-right: 2px solid rgb(255, 148, 148);
-     border-bottom: 2px solid rgb(255, 148, 148);
+     border: 1px solid #ff9494;
      font-size: 16px;
-
-
+     background-color: white;
+     display: flex;
+     justify-content: center;
+     align-items: center;
  }

@@ -1,22 +1,22 @@
-{% extends 'util/base.html' %} {% block title %}
+{% extends 'util/base.html' %}
+
+{% block title %}
 <title>全体チャット</title>
-{% endblock title %} {% block content %}
+{% endblock title %}
+
+{% block content %}
 
 <body class="body">
   <!-- ヘッダー -->
   <header class="header">
     <h1>{{ chat.chat_name }}</h1>
     <form action="/chats" method="GET" class="back-button">
-      <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
+      <input type="image" src="../../static/img/left.png" alt=" 戻る" class="header-image" />
     </form>
-
-    {% if chat.chat_type == 2 %}
-    <a onclick="openModal()" class="deletebox-button">
-      <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
-    </a>
-    {% else %}
+    {% if chat.user_id == user_id %}
     <form action="/chat/{{ chat.id }}/detail" method="GET" class="setting-button">
-      <input type="image" src="{{ url_for('static', filename='img/setting.png') }}" alt="編集" class="header-image" />
+      <input type="image" src=" ../../static/img/setting.png" alt="編集" class="header-image" />
+
     </form>
     {% endif %}
   </header>
@@ -28,56 +28,185 @@
       <div class="message-box">
         <div class="message-content">
           <div class="user-name">{{ message.user_name }}</div>
+
+          {% if message.message %}
+          <!-- テキストメッセージ -->
           <div class="message-text">{{ message.message }}</div>
-          <div>
-            <img src="{{ url_for('static', filename='img/user_icons/' + message.icon_img) }}" width="40" , height="40" />
+          {% elif message.stamp_path %}
+          <!-- スタンプ -->
+          <div class="message-stamp">
+            <img src="{{ url_for('static', filename=message.stamp_path) }}" alt="stamp">
           </div>
+          {% endif %}
+
+          <!-- 自分のメッセージの場合のみ削除ボタン表示 -->
+          {% if message.user_id == user_id %}
+          <form action="/chat/{{ chat.id }}/messages/{{ message.id }}" method="POST" style="display:inline;">
+            <input type="submit" value="削除">
+          </form>
+          {% endif %}
         </div>
       </div>
     </div>
     {% endfor %}
-  </main>
 
-  <!-- フッター（メッセージ送信フォーム）-->
-  <footer class="chat-screen">
-    <form action="/chat/{{ chat.id }}/messages" method="POST" class="chat-form">
-      <textarea id="footer-message" name="message" placeholder="メッセージを入力" required></textarea>
-      <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信" class="send-button" />
-    </form>
-  </footer>
+    <!-- フッター -->
+    <footer class="chat-screen">
+      <!-- テキスト送信 -->
+      <form id="chatInputForm" action="/chat/{{ chat.id }}/messages" method="POST" class="chat-form">
+        <div class="input-wrapper">
+          <textarea id="footer-message" name="message" placeholder="メッセージを入力"></textarea>
+          <!-- スタンプボタン -->
+          <button id="stampToggle" class="stamp-button" type="button">
+            <img src="../../static/img/stamp-button.png" class="title-logo">
+          </button>
 
-  <!-- モーダル -->
-  <div id="myModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <img src="../../static/img/chat-delete.png" class="js-logout-img" alt="注意" />
-      <div class="font">チャット削除しますか？</div>
-      <!-- ログアウト用フォーム -->
-
-      <form action="/chat/delete/private/{{ chat.id }}" method="POST">
-        <input type="submit" class="js-btn delete" value="はい" />
+          <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信"
+            class="send-button">
+        </div>
       </form>
 
-      <!-- キャンセルボタン -->
-      <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
-    </div>
-  </div>
 
-  <script>
-    // モーダルを表示する関数
-    function openModal() {
-      // id="myModal" の要素を取得して display を "flex" に変更
-      // これによりモーダルが画面に表示される
-      document.getElementById("myModal").style.display = "flex";
-    }
 
-    // モーダルを非表示にする関数
-    function closeModal() {
-      // id="myModal" の要素を取得して display を "none" に変更
-      // これによりモーダルが閉じられる
-      document.getElementById("myModal").style.display = "none";
-    }
-  </script>
+
+
+      <!-- スタンプ一覧（最初は非表示） -->
+      <div id="stampList" class="stamp-list hidden">
+        {% for stamp in stamps %}
+        <img src="{{ url_for('static', filename=stamp.stamp_path) }}" data-stamp-id="{{ stamp.id }}" class="stamp-item"
+          alt="stamp">
+        {% endfor %}
+        <!-- スタンプ一覧閉じるやつ -->
+        <button id="stampClose" class="stamp-close" type="button">
+          <img src="../../static/img/stamp-close.png" class="stamp-close-button">
+        </button>
+      </div>
+      <!-- スタンプ送信用フォーム（非表示で送信するだけ） -->
+      <form id="stampForm" action="/chat/{{ chat.id }}/messages" method="POST">
+        <input type="hidden" name="stamp" id="stampInput">
+      </form>
+
+    </footer>
+
+    <!-- JS -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const stampToggle = document.getElementById("stampToggle"); // 入力フォームのボタン
+        const stampClose = document.getElementById("stampClose");   // 一覧内の閉じるボタン
+        const stampList = document.getElementById("stampList");
+        const stampForm = document.getElementById("stampForm");
+        const stampInput = document.getElementById("stampInput");
+        const stamps = document.querySelectorAll(".stamp-item");
+        const chatInputForm = document.getElementById("chatInputForm");
+
+        // 入力フォームのボタンで開閉
+        stampToggle.addEventListener("click", function (event) {
+          event.stopPropagation();
+          if (stampList.classList.contains("hidden")) {
+            stampList.classList.remove("hidden");
+            chatInputForm.style.display = "none";
+          } else {
+            stampList.classList.add("hidden");
+            chatInputForm.style.display = "flex";
+          }
+        });
+
+        // スタンプ一覧内の閉じるボタン
+        stampClose.addEventListener("click", function (event) {
+          event.stopPropagation();
+          stampList.classList.add("hidden");
+          chatInputForm.style.display = "flex";
+        });
+
+        // スタンプクリックで送信
+        stamps.forEach(stamp => {
+          stamp.addEventListener("click", function (event) {
+            event.stopPropagation();
+            const stampId = this.getAttribute("data-stamp-id");
+            stampInput.value = stampId;
+            stampForm.submit();
+            stampList.classList.add("hidden");
+            chatInputForm.style.display = "flex";
+          });
+        });
+
+        // スタンプ一覧外クリックで閉じる
+        document.addEventListener("click", function (event) {
+          if (!stampList.contains(event.target) && event.target !== stampToggle) {
+            stampList.classList.add("hidden");
+            chatInputForm.style.display = "flex";
+          }
+        });
+      });
+
+    </script>
+    <!-- CSS -->
+    <style>
+      .stamp-list.hidden {
+        display: none;
+      }
+
+      .stamp-list {
+        position: absolute;
+        bottom: 1px;
+        background: #ff9494;
+        padding: 12px;
+        display: grid;
+        grid-template-columns: repeat(3, 70px);
+        gap: 50px;
+        justify-content: center;
+        z-index: 100;
+        width: 100%;
+      }
+
+      .stamp-item {
+        width: 80px;
+        height: 80px;
+        cursor: pointer;
+      }
+
+      .stamp-item:hover {
+        transform: scale(1.2);
+      }
+
+      .stamp-button {
+        position: absolute;
+        right: 60px;
+        top: 5px;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .stamp-button img {
+        width: 40px;
+        height: 40px;
+
+      }
+
+      .stamp-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+
+      }
+
+      .stamp-close img {
+        width: 37.33px;
+        height: 37.33x;
+        position: absolute;
+        bottom: 10px;
+        right: 100px;
+        /* 右から50pxの位置に移動 */
+      }
+
+      /* 入力欄に入れるためのCSS */
+      .input-wrapper {
+        position: relative;
+        width: 100%;
+      }
+    </style>
 </body>
-
 {% endblock content %}

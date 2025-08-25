@@ -388,13 +388,12 @@ class Message(db.Model):
     update_at = db.Column(db.DateTime)
 
     @classmethod
-    def create(cls, id, uid, cid, message):
-        now = datetime.datetime.now()
+    def create(cls, id, user_id, chat_id, message, now):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
                 sql = 'INSERT INTO messages(id, user_id, chat_id, message, created_at) VALUES(%s, %s, %s, %s, %s)'
-                cur.execute(sql, (id, uid, cid, message, now,))
+                cur.execute(sql, (id, user_id, chat_id, message, now,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
@@ -403,59 +402,54 @@ class Message(db.Model):
             db_pool.release(conn)
 
     @classmethod
-    def send_stamp(cls, id, uid, cid, stamp_id):
-        now = datetime.datetime.now()
-        insert_message = Message(id=id, user_id=uid, chat_id=cid, stamp_id=stamp_id, created_at=now)
+    def send_stamp(cls, id, user_id, chat_id, stamp_id, now):
+        conn = db_pool.get_conn()
         try:
-            db.session.add(insert_message)
-            db.session.commit()
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'INSERT INTO messages(id, user_id, chat_id, stamp_id, created_at) VALUES(%s, %s, %s, %s, %s)'
+                cur.execute(sql, (id, user_id, chat_id, stamp_id, now,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
     def delete(cls, message_id):
+        conn = db_pool.get_conn()
         try:
-            db.session.query(Message).filter(Message.id==message_id).delete()
-            db.session.commit()
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'DELETE FROM messages WHERE id=%s'
+                cur.execute(sql, (message_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
-    def get_messages(cls, cid):
+    def get_messages(cls, chat_id):
+        conn = db_pool.get_conn()
         try:
-            # messages = db.session.query(Message, Stamp).outerjoin(Stamp, Message.stamp_id == Stamp.id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
-            messages = db.session.query(Message, Stamp, User).outerjoin(Stamp, Message.stamp_id == Stamp.id).outerjoin(User, Message.user_id == User.user_id).filter(Message.chat_id == cid).order_by(Message.created_at).all()
-            result = []
-            for message in messages:
-                if message[1] == None:
-                    result.append({
-                    'id': message[0].id,
-                    'user_id': message[0].user_id,
-                    'message': message[0].message,
-                    'created_at': message[0].created_at,
-                    'user_name': message[2].user_name,
-                    'icon_img': message[2].icon_img,
-                    })
-                else:
-                    result.append({
-                    'id': message[0].id,
-                    'user_id': message[0].user_id,
-                    'message': message[0].message,
-                    'created_at': message[0].created_at,
-                    'title': message[1].title,
-                    'stamp_path': message[1].stamp_path,
-                    'user_name': message[2].user_name,
-                    'icon_img': message[2].icon_img,
-                    })
-            return result
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = """
+                    SELECT m.id, m.user_id, m.message, m.created_at, s.title, s.stamp_path, u.user_name, u.icon_img
+                    FROM messages AS m
+                    LEFT OUTER JOIN stamps AS s ON m.stamp_id = s.id
+                    LEFT OUTER JOIN users AS u ON m.user_id = u.user_id
+                    WHERE chat_id = %s
+                    ORDER BY m.created_at ASC;
+                    """
+                cur.execute(sql, (chat_id,))
+                messages = cur.fetchall()
+                return messages
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()  # TODO: flask_sqlalchemyでは必要ないというものを見た（公式ドキュメントには書いていない）必要か聞く
+            db_pool.release(conn)
 
 
 # Memberテーブル

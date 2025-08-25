@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from models import User, Chat, Message, Member, Stamp
+import datetime
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -492,12 +493,12 @@ def create_message(chat_id):
     stamp = request.form.get('stamp')
     id = uuid.uuid4()
     user_id = current_user.get_id()
-    # TODO: 追加機能・メッセージではなくスタンプの場合用
+    now = datetime.datetime.now()
     if message:
-        Message.create(id, user_id, chat_id, message)
+        Message.create(id, user_id, chat_id, message, now)
         Chat.update_latest(chat_id)
     elif stamp:
-        Message.send_stamp(id, user_id, chat_id, stamp)
+        Message.send_stamp(id, user_id, chat_id, stamp, now)
         Chat.update_latest(chat_id)
     return redirect(f'/chat/{chat_id}/messages')
 

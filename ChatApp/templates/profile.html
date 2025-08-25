@@ -12,9 +12,12 @@
     </form>
 
     <!-- JavaScript？ -->
-    <form action="/delete_user" method="GET" class="deletebox-button">
-      <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
-    </form>
+    <div class="deletebox-button">
+
+      <input type="image" onclick="openModal()" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除"
+        class="header-image" />
+
+    </div>
   </header>
   <!----- ヘッダー END ----->
 
@@ -80,17 +83,13 @@
 
   <!-- メインEND -->
 
-  <!-- ユーザー削除のJS関係　ここから -->
-  ここは吉田将貴がテストしております<br />
 
-  <!-- 起動ボタン -->
-  <button class="btn" onclick="openModal()">アカウント削除</button>
 
   <!-- モーダル -->
   <div id="myModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <img src="js-userdelet.png" class="js-userdele-img" alt="注意" />
+      <img src="{{ url_for('static', filename='img/Delete-user.png') }}" class="js-userdele-img" alt="注意" />
       <div class="font">アカウントを削除しますか？</div>
       <!-- アカウント削除ボタン -->
       <form action="/delete_user" method="POST">

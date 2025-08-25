@@ -295,13 +295,13 @@ def create_chat():
         chat_detail = ''
         
         friend_id = User.get_user_id_by_user_name(friend_name)
-        if friend_id == None:
+        if not friend_id:
             flash('入力された友達が見つかりません')
-            return redirect(url_for('chat_select_private'))
+            return redirect(url_for('chat_create_view'))
 
         if friend_name == user_name:
             flash('友達を入力してください')
-            return redirect(url_for('chat_select_private'))
+            return redirect(url_for('chat_create_view'))
         chat_exist = Chat.search_chat_exist(user_id, friend_id, user_name, friend_name)
 
     if new_chat_name == '':
@@ -322,7 +322,7 @@ def create_chat():
             for friend in friend_list:
                 if friend != '':
                     friend_id = User.get_user_id_by_user_name(friend)
-                    if friend_id == None:
+                    if not friend_id:
                         results.append(f'{friend}さんが見つかりませんでした')
                     else:
                         chat_in = Member.search_in_chat(chat_id, friend_id)
@@ -455,7 +455,7 @@ def chat_add_member(chat_id):
         if friend != '':
             # 追加するメンバーの名前を検索
             friend_id = User.get_user_id_by_user_name(friend)
-            if friend_id == None:
+            if not friend_id:
                 results.append(f'{friend}さんが見つかりませんでした')
             else:
                 # メンバーがそのチャットに参加しているか検索

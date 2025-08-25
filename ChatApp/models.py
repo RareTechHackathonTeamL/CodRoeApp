@@ -67,23 +67,39 @@ class User(UserMixin, db.Model):
     
     @classmethod
     def get_user_id_by_user_name(cls, user_name):
+        conn = db_pool.get_conn()
         try:
-            result = db.session.query(User).filter(User.user_name == user_name).first()
-            return result.user_id
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT user_id FROM users WHERE user_name = %s'
+                cur.execute(sql, (user_name,))
+                user_query = cur.fetchall()
+                if user_query:
+                    user_id = user_query[0]['user_id']
+                    return user_id
+                return user_query
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
     def get_user_name_by_user_id(cls, user_id):
+        conn = db_pool.get_conn()
         try:
-            result = db.session.query(User).filter(User.user_id == user_id).first()
-            return result.user_name
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT user_name from users WHERE user_id = %s'
+                cur.execute(sql, (user_id,))
+                user_query = cur.fetchall()
+                if user_query:
+                    user_name = user_query[0]['user_name']
+                    return user_name
+                return user_query
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     # ユーザ登録
     @classmethod

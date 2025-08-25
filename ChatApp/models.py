@@ -4,6 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import uuid
 from __init__ import db
+from flask import abort
+import pymysql
+from util.DB import DB
+
+db_pool = DB.init_db_pool()
 
 # Userテーブル
 class User(UserMixin, db.Model):
@@ -385,14 +390,17 @@ class Message(db.Model):
     @classmethod
     def create(cls, id, uid, cid, message):
         now = datetime.datetime.now()
-        insert_message = Message(id=id, user_id=uid, chat_id=cid, message=message, created_at=now)
+        conn = db_pool.get_conn()
         try:
-            db.session.add(insert_message)
-            db.session.commit()
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'INSERT INTO messages(id, user_id, chat_id, message, created_at) VALUES(%s, %s, %s, %s, %s)'
+                cur.execute(sql, (id, uid, cid, message, now,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
     def send_stamp(cls, id, uid, cid, stamp_id):

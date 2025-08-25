@@ -18,6 +18,15 @@
   <main class="main">
     <form action="/chat/create" method="post">
       <div class="input-box-list">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+            <div>
+              <h3>{{ message }}</h3>
+            </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
         <!-- チャットタイプ選択 -->
         <h3>グループタイプ選択</h3>
         <div class="select-chat_types">

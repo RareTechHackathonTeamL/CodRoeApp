@@ -20,6 +20,8 @@ footer {
     /*下に固定*/
     bottom: 0;
 
+    position: fixed;
+
 }
 
 .footer-item {
@@ -28,6 +30,7 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: white;
 
 }
 

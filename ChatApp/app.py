@@ -311,12 +311,13 @@ def create_chat():
 
     if chat_exist != True:
         chat_id = uuid.uuid4()
+        now = datetime.datetime.now()
         Chat.create(chat_id, user_id, new_chat_name, chat_type_num, chat_detail)
 
         # Member登録
         if chat_type == 'group':
             member_gid1 = uuid.uuid4()
-            Member.add_member(member_gid1, chat_id, user_id)
+            Member.add_member(member_gid1, chat_id, user_id, now)
 
             friend_list = request.form.getlist('friends_name')
             results = []
@@ -326,10 +327,10 @@ def create_chat():
                     if friend_id == None:
                         results.append(f'{friend}さんが見つかりませんでした')
                     chat_in = Member.search_in_chat(chat_id, friend_id)
-                    if chat_in != None:
+                    if chat_in:
                         results.append(f'{friend}さんは既にチャットに参加しています')
                     member_gid2 = uuid.uuid4()
-                    Member.add_member(member_gid2, chat_id, friend_id)
+                    Member.add_member(member_gid2, chat_id, friend_id, now)
             if results:
                 flash('以下のメンバーが登録できませんでした')
                 for result in results:
@@ -338,9 +339,9 @@ def create_chat():
 
         elif chat_type == 'private':
             member_pid1 = uuid.uuid4()
-            Member.add_member(member_pid1, chat_id, user_id)
+            Member.add_member(member_pid1, chat_id, user_id, now)
             member_pid2 = uuid.uuid4()
-            Member.add_member(member_pid2, chat_id, friend_id)
+            Member.add_member(member_pid2, chat_id, friend_id, now)
 
         return redirect(url_for('chats_view'))
     else:
@@ -355,7 +356,7 @@ def chat_detail(chat_id):
     chat_members = Member.get_chat_member(chat_id)
     chat_members_name =[]
     for member in chat_members:
-        chat_member_name = User.get_user_name_by_user_id(member.user_id)
+        chat_member_name = User.get_user_name_by_user_id(member['user_id'])
         chat_members_name.append(chat_member_name)
     chat_members_name.sort()
     return render_template('chatsUpdate.html', chat=chat_room, chat_member=chat_members_name)
@@ -438,7 +439,7 @@ def chat_add_member_view(chat_id):
     # 自分がこのチャットに入っているかを検索
     user_id = current_user.get_id()
     in_chat = Member.search_in_chat(chat_id, user_id)
-    if in_chat == False:
+    if not in_chat:
         flash('このチャットにアクセスできません')
         return redirect(url_for('chats_view'))
     chat_room = Chat.find_by_chat_info(chat_id)
@@ -459,12 +460,13 @@ def chat_add_member(chat_id):
             else:
                 # メンバーがそのチャットに参加しているか検索
                 chat_in = Member.search_in_chat(chat_id, friend_id)
-                if chat_in != None:
+                if chat_in:
                     results.append(f'{friend}さんは既にチャットに参加しています')
                 else:
                     # メンバーDBに追加
                     id = uuid.uuid4()
-                    Member.add_member(id, chat_id, friend_id)
+                    now = datetime.datetime.now()
+                    Member.add_member(id, chat_id, friend_id, now)
     if results == None:
         flash('メンバー追加できました！')
         return redirect(f'/chat/{chat_id}/messages')

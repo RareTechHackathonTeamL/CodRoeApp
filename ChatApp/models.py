@@ -464,35 +464,48 @@ class Member(db.Model):
 
     @classmethod
     def search_in_chat(cls, chat_id, user_id):
+        conn = db_pool.get_conn()
         try:
-            chat_in = db.session.query(Member).filter(Member.chat_id == chat_id, Member.user_id == user_id).first()
-            return chat_in
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT * FROM members AS m WHERE (m.chat_id = %s) and (m.user_id = %s)'
+                cur.execute(sql, (chat_id, user_id,))
+                chat_in = cur.fetchall()
+                return chat_in
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
-    def add_member(cls, id, chat_id, user_id):
+    def add_member(cls, id, chat_id, user_id, now):
+        conn = db_pool.get_conn()
         try:
-            now = datetime.datetime.now()
-            insert_member = Member(id=id, chat_id=chat_id, user_id=user_id, created_at=now)
-            db.session.add(insert_member)
-            db.session.commit()
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'INSERT INTO members(id, chat_id, user_id, created_at) VALUE(%s, %s, %s, %s)'
+                cur.execute(sql, (id, chat_id, user_id, now,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
     def get_chat_member(cls, chat_id):
+        conn = db_pool.get_conn()
         try:
-            members = db.session.query(Member).filter(Member.chat_id == chat_id).all()
-            return members
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT * FROM members WHERE chat_id = %s'
+                cur.execute(sql, (chat_id,))
+                members = cur.fetchall()
+                return members
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
+
 
 # Stampテーブル
 class Stamp(db.Model):
@@ -501,7 +514,6 @@ class Stamp(db.Model):
     id = db.Column(db.String(255), nullable=False, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     stamp_path = db.Column(db.String(255), nullable=False)
-    # move_stamp = db.Column(Boolean)
     created_at = db.Column(db.DateTime, nullable=False)
     update_at = db.Column(db.DateTime)
 
@@ -509,17 +521,15 @@ class Stamp(db.Model):
 
     @classmethod
     def get_stamps(cls):
+        conn = db_pool.get_conn()
         try:
-            stamps = db.session.query(Stamp).all()
-            result = [{
-                'id': s.id,
-                'title': s.title,
-                'stamp_path': s.stamp_path,
-                'created_at': s.created_at,
-                'update_at': s.update_at,
-            } for s in stamps]
-            return result
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT * FROM stamps'
+                cur.execute(sql)
+                stamps = cur.fetchall()
+                return stamps
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)

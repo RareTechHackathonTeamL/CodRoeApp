@@ -455,14 +455,15 @@ def chat_add_member(chat_id):
             friend_id = User.get_user_id_by_user_name(friend)
             if friend_id == None:
                 results.append(f'{friend}さんが見つかりませんでした')
-            # メンバーがそのチャットに参加しているか検索
-            chat_in = Member.search_in_chat(chat_id, friend_id)
-            if chat_in != None:
-                results.append(f'{friend}さんは既にチャットに参加しています')
             else:
-                # メンバーDBに追加
-                id = uuid.uuid4()
-                Member.add_member(id, chat_id, friend_id)
+                # メンバーがそのチャットに参加しているか検索
+                chat_in = Member.search_in_chat(chat_id, friend_id)
+                if chat_in != None:
+                    results.append(f'{friend}さんは既にチャットに参加しています')
+                else:
+                    # メンバーDBに追加
+                    id = uuid.uuid4()
+                    Member.add_member(id, chat_id, friend_id)
     if results == None:
         flash('メンバー追加できました！')
         return redirect(f'/chat/{chat_id}/messages')

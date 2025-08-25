@@ -322,11 +322,13 @@ def create_chat():
                     friend_id = User.get_user_id_by_user_name(friend)
                     if friend_id == None:
                         results.append(f'{friend}さんが見つかりませんでした')
-                    chat_in = Member.search_in_chat(chat_id, friend_id)
-                    if chat_in != None:
-                        results.append(f'{friend}さんは既にチャットに参加しています')
-                    member_gid2 = uuid.uuid4()
-                    Member.add_member(member_gid2, chat_id, friend_id)
+                    else:
+                        chat_in = Member.search_in_chat(chat_id, friend_id)
+                        if chat_in != None:
+                            results.append(f'{friend}さんは既にチャットに参加しています')
+                        else:
+                            member_gid2 = uuid.uuid4()
+                            Member.add_member(member_gid2, chat_id, friend_id)
             if results:
                 flash('以下のメンバーが登録できませんでした')
                 for result in results:

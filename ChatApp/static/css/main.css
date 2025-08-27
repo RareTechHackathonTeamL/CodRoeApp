@@ -234,17 +234,9 @@
      border: 1px solid #ff9494;
      border-radius: 12px;
      background: white;
- }
-
- .main-boxs {
-
-     padding: 16px;
-     height: 43px;
-     border: 1px solid rgb(255, 148, 148);
-     border-radius: 12px;
-     width: 288px;
-     background: white;
-     color: rgb(255, 148, 148);
-     font-size: 14px;
-
+     margin-top: 16px;
+     display: flex;
+     align-items: center;
+     text-decoration: none;
+     color: #ff9494;
  }

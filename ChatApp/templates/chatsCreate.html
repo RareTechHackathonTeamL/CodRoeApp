@@ -6,10 +6,8 @@
   <!----- ヘッダー ----->
   <header class="header">
     <h1>チャット作成</h1>
-    <!-- chatlistが同じファイル内にないため行かない -->
     <a href="/chats" class="back-button">
-      <!-- ファイル統一の為変更 -->
-      <img src="../static/img/left.png" alt="Parrots" class="header-image" />
+      <img src="{{ url_for('static', filename='img/left.png') }}" alt="Parrots" class="header-image" />
     </a>
   </header>
   <!----- ヘッダーEND ----->
@@ -89,8 +87,6 @@
   <footer class="footer-button_chatscreate">
     <div class="footer-button">
       <div class="footer-item">
-        <!-- src="chatcreate(2).png"を変更-->
-        <!-- chat-create-create.pngを変更-->
         <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />
         プロフィール
       </div>
@@ -98,8 +94,6 @@
 
     <a href="/chats" class="footer-button">
       <div class="footer-item">
-        <!-- src="chatlist(2).png"を変更-->
-        <!-- chat-list-create.pngを変更-->
         <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
         チャット一覧
       </div>

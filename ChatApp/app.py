@@ -259,7 +259,15 @@ def change_icon():
 def chats_view():
     user_id = current_user.get_id()
     chats = Chat.get_chat_belong_to(user_id)
-    return render_template('chats.html', chats=chats)
+    for chat in chats:
+        latest_message_time = Message.get_latest_messages(chat['id'])
+        if latest_message_time == None:
+            chat['latest'] = chat['update_at']
+        else:
+            chat['latest'] = latest_message_time
+    sorted_chats = sorted(chats, key=lambda s: s['latest'], reverse=True)
+
+    return render_template('chats.html', chats=sorted_chats)
 
 # チャット作成画面遷移
 @app.route('/chat/create', methods=['GET'])

@@ -6,10 +6,8 @@
   <!----- ヘッダー ----->
   <header class="header">
     <h1>チャット作成</h1>
-    <!-- chatlistが同じファイル内にないため行かない -->
     <a href="/chats" class="back-button">
-      <!-- ファイル統一の為変更 -->
-      <img src="../static/img/left.png" alt="Parrots" class="header-image" />
+      <img src="{{ url_for('static', filename='img/left.png') }}" alt="Parrots" class="header-image" />
     </a>
   </header>
   <!----- ヘッダーEND ----->
@@ -18,15 +16,11 @@
   <main class="main">
     <form action="/chat/create" method="post">
       <div class="input-box-list">
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-            <div>
-              <h3>{{ message }}</h3>
-            </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+        {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+        <div>
+          <h3>{{ message }}</h3>
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
         <!-- チャットタイプ選択 -->
         <h3>グループタイプ選択</h3>
         <div class="select-chat_types">
@@ -98,8 +92,6 @@
   <footer class="footer-button_chatscreate">
     <div class="footer-button">
       <div class="footer-item">
-        <!-- src="chatcreate(2).png"を変更-->
-        <!-- chat-create-create.pngを変更-->
         <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />
         プロフィール
       </div>
@@ -107,10 +99,8 @@
 
     <a href="/chats" class="footer-button">
       <div class="footer-item">
-        <!-- src="chatlist(2).png"を変更-->
-        <!-- chat-list-create.pngを変更-->
-        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
-        チャット一覧
+        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="ホーム" class="footer-image" />
+        ホーム
       </div>
     </a>
 

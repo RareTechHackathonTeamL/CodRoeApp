@@ -6,22 +6,20 @@
 
 <body class="body">
   <!----- ヘッダー ----->
-
   <header class="header">
     <h1>Eメールアドレス変更</h1>
     <a href="/profile" method="get" class="back-button">
-      <!-- ファイル統一の為変更 -->
       <img src="{{ url_for('static', filename='img/left.png') }}" alt="Parrots" class="header-image" />
     </a>
   </header>
   <!----- ヘッダー END ----->
-  <!-- <h2>{{ current_user.user_name }} さんのユーザ情報を更新します</h2> -->
+
   {% with messages = get_flashed_messages() %} {% if messages %}
-  <ul>
+  <div>
     {% for message in messages %}
-    <li>{{ message }}</li>
+    <h3>{{ message }}</h3>
     {% endfor %}
-  </ul>
+  </div>
   {% endif %} {% endwith %}
 
   <!----- メインコンテンツ ----->

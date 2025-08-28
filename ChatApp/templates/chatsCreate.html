@@ -16,15 +16,11 @@
   <main class="main">
     <form action="/chat/create" method="post">
       <div class="input-box-list">
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-            <div>
-              <h3>{{ message }}</h3>
-            </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+        {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+        <div>
+          <h3>{{ message }}</h3>
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
         <!-- チャットタイプ選択 -->
         <h3>グループタイプ選択</h3>
         <div class="select-chat_types">
@@ -103,8 +99,8 @@
 
     <a href="/chats" class="footer-button">
       <div class="footer-item">
-        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
-        チャット一覧
+        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="ホーム" class="footer-image" />
+        ホーム
       </div>
     </a>
 

@@ -114,3 +114,38 @@
      justify-content: center;
      align-items: center;
  }
+
+
+ .arrow_nameupdate {
+     display: inline-block;
+     position: relative;
+     text-align: center;
+ }
+
+ .arrow_nameupdate::before {
+     content: "";
+     width: 24px;
+     height: 24px;
+     background: url(/static/img/arrow.png) no-repeat center center / auto 100%;
+     display: inline-block;
+     position: absolute;
+     top: 10px;
+     right: 16px;
+ }
+
+ .arrow_detailupdate {
+     display: inline-block;
+     position: relative;
+     text-align: center;
+ }
+
+ .arrow_detailupdate::before {
+     content: "";
+     width: 24px;
+     height: 24px;
+     background: url(/static/img/arrow.png) no-repeat center center / auto 100%;
+     display: inline-block;
+     position: absolute;
+     top: 63px;
+     right: 16px;
+ }

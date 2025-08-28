@@ -5,31 +5,21 @@
 {% endblock title %} {% block content %}
 
 <body class="body">
-  <!-- <h2>{{ current_user.user_name }} さんのユーザ情報を更新します</h2> -->
-  {% with messages = get_flashed_messages() %} {% if messages %}
-  <ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %} {% endwith %}
   <!----- ヘッダー ----->
-
   <header class="header">
     <h1>チャット説明変更</h1>
     <a href="/chat/{{ chat.id }}/detail" class="back-button">
-      <!-- ファイル統一の為変更 -->
       <img src="../../static/img/left.png" alt="Parrots" class="header-image" />
     </a>
   </header>
   <!----- ヘッダー END ----->
 
   {% with messages = get_flashed_messages() %} {% if messages %}
-  <ul>
+  <div>
     {% for message in messages %}
-    <li>{{ message }}</li>
+    <h3>{{ message }}</h3>
     {% endfor %}
-  </ul>
+  </div>
   {% endif %} {% endwith %}
 
   <!----- メインコンテンツ ----->
@@ -38,7 +28,7 @@
       <div class="input-form">
         <div class="input-box-autu">
           <div class="font">説明</div>
-          <input type="text" name="detail" placeholder="{{chat.detail}}" class="text-box" />
+          <input type="text " name="detail" placeholder="{{chat.detail}}" class="chatexplanation" />
         </div>
       </div>
 

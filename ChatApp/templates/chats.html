@@ -1,5 +1,5 @@
 {% extends 'util/base.html' %} {% block title %}
-<title>チャット一覧</title>
+<title>ホーム</title>
 {% endblock title %} {% block content %}
 
 <body class="body">
@@ -24,9 +24,17 @@
   <main>
     <div class="list list-margin-top chatcreatesubmit">
       {% for chat in chats %}
-      <form action="/chat/{{ chat.id }}/messages" method="GET">
-        <input type="submit" value="{{ chat.chat_name}}" class="h3-box" />
-      </form>
+      <!-- 画像を押して遷移 -->
+      <a href="/chat/{{ chat.id }}/messages" class="main-box">
+        {% if chat.chat_type == 0 %}
+        <img src="{{ url_for('static', filename='img/openform.png') }}" class="main-img" />
+        {% elif chat.chat_type == 1 %}
+        <img src="{{ url_for('static', filename='img/groupform.png') }}" class="main-img" />
+        {% elif chat.chat_type == 2 %}
+        <img src="{{ url_for('static', filename='img/privateform.png') }}" class="main-img" />
+        {% endif %}
+        <span>{{ chat.chat_name}}</span>
+      </a>
       {% endfor %}
     </div>
   </main>

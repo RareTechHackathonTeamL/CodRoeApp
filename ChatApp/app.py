@@ -296,11 +296,11 @@ def create_chat():
         friend_id = User.get_user_id_by_user_name(friend_name)
         if friend_id == None:
             flash('入力された友達が見つかりません')
-            return redirect(url_for('chat_select_private'))
+            return redirect(url_for('create_chat'))
 
         if friend_name == user_name:
             flash('友達を入力してください')
-            return redirect(url_for('chat_select_private'))
+            return redirect(url_for('create_chat'))
         chat_exist = Chat.search_chat_exist(user_id, friend_id, user_name, friend_name)
 
     if new_chat_name == '':

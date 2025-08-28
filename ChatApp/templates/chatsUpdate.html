@@ -9,13 +9,6 @@
     <form action="/chat/{{ chat.id }}/messages" method="GET" class="back-button">
       <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
-    <!----- 試験 
-        <form action="/chat/delete/{{ chat.id }}" method="POST" class="deletebox-button">
-            <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除"
-                class="header-image" />
-        </form>
-        ----->
-
     {% if chat.user_id == current_user.user_id %}
     <a onclick="openModal()" class="deletebox-button">
       <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
@@ -75,9 +68,8 @@
       <div class="input-box-child">
         <div>チャット名</div>
         <a href="/chat/update_name/{{ chat.id }}" class="transitionplaceholder">
-          <div class="text-box">
-            <div class="placeholder">{{chat.chat_name}}</div>
-            <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
+          <div class="arrow_nameupdate">
+            <div class="text-box">{{chat.chat_name}}</div>
           </div>
         </a>
       </div>
@@ -85,9 +77,8 @@
       <div class="input-box-child">
         <div class="chatexplanation-label">説明</div>
         <a href="/chat/update_detail/{{ chat.id }}" class="transitionplaceholder">
-          <div class="chatexplanation">
-            <div class="placeholder">{{chat.detail}}</div>
-            <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
+          <div class="arrow_detailupdate">
+            <div class="chatexplanation">{{chat.detail}}</div>
           </div>
         </a>
       </div>
@@ -112,6 +103,7 @@
   </main>
   <!-- メインEND -->
 
+  <!-- フッター -->
   <footer class="footer-button_chatscreate">
     <a href="/profile" method="GET" class="footer-button">
       <div class="footer-item">
@@ -120,12 +112,12 @@
       </div>
     </a>
 
-    <div class="footer-button">
+    <a href="/chats" class="footer-button">
       <div class="footer-item">
-        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
-        チャット一覧
+        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="ホーム" class="footer-image" />
+        ホーム
       </div>
-    </div>
+    </a>
 
     <a onclick="openModal()" class="footer-button">
       <div class="footer-item">
@@ -134,6 +126,7 @@
       </div>
     </a>
   </footer>
+  <!-- フッターEND -->
 
   <!-- ログアウトのJSテスト　ここから -->
 

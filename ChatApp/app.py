@@ -302,15 +302,15 @@ def create_chat():
         if friend_name == user_name:
             flash('友達を入力してください')
             return redirect(url_for('chat_create_view'))
-        chat_exist = Chat.search_chat_exist(user_id, friend_id, user_name, friend_name)
+        chat_exist = Chat.search_private_chat_exist(user_id, friend_id, user_name, friend_name)
 
     if new_chat_name == '':
         return redirect(url_for('chat_create_view'))
 
-    if chat_exist != True:
+    if chat_exist == None:
         chat_id = uuid.uuid4()
         now = datetime.datetime.now()
-        Chat.create(chat_id, user_id, new_chat_name, chat_type_num, chat_detail)
+        Chat.create(chat_id, user_id, new_chat_name, chat_type_num, chat_detail, now)
 
         # Member登録
         if chat_type == 'group':
@@ -345,8 +345,8 @@ def create_chat():
 
         return redirect(url_for('chats_view'))
     else:
-        error = 'すでに同じ名前のチャンネルが存在しています'
-        return render_template('chatsCreate.html', error=error)
+        flash('すでに同じ名前のチャンネルが存在しています')
+        return redirect(url_for('chat_create_view'))
 
 # チャット編集画面
 @app.route('/chat/<chat_id>/detail', methods=['GET'])

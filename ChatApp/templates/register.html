@@ -14,17 +14,16 @@
   </header>
   <!----- ヘッダー END ----->
 
-  {% with messages = get_flashed_messages() %} {% if messages %}
-  <ul>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %} {% endwith %}
-
   <!----- メインコンテンツ ----->
   <main class="main">
     <div class="input-form">
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %} {% endwith %}
       <form action="/register" method="POST">
         <div class="input-box-autu">
           <div class="font">ユーザー名</div>

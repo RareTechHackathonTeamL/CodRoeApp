@@ -82,9 +82,9 @@ def register_process():
     elif password != passwordConfirmation:
         flash('パスワードが一致しないっタラコ！')
     elif registered_name != None:
-        flash('ごめんたい! このユーザ名は既に登録されタラコ...')  
+        flash('ごめんたい！ このユーザ名は既に登録されタラコ...')  
     elif registered_email != None:
-        flash('ごめんたい! このEメールアドレスは既に登録されタラコ...')
+        flash('ごめんたい！ このメールアドレスは既に登録されタラコ...')
     else:
         User.regist(new_uname, new_email, password, icon_img)
         user = User.find_by_email(new_email)

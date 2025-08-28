@@ -148,6 +148,7 @@
 
  .member-add-list {
      margin-bottom: 10px;
+     display: flex
  }
 
  .member-add-button {

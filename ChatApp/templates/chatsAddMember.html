@@ -3,50 +3,46 @@
 {% endblock title %} {% block content %}
 
 <body class="body">
-    <header class="header">
-        <h1>メンバー追加</h1>
-        <a href="/chat/{{ chat.id }}/detail" class="back-button">
-          <img src="{{ url_for('static', filename='img/left.png') }}" alt="Parrots" class="header-image" />
-        </a>
-    </header>
-    <main>
-        <div class="list">    
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-        {% endwith %}
+  <header class="header">
+    <h1>メンバー追加</h1>
+    <a href="/chat/{{ chat.id }}/detail" class="back-button">
+      <img src="{{ url_for('static', filename='img/left.png') }}" alt="Parrots" class="header-image" />
+    </a>
+  </header>
+  <main class="main">
+    <div class="list">
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %} {% endwith %}
+      <h3>グループメンバー追加</h3>
+
+      <form action="/chat/{{ chat.id }}/add_member" method="post" class="list">
+        <div id="add_member_form">
+          <input type="text" name="friends_name" class="h3-box member-add-list" />
         </div>
-        <h3>グループメンバー追加</h3>
-        <form action="/chat/{{ chat.id }}/add_member" method="post" class="list">
-            <div class="list">
-                <div id="add_member_form" class="list">
-                    <input type="text" name="friends_name" class="h3-box member-add-list">
-                </div>
-                <input type="button" value="+" onclick="addForm()" class="member-add-button">
-            </div>
-            <button type="submmit" class="main-button">追加</button>
-        </form>
-    </main>
-    <!-- <form action="/chat/{{ chat.id }}/detail" method="GET">
+        <input type="button" value="+" onclick="addForm()" class="member-add-button" />
+        <button type="submmit" class="main-button">追加</button>
+      </form>
+    </div>
+  </main>
+  <!-- <form action="/chat/{{ chat.id }}/detail" method="GET">
         <input type="submit" value="チャット編集へ">
     </form> -->
 
-
-    <script>
-        const addForm = () => {
-            const input_data = document.createElement('input');
-            input_data.type = 'text';
-            input_data.name = 'friends_name';
-            input_data.classList.add('h3-box');
-            input_data.classList.add('member-add-list');
-            const parent = document.getElementById('add_member_form');
-            parent.appendChild(input_data);
-        }
-    </script>
-    {% endblock content %}
+  <script>
+    const addForm = () => {
+      const input_data = document.createElement("input");
+      input_data.type = "text";
+      input_data.name = "friends_name";
+      input_data.classList.add("h3-box");
+      input_data.classList.add("member-add-list");
+      const parent = document.getElementById("add_member_form");
+      parent.appendChild(input_data);
+    };
+  </script>
+  {% endblock content %}
 </body>

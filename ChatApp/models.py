@@ -27,44 +27,13 @@ class User(UserMixin, db.Model):
     messages = db.relationship('Message', backref='users')
     members = db.relationship('Member', backref='users')
 
+    def __init__(self, user_id):
+        self.user_id = user_id
+
     # ユーザーIDの取得
     def get_id(self):
         return self.user_id
-    
-    #ユーザアイコンの取得 ****************************
-    @classmethod
-    def get_icons(cls):
-        try:
-            user_icons = db.session.query(User).all()
-            result = [{
-                'user_id': u.user_id,
-                'icon_img': u.icon_img,
-                # 'created_at': u.created_at,
-                # 'update_at': u.update_at
-            } for u in user_icons]
-            return result
-        except Exception as e:
-            print(e)
-        finally:
-            db.session.close()
 
-    @classmethod
-    def get_stamps(cls):
-        try:
-            stamps = db.session.query(Stamp).all()
-            result = [{
-                'id': s.id,
-                'title': s.title,
-                'stamp_path': s.stamp_path,
-                'created_at': s.created_at,
-                'update_at': s.update_at,
-            } for s in stamps]
-            return result
-        except Exception as e:
-            print(e)
-        finally:
-            db.session.close()
-    
     @classmethod
     def get_user_id_by_user_name(cls, user_name):
         conn = db_pool.get_conn()
@@ -107,17 +76,21 @@ class User(UserMixin, db.Model):
         user_id=uuid.uuid4()
         now = datetime.datetime.now()
         password = generate_password_hash(password)
-        new_user = User(user_id=user_id, user_name=user_name, email=email, password=password, icon_img=icon_img, created_at=now)
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            login_user(new_user)
-            db.session.close()
 
+        conn = db_pool.get_conn()
+        try:
+            with conn.cursor() as cur:
+                sql = 'INSERT INTO users(user_id, user_name, email, password, icon_img, created_at) VALUE(%s, %s, %s, %s, %s, %s);'
+                cur.execute(sql, (user_id, user_name, email, password, icon_img, now,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
+        finally:
+            login_user(User(user_id))
+            db_pool.release(conn)
+
+# =====================いらない？=====================================================
     # ユーザ情報更新(パスワード更新なし)
     @classmethod
     def update_nopass(cls, user_id, user_name, email):
@@ -164,77 +137,88 @@ class User(UserMixin, db.Model):
             print(e)
         finally:
             db.session.close()
+# ===============================================================================
 
     # ユーザ情報削除
     @classmethod
     def delete_user(cls, user_id):
-        # user = db.session.query(User).filter(User.user_id == user_id).first()
-        # now = datetime.datetime.now()
+        conn = db_pool.get_conn()
         try:
-            # with db.session.begin(subtransactions=True):
-            db.session.query(User).filter(User.user_id == user_id).delete()
-            db.session.commit()
-        except Exception as e:
-            print(e)
-            # db.session.rollback()
-            # raise
+            with conn.cursor() as cur:
+                sql = 'DELETE FROM users WHERE user_id = %s'
+                cur.execute(sql, (user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     # ユーザ名変更**********************************************************
     @classmethod
     def change_uname(cls, user_id, user_name):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.user_name = user_name
-        user.update_at = datetime.datetime.now()
+        now = datetime.datetime.now()
+        conn = db_pool.get_conn()
         try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'UPDATE users SET user_name = %s, update_at = %s WHERE user_id = %s'
+                cur.execute(sql, (user_name, now, user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     # Eメールアドレス変更**********************************************************
     @classmethod
     def change_email(cls, user_id, email):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.email = email
-        user.update_at = datetime.datetime.now()
+        now = datetime.datetime.now()
+        conn = db_pool.get_conn()
         try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'UPDATE users SET email = %s, update_at = %s WHERE user_id = %s'
+                cur.execute(sql, (email, now, user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
      # パスワード変更**********************************************************
     @classmethod
     def change_password(cls, user_id, password):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.password = generate_password_hash(password)
-        user.update_at = datetime.datetime.now()
+        password = generate_password_hash(password)
+        now = datetime.datetime.now()
+        conn = db_pool.get_conn()
         try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'UPDATE users SET password = %s, update_at = %s WHERE user_id = %s'
+                cur.execute(sql, (password, now, password,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
+            db_pool.release(conn)
             db.session.close()
 
     # ユーザアイコン変更**********************************************************
     @classmethod
     def change_icon(cls, user_id, icon_img):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.icon_img = icon_img
-        user.update_at = datetime.datetime.now()
+        now = datetime.datetime.now()
+        conn = db_pool.get_conn()
         try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'UPDATE users SET icon_img = %s, update_at = %s WHERE user_id = %s'
+                cur.execute(sql, (icon_img, now, user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
+            db_pool.release(conn)
             db.session.close()
     
     # 登録済みEメールアドレスの確認

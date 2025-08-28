@@ -82,6 +82,12 @@ def register_process():
         flash('空のフォームがあるっタラコ！')
     elif password != passwordConfirmation:
         flash('パスワードが一致しないっタラコ！')
+    elif len(password) < 8:
+        flash('パスワードは8文字以上である必要があります')
+    # elif len(password) < 8 or re.search(r'\d', password) == None or re.search(r'[a-zA-Z]', password) == None:
+    #     flash('パスワードは8文字以上で英数字が含まれている必要があります')
+    # elif len(password) < 8 or re.search(r'\d', password) == None or re.search(r'[a-z]', password) == None or re.search(r'[A-Z]', password) == None:
+    #     flash('パスワードは8文字以上で英大文字、英小文字、数字が含まれている必要があります')
     elif registered_name != None:
         flash('ごめんたい! このユーザ名は既に登録されタラコ...')  
     elif registered_email != None:

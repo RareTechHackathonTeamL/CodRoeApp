@@ -49,7 +49,7 @@ def login_process():
         user_name = user.user_name
         session['user_id'] = user.user_id
         user_id = session.get('user_id')
-        flash('おかえり！ ' + user_name + 'さん！' + str(user_id))
+        flash('おかえり！ ' + user_name + 'さん！')
         return redirect(url_for('chats_view'))
     return render_template('login.html')
             
@@ -75,7 +75,6 @@ def register_process():
     passwordConfirmation = request.form.get('password-confirmation') 
     registered_email= User.find_by_email(new_email)
     registered_name = User.find_by_uname(new_uname)
-    # icon_img = '../' + app.config['ICON_FOLDER'] + 'default_image.png'
     icon_img = 'default_image.png'
 
     if new_uname == '' or new_email =='' or password == '' or passwordConfirmation == '':
@@ -224,7 +223,6 @@ def change_icon_view():
     user = User.query.get(user_id)
     icon_img = user.icon_img
     icon_img = app.config['ICON_FOLDER'] + str(user.icon_img)
-    flash('user_id= ' + str(user_id))
     return render_template('change_icon.html', icon_img=icon_img)
 
 # アイコン変更処理 *****************************************************
@@ -248,7 +246,7 @@ def change_icon():
         file.save(app.config['ICON_FOLDER'] + secure_fname)
         icon_img = filename
         User.change_icon(user_id, icon_img)
-        flash( 'アイコン画像を変更しタラコ！' + str(file_ext))
+        flash( 'アイコン画像を変更しタラコ！')
         return redirect(f'/profile')
     else:
         flash('許可されていないファイルファイル形式です！')
@@ -324,11 +322,13 @@ def create_chat():
                     friend_id = User.get_user_id_by_user_name(friend)
                     if friend_id == None:
                         results.append(f'{friend}さんが見つかりませんでした')
-                    chat_in = Member.search_in_chat(chat_id, friend_id)
-                    if chat_in != None:
-                        results.append(f'{friend}さんは既にチャットに参加しています')
-                    member_gid2 = uuid.uuid4()
-                    Member.add_member(member_gid2, chat_id, friend_id)
+                    else:
+                        chat_in = Member.search_in_chat(chat_id, friend_id)
+                        if chat_in != None:
+                            results.append(f'{friend}さんは既にチャットに参加しています')
+                        else:
+                            member_gid2 = uuid.uuid4()
+                            Member.add_member(member_gid2, chat_id, friend_id)
             if results:
                 flash('以下のメンバーが登録できませんでした')
                 for result in results:
@@ -455,14 +455,15 @@ def chat_add_member(chat_id):
             friend_id = User.get_user_id_by_user_name(friend)
             if friend_id == None:
                 results.append(f'{friend}さんが見つかりませんでした')
-            # メンバーがそのチャットに参加しているか検索
-            chat_in = Member.search_in_chat(chat_id, friend_id)
-            if chat_in != None:
-                results.append(f'{friend}さんは既にチャットに参加しています')
             else:
-                # メンバーDBに追加
-                id = uuid.uuid4()
-                Member.add_member(id, chat_id, friend_id)
+                # メンバーがそのチャットに参加しているか検索
+                chat_in = Member.search_in_chat(chat_id, friend_id)
+                if chat_in != None:
+                    results.append(f'{friend}さんは既にチャットに参加しています')
+                else:
+                    # メンバーDBに追加
+                    id = uuid.uuid4()
+                    Member.add_member(id, chat_id, friend_id)
     if results == None:
         flash('メンバー追加できました！')
         return redirect(f'/chat/{chat_id}/messages')

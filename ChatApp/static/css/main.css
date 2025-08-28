@@ -222,3 +222,21 @@
  .memberul {
      padding-left: 0;
  }
+
+ .main-img {
+     width: 70px;
+     height: 70px;
+ }
+
+ .main-box {
+     width: 320px;
+     height: 75px;
+     border: 1px solid #ff9494;
+     border-radius: 12px;
+     background: white;
+     margin-top: 16px;
+     display: flex;
+     align-items: center;
+     text-decoration: none;
+     color: #ff9494;
+ }

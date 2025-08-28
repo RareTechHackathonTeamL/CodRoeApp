@@ -4,32 +4,26 @@
 
 <body class="body">
   <!----- ヘッダー ----->
-
   <header class="header">
     <h1>プロフィール</h1>
     <form action="/chats" method="GET" class="back-button">
       <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
-
-    <!-- JavaScript？ -->
     <div class="deletebox-button">
-
-      <input type="image" onclick="openModal()" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除"
-        class="header-image" />
-
+      <input type="image" onclick="openModal()" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
     </div>
   </header>
   <!----- ヘッダー END ----->
 
   {% with messages = get_flashed_messages() %} {% if messages %}
-  <ul>
+  <div>
     {% for message in messages %}
-    <li>{{ message }}</li>
+    <h3>{{ message }}</h3>
     {% endfor %}
-  </ul>
+  </div>
   {% endif %} {% endwith %}
 
-  <!----- メインコンテンツ ----->
+  <!----- メイン ----->
   <main class="main">
     <div class="input-form">
       <a href="/change_icon" class="footer-button">
@@ -80,10 +74,7 @@
       </div>
     </div>
   </main>
-
   <!-- メインEND -->
-
-
 
   <!-- モーダル -->
   <div id="myModal" class="modal">

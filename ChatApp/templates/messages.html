@@ -1,10 +1,6 @@
-{% extends 'util/base.html' %}
-
-{% block title %}
-<title>全体チャット</title>
-{% endblock title %}
-
-{% block content %}
+{% extends 'util/base.html' %} {% block title %}
+<title>メッセージ</title>
+{% endblock title %} {% block content %}
 
 <body class="body">
   <!-- ヘッダー -->
@@ -31,8 +27,7 @@
     <div class="message {{ 'right' if message.user_id == user_id else 'left' }}">
       {% if message.user_id != user_id %}
       <div class="message-header">
-        <img src="{{ url_for('static', filename='img/user_icons/' ~ message.icon_img) }}" alt="ユーザーアイコン"
-          class="message-icon">
+        <img src="{{ url_for('static', filename='img/user_icons/' ~ message.icon_img) }}" alt="ユーザーアイコン" class="message-icon" />
         <span class="user-name">{{ message.user_name }}</span>
       </div>
       {% endif %}
@@ -43,7 +38,7 @@
           <div class="message-text">{{ message.message }}</div>
           {% elif message.stamp_path %}
           <div class="message-stamp">
-            <img src="{{ url_for('static', filename=message.stamp_path) }}" alt="stamp">
+            <img src="{{ url_for('static', filename=message.stamp_path) }}" alt="stamp" />
           </div>
           {% endif %}
         </div>
@@ -67,27 +62,25 @@
       <div class="input-wrapper">
         <textarea id="footer-message" name="message" placeholder="メッセージを入力"></textarea>
         <button id="stampToggle" class="stamp-button" type="button">
-          <img src="../../static/img/stamp-button.png" class="title-logo">
+          <img src="../../static/img/stamp-button.png" class="title-logo" />
         </button>
-        <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信" class="send-button">
+        <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信" class="send-button" />
       </div>
     </form>
 
     <div id="stampList" class="stamp-list hidden">
       {% for stamp in stamps %}
-      <img src="{{ url_for('static', filename=stamp.stamp_path) }}" data-stamp-id="{{ stamp.id }}" class="stamp-item"
-        alt="stamp">
+      <img src="{{ url_for('static', filename=stamp.stamp_path) }}" data-stamp-id="{{ stamp.id }}" class="stamp-item" alt="stamp" />
       {% endfor %}
       <button id="stampClose" class="stamp-close" type="button">
-        <img src="{{ url_for('static', filename='img/stamp-close.png') }}" class="stamp-close-button">
+        <img src="{{ url_for('static', filename='img/stamp-close.png') }}" class="stamp-close-button" />
       </button>
     </div>
 
     <form id="stampForm" action="/chat/{{ chat.id }}/messages" method="POST">
-      <input type="hidden" name="stamp" id="stampInput">
+      <input type="hidden" name="stamp" id="stampInput" />
     </form>
   </footer>
-
 
   <!-- モーダル -->
   <!-- チャット削除用フォーム -->
@@ -107,22 +100,19 @@
     </div>
   </div>
 
-
-
   <!-- JS -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-
       // メッセージクリックでスライド削除ボタン表示
       const userMessages = document.querySelectorAll(".message.right");
-      userMessages.forEach(msg => {
+      userMessages.forEach((msg) => {
         const deleteBtn = msg.querySelector(".slide-delete-btn");
         const deleteForm = msg.querySelector(".delete-form");
 
         msg.addEventListener("click", function (e) {
           e.stopPropagation();
           // 他のボタンは隠す
-          document.querySelectorAll(".slide-delete-btn").forEach(btn => {
+          document.querySelectorAll(".slide-delete-btn").forEach((btn) => {
             if (btn !== deleteBtn) btn.classList.add("hidden");
             if (btn !== deleteBtn) btn.parentElement.querySelector(".message-box").style.transform = "translateX(0)";
           });
@@ -138,15 +128,15 @@
             method: "POST",
             headers: {
               "X-Requested-With": "XMLHttpRequest",
-              "Content-Type": "application/x-www-form-urlencoded"
+              "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: ""
+            body: "",
           })
-            .then(res => {
+            .then((res) => {
               if (res.ok) msg.remove();
               else alert("削除に失敗しました。");
             })
-            .catch(err => {
+            .catch((err) => {
               console.error(err);
               alert("削除中にエラーが発生しました。");
             });
@@ -155,7 +145,7 @@
 
       // 外クリックで削除ボタンを隠す
       document.addEventListener("click", function () {
-        userMessages.forEach(msg => {
+        userMessages.forEach((msg) => {
           const btn = msg.querySelector(".slide-delete-btn");
           if (!btn.classList.contains("hidden")) {
             btn.classList.add("hidden");
@@ -185,7 +175,7 @@
         chatInputForm.style.display = "flex";
       });
 
-      stamps.forEach(stamp => {
+      stamps.forEach((stamp) => {
         stamp.addEventListener("click", function (event) {
           event.stopPropagation();
           stampInput.value = this.dataset.stampId;
@@ -201,7 +191,6 @@
           chatInputForm.style.display = "flex";
         }
       });
-
     });
 
     // モーダルを表示する関数
@@ -217,12 +206,7 @@
       // これによりモーダルが閉じられる
       document.getElementById("myModal").style.display = "none";
     }
-
-
-
   </script>
-
-
 
   <!-- CSS -->
   <style>

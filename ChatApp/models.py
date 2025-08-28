@@ -273,7 +273,6 @@ class Chat(db.Model):
     detail = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, nullable=False)
     update_at = db.Column(db.DateTime)
-    latest_messages = db.Column(db.DateTime, nullable=False)    # チャット一覧で最新のメッセージが来ているものを上に表示させたいため、新規メッセージ・チャット新規作成のみでupdateする
 
     messages = db.relationship('Message', backref='chat')
     members = db.relationship('Member', backref='chat')
@@ -283,8 +282,8 @@ class Chat(db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'INSERT INTO chat(id, user_id, chat_name, chat_type, detail, created_at, update_at, latest_messages) VALUE(%s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(sql, (chat_id, user_id, chat_name, chat_type, detail, now, now, now,))
+                sql = 'INSERT INTO chat(id, user_id, chat_name, chat_type, detail, created_at, update_at) VALUE(%s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(sql, (chat_id, user_id, chat_name, chat_type, detail, now, now,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
@@ -319,19 +318,6 @@ class Chat(db.Model):
             abort(500)
         finally:
             db_pool.release(conn)
-
-    @classmethod
-    def update_latest(cls, chat_id):
-        try:
-            now = datetime.datetime.now()
-            chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
-            chat_info.latest_messages = now
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
 
     @classmethod
     def delete(cls, chat_id):
@@ -409,7 +395,7 @@ class Chat(db.Model):
                 open_chats = cur.fetchall()
 
                 group_private_sql = '''
-                    SELECT * FROM chat AS c
+                    SELECT c.id, c.user_id, c.chat_name, c.detail, c.chat_type, c.created_at, c.update_at FROM chat AS c
                     LEFT OUTER JOIN members AS m ON c.id = m.chat_id
                     WHERE (c.chat_type = %s) and (m.user_id = %s);
                     '''
@@ -505,6 +491,23 @@ class Message(db.Model):
                 cur.execute(sql, (chat_id,))
                 messages = cur.fetchall()
                 return messages
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
+        finally:
+            db_pool.release(conn)
+
+    @classmethod
+    def get_latest_messages(cls, chat_id):
+        conn = db_pool.get_conn()
+        try:
+            with conn.cursor() as cur:
+                sql = 'SELECT created_at FROM messages WHERE chat_id = %s ORDER BY created_at DESC LIMIT 1;'
+                cur.execute(sql, (chat_id,))
+                latest_message = cur.fetchone()
+                if latest_message == None:
+                    return None
+                return latest_message['created_at']
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
             abort(500)

@@ -115,12 +115,12 @@ class User(UserMixin, db.Model):
 
     # ユーザ名変更
     @classmethod
-    def change_uname(cls, user_name, user_id):
+    def change_uname(cls, user_name, update_at, user_id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
                sql = "UPDATE users SET user_name=%s, update_at=%s WHERE user_id=%s;"
-               cur.execute(sql, (user_name, user_id,))
+               cur.execute(sql, (user_name, update_at, user_id,))
                conn.commit()
         except pymysql.Error as e:
            print(f'エラーが発生しています：{e}')
@@ -130,12 +130,12 @@ class User(UserMixin, db.Model):
 
     # Eメールアドレス変更
     @classmethod
-    def change_email(cls, email, user_id):
+    def change_email(cls, email, update_at, user_id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
                sql = "UPDATE users SET email=%s, update_at=%s WHERE user_id=%s;"
-               cur.execute(sql, (email, user_id,))
+               cur.execute(sql, (email, update_at, user_id,))
                conn.commit()
         except pymysql.Error as e:
            print(f'エラーが発生しています：{e}')
@@ -145,12 +145,12 @@ class User(UserMixin, db.Model):
 
      # パスワード変更
     @classmethod
-    def change_password(cls, password,  user_id):
+    def change_password(cls, password, update_at,  user_id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
                sql = "UPDATE users SET password=%s, update_at=%s WHERE user_id=%s;"
-               cur.execute(sql, (password, user_id,))
+               cur.execute(sql, (password, update_at, user_id,))
                conn.commit()
         except pymysql.Error as e:
            print(f'エラーが発生しています：{e}')

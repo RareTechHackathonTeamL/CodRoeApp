@@ -134,6 +134,7 @@ def change_uname_view():
 @app.route('/change_uname', methods=['POST'])
 def change_uname():
     user_id = session.get('user_id')
+    update_at = datetime.datetime.now()
     if user_id == None:
         return redirect(url_for('login_view'))
     user = User.get_user_by_user_id(user_id)
@@ -149,8 +150,9 @@ def change_uname():
         if registered_name != None:
             flash('登録されている情報と一致するため更新できません。')
         else:
-            user_name = new_uname
-            User.change_uname(user_name, user_id)
+            # user_name = str(new_uname)
+            # User.change_uname(user_name, update_at, user_id)
+            User.change_uname(new_uname, update_at, user_id)
             flash('ユーザ情報を更新しタラコ！')
             return redirect(f'/profile')
     return render_template('change_uname.html')
@@ -167,6 +169,7 @@ def change_email_view():
 @app.route('/change_email', methods=['POST'])
 def change_email():
     user_id = session.get('user_id')
+    update_at = datetime.datetime.now()
     if user_id == None:
         return redirect(url_for('login_view'))
     else:
@@ -183,7 +186,8 @@ def change_email():
                 flash('登録されている情報と一致するため更新できません。')
             else:
                 email = new_email
-                User.change_email(email, user_id)
+
+                User.change_email(email, update_at, user_id)
                 flash('ユーザ情報を更新しタラコ！')
                 return redirect(f'/profile')
     return render_template('change_email.html')
@@ -200,6 +204,7 @@ def change_password_view():
 @app.route('/change_password', methods=['POST'])
 def change_password():
     user_id = session.get('user_id')
+    update_at = datetime.datetime.now()
     if user_id == None:
         return redirect(url_for('login_view'))
     else:
@@ -215,7 +220,7 @@ def change_password():
             flash('パスワードが一致しません！')
         else:
             password = generate_password_hash(new_password)
-            User.change_password(password, user_id)
+            User.change_password(password, update_at, user_id)
             flash('ユーザ情報を更新しタラコ！')
             return redirect(f'/profile')
         return render_template('change_password.html')
@@ -235,15 +240,11 @@ def change_icon_view():
 @app.route('/change_icon', methods=['POST'])
 def change_icon():
     user_id = session.get('user_id')
+    update_at = datetime.datetime.now()
     if user_id == None:
         return redirect(url_for('login_view'))
     else:
         user = User.get_user_by_user_id(user_id)
-        # user_name = user["user_name"]
-        # email = user["email"]
-        # password = user["password"]
-        # created_at = user["created_at"]
-        updated_at = datetime.datetime.now()
         file = request.files['icon_file']
         origin_filename = file.filename
 
@@ -258,7 +259,7 @@ def change_icon():
             secure_fname = secure_filename(filename)
             file.save(app.config['ICON_FOLDER'] + secure_fname)
             icon_img = filename
-            User.change_icon(icon_img, updated_at, user_id)
+            User.change_icon(icon_img, update_at, user_id)
             flash( 'アイコン画像を変更しタラコ！')
             return redirect(f'/profile')
         else:

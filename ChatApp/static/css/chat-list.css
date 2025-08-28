@@ -30,6 +30,7 @@
 }
 
 .messages {
+    margin-top: 110px;
 
     /* ← フッター高さ(94) + 余白 */
     padding-bottom: 110px;

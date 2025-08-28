@@ -224,12 +224,18 @@ class User(UserMixin, db.Model):
     # 登録済みEメールアドレスの確認
     @classmethod
     def find_by_email(cls, reserch_email):
+        conn = db_pool.get_conn()
         try:
-            result = db.session.query(User).filter(User.email == reserch_email).first()
-            return result
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT * FROM users WHERE email = %s'
+                cur.execute(sql, (reserch_email,))
+                result = cur.fetchone()
+                return result
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
+            db_pool.release(conn)
             db.session.close()
 
     # 登録済みユーザ名の確認

@@ -1,5 +1,5 @@
 {% extends 'util/base.html' %} {% block title %}
-<title>ホーム</title>
+<title>チャット一覧</title>
 {% endblock title %} {% block content %}
 
 <body class="body">
@@ -25,16 +25,18 @@
     <div class="list list-margin-top chatcreatesubmit">
       {% for chat in chats %}
       <!-- 画像を押して遷移 -->
-      <a href="/chat/{{ chat.id }}/messages" class="main-box">
-        {% if chat.chat_type == 0 %}
-        <img src="{{ url_for('static', filename='img/openform.png') }}" class="main-img" />
-        {% elif chat.chat_type == 1 %}
-        <img src="{{ url_for('static', filename='img/groupform.png') }}" class="main-img" />
-        {% elif chat.chat_type == 2 %}
-        <img src="{{ url_for('static', filename='img/privateform.png') }}" class="main-img" />
-        {% endif %}
-        <span>{{ chat.chat_name}}</span>
-      </a>
+      <label for="{{chat.id}}">
+        <form action="/chat/{{ chat.id }}/messages" method="GET" class="main-box" type="submit">
+          {% if chat.chat_type == 0 %}
+          <img src="{{ url_for('static', filename='img/openform.png') }}" class="main-img" />
+          {% elif chat.chat_type == 1 %}
+          <img src="{{ url_for('static', filename='img/groupform.png') }}" class="main-img" />
+          {% elif chat.chat_type == 2 %}
+          <img src="{{ url_for('static', filename='img/privateform.png') }}" class="main-im" />
+          {% endif %}
+          <input type="submit" value="{{ chat.chat_name}}" id="{{chat.id}}" class="main-boxs" />
+        </form>
+      </label>
       {% endfor %}
     </div>
   </main>
@@ -49,8 +51,8 @@
 
     <div class="footer-button">
       <div class="footer-item">
-        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="ホーム" class="footer-image" />
-        ホーム
+        <img src="{{ url_for('static', filename='img/chat-list-create.png') }}" alt="チャット一覧" class="footer-image" />
+        チャット一覧
       </div>
     </div>
 

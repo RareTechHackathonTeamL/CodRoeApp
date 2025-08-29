@@ -10,7 +10,7 @@
 
 .list-margin-top {
 
-    margin-top: 30px;
+    margin-top: 120px;
 
 }
 
@@ -18,20 +18,25 @@
 .h3-box {
 
     padding: 16px;
-    height: 43px;
+    height: 50px;
     border: 1px solid rgb(255, 148, 148);
     border-radius: 12px;
-    width: 288px;
+    width: 320px;
     background: white;
     color: rgb(255, 148, 148);
     font-size: 14px;
+    margin-top: 16px;
 
 }
 
 .messages {
+    margin-top: 120px;
 
     /* ← フッター高さ(94) + 余白 */
-    padding-bottom: 110px;
+    padding-bottom: 120px;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .message {
@@ -113,6 +118,8 @@
     /* 中央に配置 */
     display: flex;
     justify-content: center;
+    padding-top: 120px;
+    padding-bottom: 110px;
 
 }
 

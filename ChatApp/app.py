@@ -45,10 +45,11 @@ def login_process():
     elif user == None:
         flash('入力内容を間違っタラコ？')
     else:
-        if check_password_hash(user["password"], password) == False:
+        if check_password_hash(user.password, password) == False:
             flash('入力内容を間違っタラコ？')
         else:
-            session['user_id'] = user["user_id"]
+            login_user(User(user['user_id']))
+            session['user_id'] = user['user_id']
             return redirect(url_for('chats_view'))
     return render_template('login.html')
             
@@ -90,11 +91,12 @@ def register_process():
     elif registered_email != None:
         flash('ごめんたい! このEメールアドレスは既に登録されタラコ...')
     else:
-        user_id = uuid.uuid4() #add
-        password = generate_password_hash(password) #add
-        created_at = datetime.datetime.now() #add
-        User.regist(user_id, user_name, email, password, icon_img, created_at) #mod
+        user_id = uuid.uuid4()
+        password = generate_password_hash(password)
+        created_at = datetime.datetime.now()
+        User.regist(user_id, user_name, email, password, icon_img, created_at)
         user = User.find_by_email(email)
+        login_user(User(user['user_id']))
         session['user_id'] = user["user_id"]
         flash( 'ようこそ！ ' + user_name + 'さん！')
         return redirect(url_for('chats_view'))
@@ -274,7 +276,15 @@ def chats_view():
     if user_id == None:
         return redirect(url_for('login_view'))
     chats = Chat.get_chat_belong_to(user_id)
-    return render_template('chats.html', chats=chats)
+    for chat in chats:
+        latest_message_time = Message.get_latest_messages(chat['id'])
+        if latest_message_time == None:
+            chat['latest'] = chat['update_at']
+        else:
+            chat['latest'] = latest_message_time
+    sorted_chats = sorted(chats, key=lambda s: s['latest'], reverse=True)
+
+    return render_template('chats.html', chats=sorted_chats)
 
 
 # チャット作成画面遷移
@@ -317,15 +327,15 @@ def create_chat():
         if friend_name == user_name:
             flash('友達を入力してください')
             return redirect(url_for('chat_create_view'))
-        chat_exist = Chat.search_chat_exist(user_id, friend_id, user_name, friend_name)
+        chat_exist = Chat.search_private_chat_exist(user_id, friend_id, user_name, friend_name)
 
     if new_chat_name == '':
         return redirect(url_for('chat_create_view'))
 
-    if chat_exist != True:
+    if chat_exist == None:
         chat_id = uuid.uuid4()
         now = datetime.datetime.now()
-        Chat.create(chat_id, user_id, new_chat_name, chat_type_num, chat_detail)
+        Chat.create(chat_id, user_id, new_chat_name, chat_type_num, chat_detail, now)
 
         # Member登録
         if chat_type == 'group':
@@ -360,8 +370,8 @@ def create_chat():
 
         return redirect(url_for('chats_view'))
     else:
-        error = 'すでに同じ名前のチャンネルが存在しています'
-        return render_template('chatsCreate.html', error=error)
+        flash('すでに同じ名前のチャンネルが存在しています')
+        return redirect(url_for('chat_create_view'))
 
 # チャット編集画面
 @app.route('/chat/<chat_id>/detail', methods=['GET'])
@@ -512,10 +522,8 @@ def create_message(chat_id):
     now = datetime.datetime.now()
     if message:
         Message.create(id, user_id, chat_id, message, now)
-        Chat.update_latest(chat_id)
     elif stamp:
         Message.send_stamp(id, user_id, chat_id, stamp, now)
-        Chat.update_latest(chat_id)
     return redirect(f'/chat/{chat_id}/messages')
 
 # メッセージ削除

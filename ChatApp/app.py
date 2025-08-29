@@ -87,9 +87,9 @@ def register_process():
     # elif len(password) < 8 or re.search(r'\d', password) == None or re.search(r'[a-z]', password) == None or re.search(r'[A-Z]', password) == None:
     #     flash('パスワードは8文字以上で英大文字、英小文字、数字が含まれている必要があります')
     elif registered_name != None:
-        flash('ごめんたい! このユーザ名は既に登録されタラコ...')  
+        flash('ごめんたい！ このユーザ名は既に登録されタラコ...')  
     elif registered_email != None:
-        flash('ごめんたい! このEメールアドレスは既に登録されタラコ...')
+        flash('ごめんたい！ このメールアドレスは既に登録されタラコ...')
     else:
         user_id = uuid.uuid4()
         password = generate_password_hash(password)

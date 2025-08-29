@@ -14,17 +14,16 @@
   </header>
   <!----- ヘッダー END ----->
 
-  {% with messages = get_flashed_messages() %} {% if messages %}
-  <div>
-    {% for message in messages %}
-    <h3>{{ message }}</h3>
-    {% endfor %}
-  </div>
-  {% endif %} {% endwith %}
-
   <!----- メインコンテンツ ----->
   <main class="main">
     <form action="/change_email" method="POST">
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div>
+        {% for message in messages %}
+        <h3>{{ message }}</h3>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
       <div class="input-form">
         <div class="input-box-autu">
           <div class="font">メールアドレス</div>

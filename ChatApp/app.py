@@ -256,7 +256,6 @@ def change_icon():
         file = request.files['icon_file']
         origin_filename = file.filename
 
-        # if 'icon_file' not in request.files:
         if not file:
             flash('ファイルが選択されていません！')
         elif origin_filename == '':

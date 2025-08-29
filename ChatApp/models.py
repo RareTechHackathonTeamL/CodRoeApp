@@ -237,12 +237,12 @@ class Chat(db.Model):
             db_pool.release(conn)
 
     @classmethod
-    def update_name(cls, chat_id, new_name):
+    def update_name(cls, chat_id, now, new_name):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'UPDATE chat SET chat_name = %s WHERE id = %s'
-                cur.execute(sql, (new_name, chat_id,))
+                sql = 'UPDATE chat SET chat_name = %s, update_at = %s WHERE id = %s'
+                cur.execute(sql, (new_name, now, chat_id,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
@@ -251,12 +251,12 @@ class Chat(db.Model):
             db_pool.release(conn)
 
     @classmethod
-    def update_detail(cls, chat_id, new_detail):
+    def update_detail(cls, chat_id, now, new_detail):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'UPDATE chat SET detail = %s WHERE id = %s'
-                cur.execute(sql, (new_detail, chat_id,))
+                sql = 'UPDATE chat SET detail = %s, update_at = %s WHERE id = %s'
+                cur.execute(sql, (new_detail, now, chat_id,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
@@ -314,9 +314,9 @@ class Chat(db.Model):
         try:
             with conn.cursor() as cur:
                 sql = 'SELECT id FROM chat WHERE (chat_type = 2) and (user_id = %s) and (chat_name = %s)'
-                cur.execute(sql, (user_id, f'{friend_name}と{user_name}のプライベートチャット',))
+                cur.execute(sql, (user_id, f'{friend_name}・{user_name}',))
                 result1 = cur.fetchone()
-                cur.execute(sql, (friend_id, f'{user_name}と{friend_name}のプライベートチャット',))
+                cur.execute(sql, (friend_id, f'{user_name}・{friend_name}',))
                 result2 = cur.fetchone()
                 if (result1 == None) and (result2 == None):
                     return None

@@ -316,7 +316,7 @@ def create_chat():
         friend_name = request.form.get('private_friend_name')
         chat_type_num = 2
         user_name = User.get_user_name_by_user_id(user_id)
-        new_chat_name = f'{friend_name}と{user_name}のプライベートチャット'
+        new_chat_name = f'{friend_name}・{user_name}'
         chat_detail = ''
         
         friend_id = User.get_user_id_by_user_name(friend_name)
@@ -401,12 +401,13 @@ def chat_update_name(chat_id):
     new_name = request.form.get('chat_name')
     chat_info = Chat.find_by_chat_info(chat_id)
     if chat_info['user_id'] != user_id:
-        error = '他の人が作ったチャンネルです'
-        return render_template('ChatsUpdateName.html', chat=chat_info, error=error)
+        flash('他の人が作ったチャンネルです')
+        return redirect(url_for('chats_view'))
     elif new_name == "":
         return redirect(f'/chat/update_name/{chat_id}')
     elif chat_info != None:
-        Chat.update_name(chat_id, new_name)
+        now = datetime.datetime.now()
+        Chat.update_name(chat_id, now, new_name)
         flash('チャット情報が更新されました！')
     return redirect(f'/chat/{ chat_id }/detail')
 
@@ -425,12 +426,13 @@ def update_chat_detail(chat_id):
     new_detail = request.form.get('detail')
     chat_info = Chat.find_by_chat_info(chat_id)
     if chat_info['user_id'] != user_id:
-        error = '他の人が作ったチャンネルです'
-        return render_template('ChatsUpdate.html', chat=chat_info, error=error)
+        flash('他の人が作ったチャンネルです')
+        return redirect(url_for('chats_view'))
     elif new_detail == "":
         return redirect(f'/chat/update_detail/{chat_id}')
     elif chat_info != None:
-        Chat.update_detail(chat_id, new_detail)
+        now = datetime.datetime.now()
+        Chat.update_detail(chat_id, now, new_detail)
         flash('チャット情報が更新されました！')
     return redirect(f'/chat/{ chat_id }/detail')
 
@@ -441,8 +443,8 @@ def delete_chat(chat_id):
     user_id = current_user.get_id()
     chat_info = Chat.find_by_chat_info(chat_id)
     if chat_info['user_id'] != user_id:
-        error = '他の人が作ったチャンネルです'
-        return render_template('ChatsUpdate.html', chat=chat_info, error=error)
+        flash('他の人が作ったチャンネルです')
+        return redirect(url_for('chats_view'))
     elif chat_info != None:
         Chat.delete(chat_id)
     return redirect(url_for('chats_view'))
@@ -476,27 +478,30 @@ def chat_add_member_view(chat_id):
 def chat_add_member(chat_id):
     friend_list = request.form.getlist('friends_name')
     results = []
-    for friend in friend_list:
-        if friend != '':
-            # 追加するメンバーの名前を検索
-            friend_id = User.get_user_id_by_user_name(friend)
-            if not friend_id:
-                results.append(f'{friend}さんが見つかりませんでした')
-            else:
-                # メンバーがそのチャットに参加しているか検索
-                chat_in = Member.search_in_chat(chat_id, friend_id)
-                if chat_in:
-                    results.append(f'{friend}さんは既にチャットに参加しています')
+    if friend_list != ['']:
+        for friend in friend_list:
+            if friend != '':
+                # 追加するメンバーの名前を検索
+                friend_id = User.get_user_id_by_user_name(friend)
+                if not friend_id:
+                    results.append(f'{friend}さんが見つかりませんでした')
                 else:
-                    # メンバーDBに追加
-                    id = uuid.uuid4()
-                    now = datetime.datetime.now()
-                    Member.add_member(id, chat_id, friend_id, now)
-    if results == None:
-        flash('メンバー追加できました！')
-        return redirect(f'/chat/{chat_id}/messages')
+                    # メンバーがそのチャットに参加しているか検索
+                    chat_in = Member.search_in_chat(chat_id, friend_id)
+                    if chat_in:
+                        results.append(f'{friend}さんは既にチャットに参加しています')
+                    else:
+                        id = uuid.uuid4()
+                        now = datetime.datetime.now()
+                        Member.add_member(id, chat_id, friend_id, now)
     else:
-        # エラーが起こった場合があるときはグループメンバー追加画面に戻る
+        flash('友達を入力してください')
+        return redirect(f'/chat/{chat_id}/add_member')
+    if not results:
+        flash('メンバー追加できました！')
+        return redirect(f'/chat/{ chat_id }/detail')
+    else:
+        flash('以下のメンバーが登録できませんでした')
         for result in results:
             flash(result)
         return redirect(f'/chat/{chat_id}/add_member')

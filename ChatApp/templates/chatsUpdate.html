@@ -12,7 +12,7 @@
     <form action="/chat/{{ chat.id }}/messages" method="GET" class="back-button">
       <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
-    {% if chat.user_id == current_user.user_id %}
+    {% if chat.user_id == current_user.id %}
     <a onclick="openDeleteModal()" class="deletebox-button">
       <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
     </a>
@@ -40,7 +40,7 @@
       {% endwith %}
 
       <!-- 作成者であるのか -->
-      {% if chat.user_id != current_user.user_id %}
+      {% if chat.user_id != current_user.id %}
       <div class="input-box-child">
         <div>チャット名</div>
         <div class="transitionplaceholder">

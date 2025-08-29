@@ -11,33 +11,20 @@ from util.DB import DB
 db_pool = DB.init_db_pool()
 
 # Userテーブル
-class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    user_id = db.Column(db.String(255), primary_key=True)
-    user_name = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    icon_img = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)  # 更新日時
-
-    chat = db.relationship('Chat', backref='users')
-    messages = db.relationship('Message', backref='users')
-    members = db.relationship('Member', backref='users')
-
+class User(UserMixin):
     def __init__(self, user_id):
-        self.user_id = user_id
+        self.id = user_id
 
     # ユーザーIDの取得
     def get_id(self):
-        return self.user_id
+        return self.id
     
     @classmethod
     def get_user_by_user_id(cls, user_id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT * FROM users WHERE user_id = %s'
+                sql = 'SELECT * FROM users WHERE id = %s'
                 cur.execute(sql, (user_id,))
                 user = cur.fetchone()
             return user
@@ -53,11 +40,11 @@ class User(UserMixin, db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT user_id FROM users WHERE user_name = %s'
+                sql = 'SELECT id FROM users WHERE user_name = %s'
                 cur.execute(sql, (user_name,))
                 user_query = cur.fetchall()
                 if user_query:
-                    user_id = user_query[0]['user_id']
+                    user_id = user_query[0]['id']
                     return user_id
                 return user_query
         except pymysql.Error as e:
@@ -71,7 +58,7 @@ class User(UserMixin, db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT user_name from users WHERE user_id = %s'
+                sql = 'SELECT user_name from users WHERE id = %s'
                 cur.execute(sql, (user_id,))
                 user_query = cur.fetchall()
                 if user_query:
@@ -90,7 +77,7 @@ class User(UserMixin, db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = "INSERT INTO users (user_id, user_name, email, password, icon_img, created_at) VALUES (%s, %s, %s, %s, %s, %s);"
+                sql = "INSERT INTO users (id, user_name, email, password, icon_img, created_at) VALUES (%s, %s, %s, %s, %s, %s);"
                 cur.execute(sql, (user_id, user_name, email, password, icon_img, created_at,))
                 conn.commit()
         except pymysql.Error as e:
@@ -106,7 +93,7 @@ class User(UserMixin, db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'DELETE FROM users WHERE user_id = %s'
+                sql = 'DELETE FROM users WHERE id = %s'
                 cur.execute(sql, (user_id,))
                 conn.commit()
         except pymysql.Error as e:
@@ -117,12 +104,12 @@ class User(UserMixin, db.Model):
 
     # ユーザ名変更
     @classmethod
-    def change_uname(cls, user_name, update_at, user_id):
+    def change_uname(cls, user_name, updated_at, user_id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = "UPDATE users SET user_name=%s, update_at=%s WHERE user_id=%s;"
-                cur.execute(sql, (user_name, update_at, user_id,))
+                sql = "UPDATE users SET user_name=%s, updated_at=%s WHERE id=%s;"
+                cur.execute(sql, (user_name, updated_at, user_id,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
@@ -132,12 +119,12 @@ class User(UserMixin, db.Model):
 
     # Eメールアドレス変更
     @classmethod
-    def change_email(cls, email, update_at, user_id):
+    def change_email(cls, email, updated_at, user_id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = "UPDATE users SET email=%s, update_at=%s WHERE user_id=%s;"
-                cur.execute(sql, (email, update_at, user_id,))
+                sql = "UPDATE users SET email=%s, updated_at=%s WHERE id=%s;"
+                cur.execute(sql, (email, updated_at, user_id,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
@@ -147,12 +134,12 @@ class User(UserMixin, db.Model):
 
     # パスワード変更
     @classmethod
-    def change_password(cls, password, update_at,  user_id):
+    def change_password(cls, password, updated_at,  user_id):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = "UPDATE users SET password=%s, update_at=%s WHERE user_id=%s;"
-                cur.execute(sql, (password, update_at, user_id,))
+                sql = "UPDATE users SET password=%s, updated_at=%s WHERE id=%s;"
+                cur.execute(sql, (password, updated_at, user_id,))
                 conn.commit()
         except pymysql.Error as e:
             print(f'エラーが発生しています：{e}')
@@ -166,7 +153,7 @@ class User(UserMixin, db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = "UPDATE users SET icon_img=%s, update_at=%s WHERE user_id=%s;"
+                sql = "UPDATE users SET icon_img=%s, updated_at=%s WHERE id=%s;"
                 cur.execute(sql, (icon_img, updated_at, user_id,))
                 conn.commit()
         except pymysql.Error as e:
@@ -208,26 +195,13 @@ class User(UserMixin, db.Model):
             db_pool.release(conn)
 
 # Chatテーブル
-class Chat(db.Model):
-    __tablename__ = 'chat'
-
-    id = db.Column(db.String(255), nullable=False, primary_key=True)
-    user_id = db.Column(db.String(255), db.ForeignKey('users.user_id'), nullable=False)
-    chat_name = db.Column(db.String(255), nullable=False)
-    chat_type = db.Column(db.Integer, nullable=False)
-    detail = db.Column(db.String(255), nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)
-
-    messages = db.relationship('Message', backref='chat')
-    members = db.relationship('Member', backref='chat')
-
+class Chat():
     @classmethod
     def create(cls, chat_id, user_id, chat_name, chat_type, detail, now):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'INSERT INTO chat(id, user_id, chat_name, chat_type, detail, created_at, update_at) VALUE(%s, %s, %s, %s, %s, %s, %s)'
+                sql = 'INSERT INTO chats(id, user_id, chat_name, chat_type, detail, created_at, updated_at) VALUE(%s, %s, %s, %s, %s, %s, %s)'
                 cur.execute(sql, (chat_id, user_id, chat_name, chat_type, detail, now, now,))
                 conn.commit()
         except pymysql.Error as e:
@@ -241,7 +215,7 @@ class Chat(db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'UPDATE chat SET chat_name = %s, update_at = %s WHERE id = %s'
+                sql = 'UPDATE chats SET chat_name = %s, updated_at = %s WHERE id = %s'
                 cur.execute(sql, (new_name, now, chat_id,))
                 conn.commit()
         except pymysql.Error as e:
@@ -255,7 +229,7 @@ class Chat(db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'UPDATE chat SET detail = %s, update_at = %s WHERE id = %s'
+                sql = 'UPDATE chats SET detail = %s, updated_at = %s WHERE id = %s'
                 cur.execute(sql, (new_detail, now, chat_id,))
                 conn.commit()
         except pymysql.Error as e:
@@ -269,7 +243,7 @@ class Chat(db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'DELETE FROM chat WHERE id = %s'
+                sql = 'DELETE FROM chats WHERE id = %s'
                 cur.execute(sql, (chat_id,))
                 conn.commit()
         except pymysql.Error as e:
@@ -283,7 +257,7 @@ class Chat(db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT id FROM chat WHERE chat_name = %s'
+                sql = 'SELECT id FROM chats WHERE chat_name = %s'
                 cur.execute(sql, (reserch_chat_name,))
                 chat_id = cur.fetchone()
                 return chat_id
@@ -298,7 +272,7 @@ class Chat(db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT * FROM chat WHERE id = %s'
+                sql = 'SELECT * FROM chats WHERE id = %s'
                 cur.execute(sql, (reserch_chat_id,))
                 chat_info = cur.fetchone()
                 return chat_info
@@ -313,7 +287,7 @@ class Chat(db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT id FROM chat WHERE (chat_type = 2) and (user_id = %s) and (chat_name = %s)'
+                sql = 'SELECT id FROM chats WHERE (chat_type = 2) and (user_id = %s) and (chat_name = %s)'
                 cur.execute(sql, (user_id, f'{friend_name}・{user_name}',))
                 result1 = cur.fetchone()
                 cur.execute(sql, (friend_id, f'{user_name}・{friend_name}',))
@@ -335,12 +309,12 @@ class Chat(db.Model):
             with conn.cursor() as cur:
                 chats = []
 
-                open_sql = 'SELECT * FROM chat WHERE chat_type = 0'
+                open_sql = 'SELECT * FROM chats WHERE chat_type = 0'
                 cur.execute(open_sql)
                 open_chats = cur.fetchall()
 
                 group_private_sql = '''
-                    SELECT c.id, c.user_id, c.chat_name, c.detail, c.chat_type, c.created_at, c.update_at FROM chat AS c
+                    SELECT c.id, c.user_id, c.chat_name, c.detail, c.chat_type, c.created_at, c.updated_at FROM chats AS c
                     LEFT OUTER JOIN members AS m ON c.id = m.chat_id
                     WHERE (c.chat_type = %s) and (m.user_id = %s);
                     '''
@@ -365,17 +339,7 @@ class Chat(db.Model):
 
 
 # Messageテーブル
-class Message(db.Model):
-    __tablename__ = 'messages'
-
-    id = db.Column(db.String(255), nullable=False, primary_key=True)
-    user_id = db.Column(db.String(255), db.ForeignKey('users.user_id'), nullable=False)
-    chat_id = db.Column(db.String(255), db.ForeignKey('chat.id'), nullable=False)
-    message = db.Column(db.Text)
-    stamp_id = db.Column(db.ForeignKey('stamps.id'))
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)
-
+class Message():
     @classmethod
     def create(cls, id, user_id, chat_id, message, now):
         conn = db_pool.get_conn()
@@ -427,7 +391,7 @@ class Message(db.Model):
                     SELECT m.id, m.user_id, m.message, m.created_at, s.title, s.stamp_path, u.user_name, u.icon_img
                     FROM messages AS m
                     LEFT OUTER JOIN stamps AS s ON m.stamp_id = s.id
-                    LEFT OUTER JOIN users AS u ON m.user_id = u.user_id
+                    LEFT OUTER JOIN users AS u ON m.user_id = u.id
                     WHERE chat_id = %s
                     ORDER BY m.created_at ASC;
                     '''
@@ -459,15 +423,7 @@ class Message(db.Model):
 
 
 # Memberテーブル
-class Member(db.Model):
-    __tablename__ = 'members'
-
-    id = db.Column(db.String(255), nullable=False, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.user_id'), nullable=False)
-    chat_id = db.Column(db.ForeignKey('chat.id'), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)
-
+class Member():
     @classmethod
     def search_in_chat(cls, chat_id, user_id):
         conn = db_pool.get_conn()
@@ -514,17 +470,7 @@ class Member(db.Model):
 
 
 # Stampテーブル
-class Stamp(db.Model):
-    __tablename__ = 'stamps'
-
-    id = db.Column(db.String(255), nullable=False, primary_key=True)
-    title = db.Column(db.String(255), nullable=False)
-    stamp_path = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)
-
-    messages = db.relationship('Message', backref='stamps')
-
+class Stamp():
     @classmethod
     def get_stamps(cls):
         conn = db_pool.get_conn()

@@ -42,7 +42,7 @@
         <a href="/change_uname" class="transitionplaceholder">
           <div class="search-box">
             <div class="text-box">
-              <div class="placeholder">{{ current_user.user_name }}</div>
+              <div class="placeholder">{{ user.user_name }}</div>
               <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
             </div>
           </div>
@@ -54,7 +54,7 @@
         <a href="/change_email" class="transitionplaceholder">
           <div class="search-box1">
             <div class="text-box">
-              <div class="placeholder">{{ current_user.email }}</div>
+              <div class="placeholder">{{ user.email }}</div>
               <img src="{{ url_for('static', filename='img/arrow.png') }}" class="arrow" />
             </div>
           </div>

@@ -13,8 +13,7 @@ app = create_app()
 # User loader function
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
-    # user = User.get_user_by_user_id(user_id)
+    return User(user_id)
 
 # # アップロードファイル形式確認（拡張子）
 def allowed_file(filename):
@@ -48,8 +47,8 @@ def login_process():
         if check_password_hash(user['password'], password) == False:
             flash('入力内容を間違っタラコ？')
         else:
-            login_user(User(user['user_id']))
-            session['user_id'] = user['user_id']
+            login_user(User(user['id']))
+            session['user_id'] = user['id']
             return redirect(url_for('chats_view'))
     return render_template('login.html')
             
@@ -96,8 +95,8 @@ def register_process():
         created_at = datetime.datetime.now()
         User.regist(user_id, user_name, email, password, icon_img, created_at)
         user = User.find_by_email(email)
-        login_user(User(user['user_id']))
-        session['user_id'] = user["user_id"]
+        login_user(User(user['id']))
+        session['user_id'] = user["id"]
         flash( 'ようこそ！ ' + user_name + 'さん！')
         return redirect(url_for('chats_view'))
     return render_template('register.html')
@@ -119,9 +118,10 @@ def profile_view():
     if user_id == None:
         return redirect(url_for('login_view'))
     user = User.get_user_by_user_id(user_id)
+    user_info = {'user_name': user['user_name'], 'email': user['email']}
     icon_img = user['icon_img']
     icon_img = '../' + app.config['ICON_FOLDER'] + str(icon_img)
-    return render_template('profile.html', icon_img=icon_img)
+    return render_template('profile.html', icon_img=icon_img, user=user_info)
 
 # ユーザ名変更画面表示 *****************************************************
 @app.route('/change_uname', methods=['GET'])
@@ -130,7 +130,9 @@ def change_uname_view():
     if user_id == None:
         return redirect(url_for('login_view'))
     user_id = session.get('user_id')
-    return render_template('change_uname.html')
+    user = User.get_user_by_user_id(user_id)
+    user_info = {'user_name': user['user_name'], 'email': user['email']}
+    return render_template('change_uname.html', user=user_info)
 
 # ユーザ名変更処理 *****************************************************
 @app.route('/change_uname', methods=['POST'])
@@ -157,7 +159,7 @@ def change_uname():
             User.change_uname(new_uname, update_at, user_id)
             flash('ユーザ情報を更新しタラコ！')
             return redirect(f'/profile')
-    return render_template('change_uname.html')
+    return redirect(url_for('change_uname_view'))
 
 # Eメールアドレス変更画面表示 *****************************************************
 @app.route('/change_email', methods=['GET'])
@@ -165,7 +167,9 @@ def change_email_view():
     user_id = session.get('user_id')
     if user_id == None:
         return redirect(url_for('login_view'))
-    return render_template('change_email.html')
+    user = User.get_user_by_user_id(user_id)
+    user_info = {'user_name': user['user_name'], 'email': user['email']}
+    return render_template('change_email.html', user=user_info)
 
 # Eメールアドレス変更処理 *****************************************************
 @app.route('/change_email', methods=['POST'])
@@ -192,7 +196,7 @@ def change_email():
                 User.change_email(email, update_at, user_id)
                 flash('ユーザ情報を更新しタラコ！')
                 return redirect(f'/profile')
-    return render_template('change_email.html')
+    return redirect(url_for('change_email_view'))
 
 # パスワード変更画面表示 *****************************************************
 @app.route('/change_password', methods=['GET'])
@@ -279,7 +283,7 @@ def chats_view():
     for chat in chats:
         latest_message_time = Message.get_latest_messages(chat['id'])
         if latest_message_time == None:
-            chat['latest'] = chat['update_at']
+            chat['latest'] = chat['updated_at']
         else:
             chat['latest'] = latest_message_time
     sorted_chats = sorted(chats, key=lambda s: s['latest'], reverse=True)

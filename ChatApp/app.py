@@ -247,14 +247,17 @@ def change_icon_view():
 def change_icon():
     user_id = session.get('user_id')
     update_at = datetime.datetime.now()
+    
     if user_id == None:
         return redirect(url_for('login_view'))
     else:
         user = User.get_user_by_user_id(user_id)
+        icon_img = user['icon_img']
         file = request.files['icon_file']
         origin_filename = file.filename
 
-        if 'icon_file' not in request.files:
+        # if 'icon_file' not in request.files:
+        if not file:
             flash('ファイルが選択されていません！')
         elif origin_filename == '':
             flash('ファイル名が無いか新しいファイルが選択されてません！')

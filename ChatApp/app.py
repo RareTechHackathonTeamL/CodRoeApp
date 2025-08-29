@@ -43,12 +43,12 @@ def login_process():
         flash('空のフォームがあるっタラコ！')
     elif user == None:
         flash('Eメールアドレスか、パスワーを間違っタラコ？')
-    elif check_password_hash(user.password, password) == False:
+    elif check_password_hash(user['password'], password) == False:
         flash('Eメールアドレスか、パスワーを間違っタラコ？')
     else:
-        login_user(user)
-        user_name = user.user_name
-        session['user_id'] = user.user_id
+        login_user(User(user['user_id']))
+        user_name = user['user_name']
+        session['user_id'] = user['user_id']
         user_id = session.get('user_id')
         flash('おかえり！ ' + user_name + 'さん！')
         return redirect(url_for('chats_view'))
@@ -89,8 +89,8 @@ def register_process():
     else:
         User.regist(new_uname, new_email, password, icon_img)
         user = User.find_by_email(new_email)
-        login_user(user)
-        session['user_id'] = user.user_id
+        login_user(User(user['user_id']))
+        session['user_id'] = user['user_id']
         flash( 'ようこそ！ ' + new_uname + 'さん！')
         return redirect(url_for('chats_view'))
     return render_template('register.html')

@@ -18,8 +18,6 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     icon_img = db.Column(db.String(255))
-    # company_id = db.Column(db.Integer, db.schema.ForeignKey("companies.id", name="?????", nullable=False))
-    # nickname = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, nullable=False)
     update_at = db.Column(db.DateTime)  # 更新日時
 
@@ -90,55 +88,6 @@ class User(UserMixin, db.Model):
             login_user(User(user_id))
             db_pool.release(conn)
 
-# =====================いらない？=====================================================
-    # ユーザ情報更新(パスワード更新なし)
-    @classmethod
-    def update_nopass(cls, user_id, user_name, email):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.user_name = user_name
-        user.email = email
-        user.update_at = datetime.datetime.now()
-        try:
-            # db.session.merge(user)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
-
-    # ユーザ情報更新(パスワード更新あり)
-    @classmethod
-    def update_user(cls, user_id, user_name, email, password):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.user_name = user_name
-        user.email = email
-        user.password = generate_password_hash(password)
-        user.update_at = datetime.datetime.now()
-        try:
-            db.session.merge(user)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
-
-    #  ユーザ情報更新(パスワード更新のみ)
-    @classmethod
-    def update_password(cls, user_id, password):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.password = generate_password_hash(password)
-        user.update_at = datetime.datetime.now()
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
-# ===============================================================================
-
     # ユーザ情報削除
     @classmethod
     def delete_user(cls, user_id):
@@ -202,7 +151,6 @@ class User(UserMixin, db.Model):
             abort(500)
         finally:
             db_pool.release(conn)
-            db.session.close()
 
     # ユーザアイコン変更**********************************************************
     @classmethod
@@ -219,7 +167,6 @@ class User(UserMixin, db.Model):
             abort(500)
         finally:
             db_pool.release(conn)
-            db.session.close()
     
     # 登録済みEメールアドレスの確認
     @classmethod
@@ -236,18 +183,22 @@ class User(UserMixin, db.Model):
             abort(500)
         finally:
             db_pool.release(conn)
-            db.session.close()
 
     # 登録済みユーザ名の確認
     @classmethod
     def find_by_uname(cls, reserch_name):
+        conn = db_pool.get_conn()
         try:
-            result = db.session.query(User).filter(User.user_name == reserch_name).first()
-            return result
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT * FROM users WHERE user_name = %s'
+                cur.execute(sql, (reserch_name,))
+                result = cur.fetchone()
+                return result
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
 
 
@@ -393,8 +344,6 @@ class Chat(db.Model):
                 group_chats = cur.fetchall()
                 cur.execute(group_private_sql, (2, user_id))
                 private_chats = cur.fetchall()
-                print(not group_chats)
-                print(not private_chats)
                 if (not group_chats) and (not private_chats):
                     chats = open_chats
                 elif not group_chats:

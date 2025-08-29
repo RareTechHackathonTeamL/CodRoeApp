@@ -1,9 +1,4 @@
-# from sqlalchemy import Column, String, Integer, DateTime, update
 from flask_login import UserMixin, login_user
-from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
-import uuid
-from __init__ import db
 from flask import abort
 import pymysql
 from util.DB import DB

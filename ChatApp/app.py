@@ -1,25 +1,26 @@
 from flask import render_template, redirect, url_for, request, flash, session
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, login_required, current_user
 from models import User, Chat, Message, Member, Stamp
 import datetime
-import uuid
+import uuid, re
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
-from __init__ import create_app, login_manager, db
+from __init__ import create_app, login_manager
 
 app = create_app()
 
 # User loader function
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    return User(user_id)
 
-# アップロードファイル形式確認
+# # アップロードファイル形式確認（拡張子）
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # ルートパスへのアクセスをログインページへリダイレクト
 @app.route('/', methods=['GET'])
@@ -36,29 +37,25 @@ def login_view():
 def login_process():
     email = request.form.get('email')
     password = request.form.get('password')
-    # Userテーブルからemailに一致するユーザを取得
     user = User.find_by_email(email)
 
     if email == '' or password == '':
         flash('空のフォームがあるっタラコ！')
     elif user == None:
-        flash('Eメールアドレスか、パスワーを間違っタラコ？')
-    elif check_password_hash(user.password, password) == False:
-        flash('Eメールアドレスか、パスワーを間違っタラコ？')
+        flash('入力内容を間違っタラコ？')
     else:
-        login_user(user)
-        user_name = user.user_name
-        session['user_id'] = user.user_id
-        user_id = session.get('user_id')
-        flash('おかえり！ ' + user_name + 'さん！')
-        return redirect(url_for('chats_view'))
+        if check_password_hash(user['password'], password) == False:
+            flash('入力内容を間違っタラコ？')
+        else:
+            login_user(User(user['id']))
+            session['user_id'] = user['id']
+            return redirect(url_for('chats_view'))
     return render_template('login.html')
             
 # ログアウト処理
 @app.route('/logout')
-@login_required
 def logout():
-    logout_user()
+    session.clear()
     flash('ログアウトしタラコ！')
     return redirect(url_for('login_view'))
 
@@ -70,79 +67,82 @@ def register_view():
 # ユーザ登録処理
 @app.route('/register', methods=['POST'])
 def register_process():
-    new_uname = request.form.get('user_name')
-    new_email = request.form.get('email')
+    user_name = request.form.get('user_name')
+    email = request.form.get('email')
     password = request.form.get('password')
     passwordConfirmation = request.form.get('password-confirmation') 
-    registered_email= User.find_by_email(new_email)
-    registered_name = User.find_by_uname(new_uname)
+    registered_email= User.find_by_email(email)
+    registered_name = User.find_by_uname(user_name)
     icon_img = 'default_image.png'
 
-    if new_uname == '' or new_email =='' or password == '' or passwordConfirmation == '':
+    if user_name == '' or email =='' or password == '' or passwordConfirmation == '':
         flash('空のフォームがあるっタラコ！')
     elif password != passwordConfirmation:
         flash('パスワードが一致しないっタラコ！')
-    elif len(password) < 8:
-        flash('パスワードは8文字以上である必要があります')
+    # elif len(password) < 8:
+    #     flash('パスワードは8文字以上である必要があります')
     # elif len(password) < 8 or re.search(r'\d', password) == None or re.search(r'[a-zA-Z]', password) == None:
     #     flash('パスワードは8文字以上で英数字が含まれている必要があります')
     # elif len(password) < 8 or re.search(r'\d', password) == None or re.search(r'[a-z]', password) == None or re.search(r'[A-Z]', password) == None:
     #     flash('パスワードは8文字以上で英大文字、英小文字、数字が含まれている必要があります')
     elif registered_name != None:
-        flash('ごめんたい! このユーザ名は既に登録されタラコ...')  
+        flash('ごめんたい！ このユーザ名は既に登録されタラコ...')  
     elif registered_email != None:
-        flash('ごめんたい! このEメールアドレスは既に登録されタラコ...')
+        flash('ごめんたい！ このメールアドレスは既に登録されタラコ...')
     else:
-        User.regist(new_uname, new_email, password, icon_img)
-        user = User.find_by_email(new_email)
-        login_user(user)
-        session['user_id'] = user.user_id
-        flash( 'ようこそ！ ' + new_uname + 'さん！')
+        user_id = uuid.uuid4()
+        password = generate_password_hash(password)
+        created_at = datetime.datetime.now()
+        User.regist(user_id, user_name, email, password, icon_img, created_at)
+        user = User.find_by_email(email)
+        login_user(User(user['id']))
+        session['user_id'] = user["id"]
+        flash( 'ようこそ！ ' + user_name + 'さん！')
         return redirect(url_for('chats_view'))
     return render_template('register.html')
 
 # ユーザ削除
-@app.route('/delete_user', methods=['GET', 'POST'])
-@login_required
+@app.route('/delete_user', methods=['POST'])
 def delete_user():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-
-    #　GETの場合
-    if request.method == 'GET':
-        return render_template('delete_user.html', user=user)
-    # POSTの場合
-    else:
-        User.delete_user(user_id)
-        flash('ユーザを削除しタラコ！')
+    if user_id == None:
         return redirect(url_for('login_view'))
+    User.delete_user(user_id)
+    flash('ユーザを削除しタラコ！')
+    return redirect(url_for('login_view'))
     
-
-# プロフィール画面表示 *****************************************************
+# プロフィール画面表示 ****************************** ***********************
 @app.route('/profile', methods=['GET'])
-@login_required
 def profile_view():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    icon_img = user.icon_img
-    icon_img = '../' + app.config['ICON_FOLDER'] + str(user.icon_img)
-    return render_template('profile.html', icon_img=icon_img)
+    if user_id == None:
+        return redirect(url_for('login_view'))
+    user = User.get_user_by_user_id(user_id)
+    user_info = {'user_name': user['user_name'], 'email': user['email']}
+    icon_img = user['icon_img']
+    icon_img = '../' + app.config['ICON_FOLDER'] + str(icon_img)
+    return render_template('profile.html', icon_img=icon_img, user=user_info)
 
 # ユーザ名変更画面表示 *****************************************************
 @app.route('/change_uname', methods=['GET'])
-@login_required
 def change_uname_view():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    return render_template('change_uname.html')
+    if user_id == None:
+        return redirect(url_for('login_view'))
+    user_id = session.get('user_id')
+    user = User.get_user_by_user_id(user_id)
+    user_info = {'user_name': user['user_name'], 'email': user['email']}
+    return render_template('change_uname.html', user=user_info)
 
 # ユーザ名変更処理 *****************************************************
 @app.route('/change_uname', methods=['POST'])
-@login_required
 def change_uname():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    current_uname = user.user_name
+    update_at = datetime.datetime.now()
+    if user_id == None:
+        return redirect(url_for('login_view'))
+    user = User.get_user_by_user_id(user_id)
+    current_uname = user["user_name"]
     new_uname = request.form.get('user_name')
 
     if new_uname == '' :
@@ -154,119 +154,142 @@ def change_uname():
         if registered_name != None:
             flash('登録されている情報と一致するため更新できません。')
         else:
-            user_name = new_uname
-            User.change_uname(user_id, user_name)
+            # user_name = str(new_uname)
+            # User.change_uname(user_name, update_at, user_id)
+            User.change_uname(new_uname, update_at, user_id)
             flash('ユーザ情報を更新しタラコ！')
             return redirect(f'/profile')
-    return render_template('change_uname.html')
+    return redirect(url_for('change_uname_view'))
 
 # Eメールアドレス変更画面表示 *****************************************************
 @app.route('/change_email', methods=['GET'])
-@login_required
 def change_email_view():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    return render_template('change_email.html')
+    if user_id == None:
+        return redirect(url_for('login_view'))
+    user = User.get_user_by_user_id(user_id)
+    user_info = {'user_name': user['user_name'], 'email': user['email']}
+    return render_template('change_email.html', user=user_info)
 
 # Eメールアドレス変更処理 *****************************************************
 @app.route('/change_email', methods=['POST'])
-@login_required
 def change_email():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    current_email = user.email
-    new_email = request.form.get('email')
-
-    if new_email == '' :
-        flash('新規情報が入力されていません！')
-    elif new_email == current_email:
-        flash('更新する情報がないっタラコ！')
+    update_at = datetime.datetime.now()
+    if user_id == None:
+        return redirect(url_for('login_view'))
     else:
-        registered_email = User.find_by_email(new_email)
-        if registered_email != None:
-            flash('登録されている情報と一致するため更新できません。')
+        user = User.get_user_by_user_id(user_id)
+        current_email = user['email']
+        new_email = request.form.get('email')
+        if new_email == '' :
+            flash('新規情報が入力されていません！')
+        elif new_email == current_email:
+            flash('更新する情報がないっタラコ！')
         else:
-            email = new_email
-            User.change_email(user_id, email)
-            flash('ユーザ情報を更新しタラコ！')
-            return redirect(f'/profile')
-    return render_template('change_email.html')
+            registered_email = User.find_by_email(new_email)
+            if registered_email != None:
+                flash('登録されている情報と一致するため更新できません。')
+            else:
+                email = new_email
+
+                User.change_email(email, update_at, user_id)
+                flash('ユーザ情報を更新しタラコ！')
+                return redirect(f'/profile')
+    return redirect(url_for('change_email_view'))
 
 # パスワード変更画面表示 *****************************************************
 @app.route('/change_password', methods=['GET'])
-@login_required
 def change_password_view():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
+    if user_id == None:
+        return redirect(url_for('login_view'))
     return render_template('change_password.html')
 
 # パスワード変更処理 *****************************************************
 @app.route('/change_password', methods=['POST'])
-@login_required
 def change_password():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    current_password = request.form.get('current_password')
-    new_password = request.form.get('password')
-    new_passwordConfirmation = request.form.get('password-confirmation')
-
-    if current_password == '' or new_password == '' or new_passwordConfirmation == '':
-        flash('空のフォームがあります。')
-    elif check_password_hash(user.password, current_password) == False:
-        flash('現在のパスワードを間違っタラコ？')
-    elif new_password != new_passwordConfirmation:
-        flash('パスワードが一致しません！')
+    update_at = datetime.datetime.now()
+    if user_id == None:
+        return redirect(url_for('login_view'))
     else:
-        User.change_password(user_id, new_password)
-        flash('ユーザ情報を更新しタラコ！')
-        return redirect(f'/profile')
-    return render_template('change_password.html')
+        user = User.get_user_by_user_id(user_id)
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('password')
+        new_passwordConfirmation = request.form.get('password-confirmation')
+        if current_password == '' or new_password == '' or new_passwordConfirmation == '':
+            flash('空のフォームがあります。')
+        elif check_password_hash(user['password'], current_password) == False:
+            flash('現在のパスワードを間違っタラコ？')
+        elif new_password != new_passwordConfirmation:
+            flash('パスワードが一致しません！')
+        else:
+            password = generate_password_hash(new_password)
+            User.change_password(password, update_at, user_id)
+            flash('ユーザ情報を更新しタラコ！')
+            return redirect(f'/profile')
+        return render_template('change_password.html')
 
 # アイコン変更画面表示 *****************************************************
 @app.route('/change_icon', methods=['GET'])
-@login_required
 def change_icon_view():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    icon_img = user.icon_img
-    icon_img = app.config['ICON_FOLDER'] + str(user.icon_img)
+    if user_id == None:
+        return redirect(url_for('login_view'))
+    user = User.get_user_by_user_id(user_id)
+    icon_img = user['icon_img']
+    icon_img = app.config['ICON_FOLDER'] + str(icon_img)
     return render_template('change_icon.html', icon_img=icon_img)
 
 # アイコン変更処理 *****************************************************
 @app.route('/change_icon', methods=['POST'])
-@login_required
 def change_icon():
     user_id = session.get('user_id')
-    user = User.query.get(user_id)
-    file = request.files['icon_file']
-    origin_filename = file.filename
-
-    if 'icon_file' not in request.files:
-        flash('ファイルが選択されていません！')
-    elif origin_filename == '':
-        flash('ファイル名が無いか新しいファイルが選択されてません！')
-    elif file and allowed_file(origin_filename):
-        split_fname = origin_filename.rsplit('.', 1)
-        file_ext = split_fname[1]
-        filename = str(user_id) + '.' + str(file_ext)
-        secure_fname = secure_filename(filename)
-        file.save(app.config['ICON_FOLDER'] + secure_fname)
-        icon_img = filename
-        User.change_icon(user_id, icon_img)
-        flash( 'アイコン画像を変更しタラコ！')
-        return redirect(f'/profile')
+    update_at = datetime.datetime.now()
+    if user_id == None:
+        return redirect(url_for('login_view'))
     else:
-        flash('許可されていないファイルファイル形式です！')
-    icon_img = app.config['ICON_FOLDER'] + str(user.icon_img)
-    return render_template('change_icon.html', icon_img=icon_img)
+        user = User.get_user_by_user_id(user_id)
+        file = request.files['icon_file']
+        origin_filename = file.filename
+
+        if 'icon_file' not in request.files:
+            flash('ファイルが選択されていません！')
+        elif origin_filename == '':
+            flash('ファイル名が無いか新しいファイルが選択されてません！')
+        elif file and allowed_file(origin_filename):
+            split_fname = origin_filename.rsplit('.', 1)
+            file_ext = split_fname[1]
+            filename = str(user_id) + '.' + str(file_ext)
+            secure_fname = secure_filename(filename)
+            file.save(app.config['ICON_FOLDER'] + secure_fname)
+            icon_img = filename
+            User.change_icon(icon_img, update_at, user_id)
+            flash( 'アイコン画像を変更しタラコ！')
+            return redirect(f'/profile')
+        else:
+            flash('許可されていないファイルファイル形式です！')
+        icon_img = app.config['ICON_FOLDER'] + str(icon_img)
+        return render_template('change_icon.html', icon_img=icon_img)
 
 # チャット一覧表示
 @app.route('/chats', methods=['GET'])
-@login_required
 def chats_view():
-    user_id = current_user.get_id()
+    user_id = session.get('user_id')
+    if user_id == None:
+        return redirect(url_for('login_view'))
     chats = Chat.get_chat_belong_to(user_id)
-    return render_template('chats.html', chats=chats)
+    for chat in chats:
+        latest_message_time = Message.get_latest_messages(chat['id'])
+        if latest_message_time == None:
+            chat['latest'] = chat['updated_at']
+        else:
+            chat['latest'] = latest_message_time
+    sorted_chats = sorted(chats, key=lambda s: s['latest'], reverse=True)
+
+    return render_template('chats.html', chats=sorted_chats)
+
 
 # チャット作成画面遷移
 @app.route('/chat/create', methods=['GET'])
@@ -297,26 +320,26 @@ def create_chat():
         friend_name = request.form.get('private_friend_name')
         chat_type_num = 2
         user_name = User.get_user_name_by_user_id(user_id)
-        new_chat_name = f'{friend_name}と{user_name}のプライベートチャット'
+        new_chat_name = f'{friend_name}・{user_name}'
         chat_detail = ''
         
         friend_id = User.get_user_id_by_user_name(friend_name)
         if not friend_id:
             flash('入力された友達が見つかりません')
-            return redirect(url_for('create_chat'))
+            return redirect(url_for('chat_create_view'))
 
         if friend_name == user_name:
             flash('友達を入力してください')
-            return redirect(url_for('create_chat'))
-        chat_exist = Chat.search_chat_exist(user_id, friend_id, user_name, friend_name)
+            return redirect(url_for('chat_create_view'))
+        chat_exist = Chat.search_private_chat_exist(user_id, friend_id, user_name, friend_name)
 
     if new_chat_name == '':
         return redirect(url_for('chat_create_view'))
 
-    if chat_exist != True:
+    if chat_exist == None:
         chat_id = uuid.uuid4()
         now = datetime.datetime.now()
-        Chat.create(chat_id, user_id, new_chat_name, chat_type_num, chat_detail)
+        Chat.create(chat_id, user_id, new_chat_name, chat_type_num, chat_detail, now)
 
         # Member登録
         if chat_type == 'group':
@@ -351,8 +374,8 @@ def create_chat():
 
         return redirect(url_for('chats_view'))
     else:
-        error = 'すでに同じ名前のチャンネルが存在しています'
-        return render_template('chatsCreate.html', error=error)
+        flash('すでに同じ名前のチャンネルが存在しています')
+        return redirect(url_for('chat_create_view'))
 
 # チャット編集画面
 @app.route('/chat/<chat_id>/detail', methods=['GET'])
@@ -382,12 +405,13 @@ def chat_update_name(chat_id):
     new_name = request.form.get('chat_name')
     chat_info = Chat.find_by_chat_info(chat_id)
     if chat_info['user_id'] != user_id:
-        error = '他の人が作ったチャンネルです'
-        return render_template('ChatsUpdateName.html', chat=chat_info, error=error)
+        flash('他の人が作ったチャンネルです')
+        return redirect(url_for('chats_view'))
     elif new_name == "":
         return redirect(f'/chat/update_name/{chat_id}')
     elif chat_info != None:
-        Chat.update_name(chat_id, new_name)
+        now = datetime.datetime.now()
+        Chat.update_name(chat_id, now, new_name)
         flash('チャット情報が更新されました！')
     return redirect(f'/chat/{ chat_id }/detail')
 
@@ -406,12 +430,13 @@ def update_chat_detail(chat_id):
     new_detail = request.form.get('detail')
     chat_info = Chat.find_by_chat_info(chat_id)
     if chat_info['user_id'] != user_id:
-        error = '他の人が作ったチャンネルです'
-        return render_template('ChatsUpdate.html', chat=chat_info, error=error)
+        flash('他の人が作ったチャンネルです')
+        return redirect(url_for('chats_view'))
     elif new_detail == "":
         return redirect(f'/chat/update_detail/{chat_id}')
     elif chat_info != None:
-        Chat.update_detail(chat_id, new_detail)
+        now = datetime.datetime.now()
+        Chat.update_detail(chat_id, now, new_detail)
         flash('チャット情報が更新されました！')
     return redirect(f'/chat/{ chat_id }/detail')
 
@@ -422,8 +447,8 @@ def delete_chat(chat_id):
     user_id = current_user.get_id()
     chat_info = Chat.find_by_chat_info(chat_id)
     if chat_info['user_id'] != user_id:
-        error = '他の人が作ったチャンネルです'
-        return render_template('ChatsUpdate.html', chat=chat_info, error=error)
+        flash('他の人が作ったチャンネルです')
+        return redirect(url_for('chats_view'))
     elif chat_info != None:
         Chat.delete(chat_id)
     return redirect(url_for('chats_view'))
@@ -457,27 +482,30 @@ def chat_add_member_view(chat_id):
 def chat_add_member(chat_id):
     friend_list = request.form.getlist('friends_name')
     results = []
-    for friend in friend_list:
-        if friend != '':
-            # 追加するメンバーの名前を検索
-            friend_id = User.get_user_id_by_user_name(friend)
-            if not friend_id:
-                results.append(f'{friend}さんが見つかりませんでした')
-            else:
-                # メンバーがそのチャットに参加しているか検索
-                chat_in = Member.search_in_chat(chat_id, friend_id)
-                if chat_in:
-                    results.append(f'{friend}さんは既にチャットに参加しています')
+    if friend_list != ['']:
+        for friend in friend_list:
+            if friend != '':
+                # 追加するメンバーの名前を検索
+                friend_id = User.get_user_id_by_user_name(friend)
+                if not friend_id:
+                    results.append(f'{friend}さんが見つかりませんでした')
                 else:
-                    # メンバーDBに追加
-                    id = uuid.uuid4()
-                    now = datetime.datetime.now()
-                    Member.add_member(id, chat_id, friend_id, now)
-    if results == None:
-        flash('メンバー追加できました！')
-        return redirect(f'/chat/{chat_id}/messages')
+                    # メンバーがそのチャットに参加しているか検索
+                    chat_in = Member.search_in_chat(chat_id, friend_id)
+                    if chat_in:
+                        results.append(f'{friend}さんは既にチャットに参加しています')
+                    else:
+                        id = uuid.uuid4()
+                        now = datetime.datetime.now()
+                        Member.add_member(id, chat_id, friend_id, now)
     else:
-        # エラーが起こった場合があるときはグループメンバー追加画面に戻る
+        flash('友達を入力してください')
+        return redirect(f'/chat/{chat_id}/add_member')
+    if not results:
+        flash('メンバー追加できました！')
+        return redirect(f'/chat/{ chat_id }/detail')
+    else:
+        flash('以下のメンバーが登録できませんでした')
         for result in results:
             flash(result)
         return redirect(f'/chat/{chat_id}/add_member')
@@ -489,9 +517,7 @@ def messages_view(chat_id):
     user_id = current_user.get_id()
     chat_room = Chat.find_by_chat_info(chat_id)
     messages = Message.get_messages(chat_id)
-    # user_icons = User.get_icons()
     stamps = Stamp.get_stamps()
-    # return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps, user_icons=user_icons)
     return render_template('messages.html', user_id=user_id, chat=chat_room, messages=messages, stamps=stamps)
 
 # メッセージ作成
@@ -505,10 +531,8 @@ def create_message(chat_id):
     now = datetime.datetime.now()
     if message:
         Message.create(id, user_id, chat_id, message, now)
-        Chat.update_latest(chat_id)
     elif stamp:
         Message.send_stamp(id, user_id, chat_id, stamp, now)
-        Chat.update_latest(chat_id)
     return redirect(f'/chat/{chat_id}/messages')
 
 # メッセージ削除

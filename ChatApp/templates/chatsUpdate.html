@@ -1,6 +1,9 @@
-{% extends 'util/base.html' %} {% block title %}
+{% extends 'util/base.html' %}
+{% block title %}
 <title>アップデートチャット</title>
-{% endblock title %} {% block content %}
+{% endblock title %}
+
+{% block content %}
 
 <body class="body">
   <!----- ヘッダー ----->
@@ -9,8 +12,8 @@
     <form action="/chat/{{ chat.id }}/messages" method="GET" class="back-button">
       <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
-    {% if chat.user_id == current_user.user_id %}
-    <a onclick="openModal()" class="deletebox-button">
+    {% if chat.user_id == current_user.id %}
+    <a onclick="openDeleteModal()" class="deletebox-button">
       <input type="image" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
     </a>
     {% endif %}
@@ -24,15 +27,20 @@
       <div>
         <h3>{{ error }}</h3>
       </div>
-      {% endif %} {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+      {% endif %}
+
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      {% for message in messages %}
       <div>
         <h3>{{ message }}</h3>
       </div>
-      {% endfor %} {% endif %} {% endwith %}
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
 
       <!-- 作成者であるのか -->
-      {% if chat.user_id != current_user.user_id %}
-
+      {% if chat.user_id != current_user.id %}
       <div class="input-box-child">
         <div>チャット名</div>
         <div class="transitionplaceholder">
@@ -50,11 +58,11 @@
           </div>
         </div>
       </div>
+
       {% if chat.chat_type == 1 %}
       <div class="chatexplanation-label">グループメンバー</div>
       <ul class="memberul">
         {% for member in chat_member%}
-
         <li class="memberlist">
           <div class="text-box">{{ member }}</div>
         </li>
@@ -63,8 +71,8 @@
       <form action="/chat/{{ chat.id }}/add_member" method="GET">
         <input type="submit" value="メンバー追加へ" class="main-button-login chatcreatesubmit" />
       </form>
-      {% endif %} {% else %}
-
+      {% endif %}
+      {% else %}
       <div class="input-box-child">
         <div>チャット名</div>
         <a href="/chat/update_name/{{ chat.id }}" class="transitionplaceholder">
@@ -88,7 +96,6 @@
       <div class="chatexplanation-label">グループメンバー</div>
       <ul class="memberul">
         {% for member in chat_member%}
-
         <li class="memberlist">
           <div class="text-box">{{ member }}</div>
         </li>
@@ -97,15 +104,15 @@
       <form action="/chat/{{ chat.id }}/add_member" method="GET">
         <input type="submit" value="メンバー追加へ" class="main-button-login chatcreatesubmit" />
       </form>
-
-      {% endif %} {% endif %}
+      {% endif %}
+      {% endif %}
     </div>
   </main>
   <!-- メインEND -->
 
   <!-- フッター -->
   <footer class="footer-button_chatscreate">
-    <a href="/profile" method="GET" class="footer-button">
+    <a href="/profile" class="footer-button">
       <div class="footer-item">
         <img src="{{ url_for('static', filename='img/profile.png') }}" alt="プロフィール" class="footer-image" />
         プロフィール
@@ -119,7 +126,8 @@
       </div>
     </a>
 
-    <a onclick="openModal()" class="footer-button">
+    <!-- ログアウト用モーダルを開く -->
+    <a onclick="openLogoutModal()" class="footer-button">
       <div class="footer-item">
         <img src="{{ url_for('static', filename='img/logout-create.png') }}" alt="ログアウト" class="footer-image" />
         ログアウト
@@ -128,42 +136,56 @@
   </footer>
   <!-- フッターEND -->
 
-  <!-- ログアウトのJSテスト　ここから -->
+  <!-- ======================== モーダル ======================== -->
 
-  <!-- モーダル -->
-  <div id="myModal" class="modal">
+  <!-- チャット削除モーダル -->
+  <div id="deleteModal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <img src="{{ url_for('static', filename='img/chat-delete.png') }}" class="js-logout-img" alt="注意" />
-      <div class="font">チャット削除しますか？</div>
-      <!-- ログアウト用フォーム -->
-
+      <span class="close" onclick="closeDeleteModal()">&times;</span>
+      <img src="{{ url_for('static', filename='img/chat-delete.png') }}" class="js-deletet-img" alt="注意" />
+      <div class="font">チャットを削除しますか？</div>
+      <!-- 削除用フォーム -->
       <form action="/chat/delete/{{ chat.id }}" method="POST">
         <input type="submit" class="js-btn delete" value="はい" />
       </form>
-
       <!-- キャンセルボタン -->
-      <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
+      <button class="js-btn cancel" onclick="closeDeleteModal()">キャンセル</button>
     </div>
   </div>
 
+  <!-- ログアウトモーダル -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeLogoutModal()">&times;</span>
+      <img src="{{ url_for('static', filename='img/logout-create.png') }}" class="js-deletet-img" alt="注意" />
+      <div class="font">ログアウトしますか？</div>
+      <!-- ログアウト用フォーム -->
+      <form action="/logout">
+        <input type="submit" class="js-btn delete" value="はい" />
+      </form>
+      <!-- キャンセルボタン -->
+      <button class="js-btn cancel" onclick="closeLogoutModal()">キャンセル</button>
+    </div>
+  </div>
+
+  <!-- ======================== JS ======================== -->
   <script>
-    // モーダルを表示する関数
-    function openModal() {
-      // id="myModal" の要素を取得して display を "flex" に変更
-      // これによりモーダルが画面に表示される
-      document.getElementById("myModal").style.display = "flex";
+    // チャット削除モーダル
+    function openDeleteModal() {
+      document.getElementById("deleteModal").style.display = "flex";
+    }
+    function closeDeleteModal() {
+      document.getElementById("deleteModal").style.display = "none";
     }
 
-    // モーダルを非表示にする関数
-    function closeModal() {
-      // id="myModal" の要素を取得して display を "none" に変更
-      // これによりモーダルが閉じられる
-      document.getElementById("myModal").style.display = "none";
+    // ログアウトモーダル
+    function openLogoutModal() {
+      document.getElementById("logoutModal").style.display = "flex";
+    }
+    function closeLogoutModal() {
+      document.getElementById("logoutModal").style.display = "none";
     }
   </script>
-
-  <!-- ログアウトのJSテスト　ここまで -->
 
   {% endblock content %}
 </body>

@@ -1,9 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, update
 from flask_login import UserMixin, login_user
-from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
-import uuid
-from __init__ import db
 from flask import abort
 import pymysql
 from util.DB import DB
@@ -11,70 +6,40 @@ from util.DB import DB
 db_pool = DB.init_db_pool()
 
 # Userテーブル
-class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    user_id = db.Column(db.String(255), primary_key=True)
-    user_name = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    icon_img = db.Column(db.String(255))
-    # company_id = db.Column(db.Integer, db.schema.ForeignKey("companies.id", name="?????", nullable=False))
-    # nickname = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)  # 更新日時
-
-    chat = db.relationship('Chat', backref='users')
-    messages = db.relationship('Message', backref='users')
-    members = db.relationship('Member', backref='users')
+class User(UserMixin):
+    def __init__(self, user_id):
+        self.id = user_id
 
     # ユーザーIDの取得
     def get_id(self):
-        return self.user_id
+        return self.id
     
-    #ユーザアイコンの取得 ****************************
     @classmethod
-    def get_icons(cls):
+    def get_user_by_user_id(cls, user_id):
+        conn = db_pool.get_conn()
         try:
-            user_icons = db.session.query(User).all()
-            result = [{
-                'user_id': u.user_id,
-                'icon_img': u.icon_img,
-                # 'created_at': u.created_at,
-                # 'update_at': u.update_at
-            } for u in user_icons]
-            return result
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT * FROM users WHERE id = %s'
+                cur.execute(sql, (user_id,))
+                user = cur.fetchone()
+            return user
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
-
-    @classmethod
-    def get_stamps(cls):
-        try:
-            stamps = db.session.query(Stamp).all()
-            result = [{
-                'id': s.id,
-                'title': s.title,
-                'stamp_path': s.stamp_path,
-                'created_at': s.created_at,
-                'update_at': s.update_at,
-            } for s in stamps]
-            return result
-        except Exception as e:
-            print(e)
-        finally:
-            db.session.close()
+            db_pool.release(conn)
+        
     
     @classmethod
     def get_user_id_by_user_name(cls, user_name):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT user_id FROM users WHERE user_name = %s'
+                sql = 'SELECT id FROM users WHERE user_name = %s'
                 cur.execute(sql, (user_name,))
                 user_query = cur.fetchall()
                 if user_query:
-                    user_id = user_query[0]['user_id']
+                    user_id = user_query[0]['id']
                     return user_id
                 return user_query
         except pymysql.Error as e:
@@ -88,7 +53,7 @@ class User(UserMixin, db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = 'SELECT user_name from users WHERE user_id = %s'
+                sql = 'SELECT user_name from users WHERE id = %s'
                 cur.execute(sql, (user_id,))
                 user_query = cur.fetchall()
                 if user_query:
@@ -103,306 +68,273 @@ class User(UserMixin, db.Model):
 
     # ユーザ登録
     @classmethod
-    def regist(cls, user_name, email, password, icon_img):
-        user_id=uuid.uuid4()
-        now = datetime.datetime.now()
-        password = generate_password_hash(password)
-        new_user = User(user_id=user_id, user_name=user_name, email=email, password=password, icon_img=icon_img, created_at=now)
+    def regist(cls, user_id, user_name, email, password, icon_img, created_at):
+        conn = db_pool.get_conn()
         try:
-            db.session.add(new_user)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = "INSERT INTO users (id, user_name, email, password, icon_img, created_at) VALUES (%s, %s, %s, %s, %s, %s);"
+                cur.execute(sql, (user_id, user_name, email, password, icon_img, created_at,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            login_user(new_user)
-            db.session.close()
-
-    # ユーザ情報更新(パスワード更新なし)
-    @classmethod
-    def update_nopass(cls, user_id, user_name, email):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.user_name = user_name
-        user.email = email
-        user.update_at = datetime.datetime.now()
-        try:
-            # db.session.merge(user)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
-
-    # ユーザ情報更新(パスワード更新あり)
-    @classmethod
-    def update_user(cls, user_id, user_name, email, password):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.user_name = user_name
-        user.email = email
-        user.password = generate_password_hash(password)
-        user.update_at = datetime.datetime.now()
-        try:
-            db.session.merge(user)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
-
-    #  ユーザ情報更新(パスワード更新のみ)
-    @classmethod
-    def update_password(cls, user_id, password):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.password = generate_password_hash(password)
-        user.update_at = datetime.datetime.now()
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
+            login_user(User(user_id))
+            db_pool.release(conn)
 
     # ユーザ情報削除
     @classmethod
     def delete_user(cls, user_id):
-        # user = db.session.query(User).filter(User.user_id == user_id).first()
-        # now = datetime.datetime.now()
+        conn = db_pool.get_conn()
         try:
-            # with db.session.begin(subtransactions=True):
-            db.session.query(User).filter(User.user_id == user_id).delete()
-            db.session.commit()
-        except Exception as e:
-            print(e)
-            # db.session.rollback()
-            # raise
+            with conn.cursor() as cur:
+                sql = 'DELETE FROM users WHERE id = %s'
+                cur.execute(sql, (user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
-    # ユーザ名変更**********************************************************
+    # ユーザ名変更
     @classmethod
-    def change_uname(cls, user_id, user_name):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.user_name = user_name
-        user.update_at = datetime.datetime.now()
+    def change_uname(cls, user_name, updated_at, user_id):
+        conn = db_pool.get_conn()
         try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = "UPDATE users SET user_name=%s, updated_at=%s WHERE id=%s;"
+                cur.execute(sql, (user_name, updated_at, user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
-    # Eメールアドレス変更**********************************************************
+    # Eメールアドレス変更
     @classmethod
-    def change_email(cls, user_id, email):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.email = email
-        user.update_at = datetime.datetime.now()
+    def change_email(cls, email, updated_at, user_id):
+        conn = db_pool.get_conn()
         try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = "UPDATE users SET email=%s, updated_at=%s WHERE id=%s;"
+                cur.execute(sql, (email, updated_at, user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
-     # パスワード変更**********************************************************
+    # パスワード変更
     @classmethod
-    def change_password(cls, user_id, password):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.password = generate_password_hash(password)
-        user.update_at = datetime.datetime.now()
+    def change_password(cls, password, updated_at,  user_id):
+        conn = db_pool.get_conn()
         try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = "UPDATE users SET password=%s, updated_at=%s WHERE id=%s;"
+                cur.execute(sql, (password, updated_at, user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
-    # ユーザアイコン変更**********************************************************
+    # ユーザアイコン変更
     @classmethod
-    def change_icon(cls, user_id, icon_img):
-        user = db.session.query(User).filter(User.user_id == user_id).first()
-        user.icon_img = icon_img
-        user.update_at = datetime.datetime.now()
+    def change_icon(cls, icon_img, updated_at, user_id):
+        conn = db_pool.get_conn()
         try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = "UPDATE users SET icon_img=%s, updated_at=%s WHERE id=%s;"
+                cur.execute(sql, (icon_img, updated_at, user_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
     
     # 登録済みEメールアドレスの確認
     @classmethod
-    def find_by_email(cls, reserch_email):
+    def find_by_email(cls, email):
+        conn = db_pool.get_conn()
         try:
-            result = db.session.query(User).filter(User.email == reserch_email).first()
-            return result
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = "SELECT * FROM users WHERE email=%s;"
+                cur.execute(sql, (email,))
+                user = cur.fetchone()
+            return user
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     # 登録済みユーザ名の確認
     @classmethod
-    def find_by_uname(cls, reserch_name):
+    def find_by_uname(cls, name):
+        conn = db_pool.get_conn()
         try:
-            result = db.session.query(User).filter(User.user_name == reserch_name).first()
-            return result
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = "SELECT * FROM users WHERE user_name=%s;"
+                cur.execute(sql, (name,))
+                user = cur.fetchone()
+            return user
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
-
-
-
+            db_pool.release(conn)
 
 # Chatテーブル
-class Chat(db.Model):
-    __tablename__ = 'chat'
-
-    id = db.Column(db.String(255), nullable=False, primary_key=True)
-    user_id = db.Column(db.String(255), db.ForeignKey('users.user_id'), nullable=False)
-    chat_name = db.Column(db.String(255), nullable=False)
-    chat_type = db.Column(db.Integer, nullable=False)
-    detail = db.Column(db.String(255), nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)
-    latest_messages = db.Column(db.DateTime, nullable=False)    # チャット一覧で最新のメッセージが来ているものを上に表示させたいため、新規メッセージ・チャット新規作成のみでupdateする
-
-    messages = db.relationship('Message', backref='chat')
-    members = db.relationship('Member', backref='chat')
+class Chat():
+    @classmethod
+    def create(cls, chat_id, user_id, chat_name, chat_type, detail, now):
+        conn = db_pool.get_conn()
+        try:
+            with conn.cursor() as cur:
+                sql = 'INSERT INTO chats(id, user_id, chat_name, chat_type, detail, created_at, updated_at) VALUE(%s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(sql, (chat_id, user_id, chat_name, chat_type, detail, now, now,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
+        finally:
+            db_pool.release(conn)
 
     @classmethod
-    def create(cls, chat_id, user_id, chat_name, chat_type, detail):
-        now = datetime.datetime.now()
-        chat_new = Chat(id=chat_id, user_id=user_id, chat_name=chat_name, chat_type=chat_type, detail=detail, created_at=now, update_at=now, latest_messages=now)
+    def update_name(cls, chat_id, now, new_name):
+        conn = db_pool.get_conn()
         try:
-            db.session.add(chat_new)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'UPDATE chats SET chat_name = %s, updated_at = %s WHERE id = %s'
+                cur.execute(sql, (new_name, now, chat_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
-    def update_name(cls, chat_id, new_name):
+    def update_detail(cls, chat_id, now, new_detail):
+        conn = db_pool.get_conn()
         try:
-            chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
-            if new_name != '':
-                chat_info.chat_name = new_name
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'UPDATE chats SET detail = %s, updated_at = %s WHERE id = %s'
+                cur.execute(sql, (new_detail, now, chat_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
-
-    @classmethod
-    def update_detail(cls, chat_id, new_detail):
-        try:
-            chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
-            if new_detail != '':
-                chat_info.detail = new_detail
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
-
-    @classmethod
-    def update_latest(cls, chat_id):
-        try:
-            now = datetime.datetime.now()
-            chat_info = db.session.query(Chat).filter(Chat.id == chat_id).first()
-            chat_info.latest_messages = now
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-        finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
     def delete(cls, chat_id):
+        conn = db_pool.get_conn()
         try:
-            db.session.query(Chat).filter(Chat.id == chat_id).delete()
-            db.session.commit()
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'DELETE FROM chats WHERE id = %s'
+                cur.execute(sql, (chat_id,))
+                conn.commit()
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
     def find_by_name(cls, reserch_chat_name):
+        conn = db_pool.get_conn()
         try:
-            result = db.session.query(Chat).filter(Chat.chat_name == reserch_chat_name).first()
-            return result
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT id FROM chats WHERE chat_name = %s'
+                cur.execute(sql, (reserch_chat_name,))
+                chat_id = cur.fetchone()
+                return chat_id
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
     def find_by_chat_info(cls, reserch_chat_id):
+        conn = db_pool.get_conn()
         try:
-            result = db.session.query(Chat).filter(Chat.id == reserch_chat_id).first()
-            return {"id": result.id, "user_id": result.user_id, "chat_name": result.chat_name, "detail": result.detail, 'chat_type': result.chat_type}
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT * FROM chats WHERE id = %s'
+                cur.execute(sql, (reserch_chat_id,))
+                chat_info = cur.fetchone()
+                return chat_info
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
     @classmethod
-    def search_chat_exist(cls, user_id, friend_id, user_name, friend_name):
+    def search_private_chat_exist(cls, user_id, friend_id, user_name, friend_name):
+        conn = db_pool.get_conn()
         try:
-            result1 = db.session.query(Chat).filter(Chat.chat_type == 2, Chat.user_id == user_id, Chat.chat_name == f'{friend_name}と{user_name}のプライベートチャット').first()
-            result2 = db.session.query(Chat).filter(Chat.chat_type == 2, Chat.user_id == friend_id, Chat.chat_name == f'{user_name}と{friend_name}のプライベートチャット').first()
-            if (result1 == None) and (result2 == None):
-                return False
-            else:
-                return True
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                sql = 'SELECT id FROM chats WHERE (chat_type = 2) and (user_id = %s) and (chat_name = %s)'
+                cur.execute(sql, (user_id, f'{friend_name}・{user_name}',))
+                result1 = cur.fetchone()
+                cur.execute(sql, (friend_id, f'{user_name}・{friend_name}',))
+                result2 = cur.fetchone()
+                if (result1 == None) and (result2 == None):
+                    return None
+                else:
+                    return True
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
-
+            db_pool.release(conn)
 
     @classmethod
     def get_chat_belong_to(cls, user_id):
+        conn = db_pool.get_conn()
         try:
-            open_chats = db.session.query(Chat).filter(Chat.chat_type == 0).all()
-            group_chats = db.session.query(Chat, Member).outerjoin(Member, Chat.id == Member.chat_id).filter(Chat.chat_type == 1, Member.user_id == user_id).all()
-            private_chats = db.session.query(Chat, Member).outerjoin(Member, Chat.id == Member.chat_id).filter(Chat.chat_type == 2, Member.user_id == user_id).all()
-            groups = [g[0] for g in group_chats]
-            privates = [g[0] for g in private_chats]
-            chats = open_chats + groups + privates
-            return chats
-        except Exception as e:
-            print(e)
+            with conn.cursor() as cur:
+                chats = []
+
+                open_sql = 'SELECT * FROM chats WHERE chat_type = 0'
+                cur.execute(open_sql)
+                open_chats = cur.fetchall()
+
+                group_private_sql = '''
+                    SELECT c.id, c.user_id, c.chat_name, c.detail, c.chat_type, c.created_at, c.updated_at FROM chats AS c
+                    LEFT OUTER JOIN members AS m ON c.id = m.chat_id
+                    WHERE (c.chat_type = %s) and (m.user_id = %s);
+                    '''
+                cur.execute(group_private_sql, (1, user_id))
+                group_chats = cur.fetchall()
+                cur.execute(group_private_sql, (2, user_id))
+                private_chats = cur.fetchall()
+                if (not group_chats) and (not private_chats):
+                    chats = open_chats
+                elif not group_chats:
+                    chats = open_chats + private_chats
+                elif not private_chats:
+                    chats = open_chats + group_chats
+                else:
+                    chats = open_chats + group_chats + private_chats
+                return chats
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
         finally:
-            db.session.close()
+            db_pool.release(conn)
 
 
 # Messageテーブル
-class Message(db.Model):
-    __tablename__ = 'messages'
-
-    id = db.Column(db.String(255), nullable=False, primary_key=True)
-    user_id = db.Column(db.String(255), db.ForeignKey('users.user_id'), nullable=False)
-    chat_id = db.Column(db.String(255), db.ForeignKey('chat.id'), nullable=False)
-    message = db.Column(db.Text)
-    stamp_id = db.Column(db.ForeignKey('stamps.id'))
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)
-
+class Message():
     @classmethod
     def create(cls, id, user_id, chat_id, message, now):
         conn = db_pool.get_conn()
@@ -450,14 +382,14 @@ class Message(db.Model):
         conn = db_pool.get_conn()
         try:
             with conn.cursor() as cur:
-                sql = """
+                sql = '''
                     SELECT m.id, m.user_id, m.message, m.created_at, s.title, s.stamp_path, u.user_name, u.icon_img
                     FROM messages AS m
                     LEFT OUTER JOIN stamps AS s ON m.stamp_id = s.id
-                    LEFT OUTER JOIN users AS u ON m.user_id = u.user_id
+                    LEFT OUTER JOIN users AS u ON m.user_id = u.id
                     WHERE chat_id = %s
                     ORDER BY m.created_at ASC;
-                    """
+                    '''
                 cur.execute(sql, (chat_id,))
                 messages = cur.fetchall()
                 return messages
@@ -467,17 +399,26 @@ class Message(db.Model):
         finally:
             db_pool.release(conn)
 
+    @classmethod
+    def get_latest_messages(cls, chat_id):
+        conn = db_pool.get_conn()
+        try:
+            with conn.cursor() as cur:
+                sql = 'SELECT created_at FROM messages WHERE chat_id = %s ORDER BY created_at DESC LIMIT 1;'
+                cur.execute(sql, (chat_id,))
+                latest_message = cur.fetchone()
+                if latest_message == None:
+                    return None
+                return latest_message['created_at']
+        except pymysql.Error as e:
+            print(f'エラーが発生しています：{e}')
+            abort(500)
+        finally:
+            db_pool.release(conn)
+
 
 # Memberテーブル
-class Member(db.Model):
-    __tablename__ = 'members'
-
-    id = db.Column(db.String(255), nullable=False, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.user_id'), nullable=False)
-    chat_id = db.Column(db.ForeignKey('chat.id'), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)
-
+class Member():
     @classmethod
     def search_in_chat(cls, chat_id, user_id):
         conn = db_pool.get_conn()
@@ -524,17 +465,7 @@ class Member(db.Model):
 
 
 # Stampテーブル
-class Stamp(db.Model):
-    __tablename__ = 'stamps'
-
-    id = db.Column(db.String(255), nullable=False, primary_key=True)
-    title = db.Column(db.String(255), nullable=False)
-    stamp_path = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
-    update_at = db.Column(db.DateTime)
-
-    messages = db.relationship('Message', backref='stamps')
-
+class Stamp():
     @classmethod
     def get_stamps(cls):
         conn = db_pool.get_conn()

@@ -74,7 +74,7 @@
 
     /*左寄せ*/
     align-self: flex-start;
-    margin-left: 24px;
+    margin-left: 14px;
     line-height: 1.3em;
 
     /* 文字・字背景色指定 */
@@ -91,7 +91,7 @@
 
     /*右寄せ*/
     align-self: flex-end;
-    margin-right: 24px;
+    margin-right: 14px;
     line-height: 1.3em;
 
     /* 文字・字背景色指定 */

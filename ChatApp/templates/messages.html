@@ -27,7 +27,8 @@
     <div class="message {{ 'right' if message.user_id == user_id else 'left' }}">
       {% if message.user_id != user_id %}
       <div class="message-header">
-        <img src="{{ url_for('static', filename='img/user_icons/' ~ message.icon_img) }}" alt="ユーザーアイコン" class="message-icon" />
+        <img src="{{ url_for('static', filename='img/user_icons/' ~ message.icon_img) }}" alt="ユーザーアイコン"
+          class="message-icon" />
         <span class="user-name">{{ message.user_name }}</span>
       </div>
       {% endif %}
@@ -64,13 +65,15 @@
         <button id="stampToggle" class="stamp-button" type="button">
           <img src="../../static/img/stamp-button.png" class="title-logo" />
         </button>
-        <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信" class="send-button" />
+        <input type="image" src="{{ url_for('static', filename='img/send-button.png') }}" alt="送信"
+          class="send-button" />
       </div>
     </form>
 
     <div id="stampList" class="stamp-list hidden">
       {% for stamp in stamps %}
-      <img src="{{ url_for('static', filename=stamp.stamp_path) }}" data-stamp-id="{{ stamp.id }}" class="stamp-item" alt="stamp" />
+      <img src="{{ url_for('static', filename=stamp.stamp_path) }}" data-stamp-id="{{ stamp.id }}" class="stamp-item"
+        alt="stamp" />
       {% endfor %}
       <button id="stampClose" class="stamp-close" type="button">
         <img src="{{ url_for('static', filename='img/stamp-close.png') }}" class="stamp-close-button" />
@@ -91,7 +94,7 @@
       <div class="font">チャット削除しますか？</div>
       <!-- チャット削除用フォーム -->
 
-      <form action="/chat/delete/{{ chat.id }}" method="POST">
+      <form action="/chat/delete/private/{{ chat.id }}" method="POST">
         <input type="submit" class="js-btn delete" value="はい" />
       </form>
 
@@ -99,114 +102,135 @@
       <button class="js-btn cancel" onclick="closeModal()">キャンセル</button>
     </div>
   </div>
-
-  <!-- JS -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // メッセージクリックでスライド削除ボタン表示
-      const userMessages = document.querySelectorAll(".message.right");
-      userMessages.forEach((msg) => {
-        const deleteBtn = msg.querySelector(".slide-delete-btn");
-        const deleteForm = msg.querySelector(".delete-form");
+      const messagesContainer = document.querySelector('main.messages');
+      const chatInputForm = document.getElementById('chatInputForm');
 
-        msg.addEventListener("click", function (e) {
-          e.stopPropagation();
-          // 他のボタンは隠す
-          document.querySelectorAll(".slide-delete-btn").forEach((btn) => {
-            if (btn !== deleteBtn) btn.classList.add("hidden");
-            if (btn !== deleteBtn) btn.parentElement.querySelector(".message-box").style.transform = "translateX(0)";
-          });
+      // ------------------------
+      // スクロール関数
+      // ------------------------
+      function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
 
-          deleteBtn.classList.toggle("hidden");
-          msg.querySelector(".message-box").style.transform = deleteBtn.classList.contains("hidden") ? "translateX(0)" : "translateX(-50px)";
-        });
+      // 初期表示でスクロール
+      scrollToBottom();
 
-        // 削除処理（即削除）
-        deleteBtn.addEventListener("click", function (e) {
-          e.stopPropagation();
-          fetch(deleteForm.action, {
-            method: "POST",
-            headers: {
-              "X-Requested-With": "XMLHttpRequest",
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: "",
-          })
-            .then((res) => {
-              if (res.ok) msg.remove();
-              else alert("削除に失敗しました。");
-            })
-            .catch((err) => {
-              console.error(err);
-              alert("削除中にエラーが発生しました。");
-            });
-        });
-      });
-
-      // 外クリックで削除ボタンを隠す
-      document.addEventListener("click", function () {
-        userMessages.forEach((msg) => {
-          const btn = msg.querySelector(".slide-delete-btn");
-          if (!btn.classList.contains("hidden")) {
-            btn.classList.add("hidden");
-            msg.querySelector(".message-box").style.transform = "translateX(0)";
+      // ------------------------
+      // メッセージ時間の変換
+      // ------------------------
+      function formatMessageTime() {
+        document.querySelectorAll('.message-time').forEach(span => {
+          const dateStr = span.textContent.trim();
+          if (dateStr) {
+            const utcStr = dateStr.replace(" ", "T") + "Z";
+            const date = new Date(utcStr);
+            if (!isNaN(date.getTime())) {
+              const hours = String((date.getUTCHours() + 9) % 24).padStart(2, '0');
+              const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+              span.textContent = `${hours}:${minutes}`;
+            }
           }
         });
-      });
+      }
+      formatMessageTime();
 
-      // スタンプ関連処理
+      // ------------------------
+      // 削除ボタン設定
+      // ------------------------
+      function setupDeleteButtons() {
+        const userMessages = document.querySelectorAll(".message.right");
+        userMessages.forEach((msg) => {
+          const deleteBtn = msg.querySelector(".slide-delete-btn");
+          const deleteForm = msg.querySelector(".delete-form");
+
+          if (!deleteBtn) return;
+
+          msg.addEventListener("click", function (e) {
+            e.stopPropagation();
+            document.querySelectorAll(".slide-delete-btn").forEach((btn) => {
+              if (btn !== deleteBtn) btn.classList.add("hidden");
+              if (btn !== deleteBtn) btn.parentElement.querySelector(".message-box").style.transform = "translateX(0)";
+            });
+            deleteBtn.classList.toggle("hidden");
+            msg.querySelector(".message-box").style.transform = deleteBtn.classList.contains("hidden") ? "translateX(0)" : "translateX(-50px)";
+          });
+
+          deleteBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            fetch(deleteForm.action, { method: "POST", headers: { "X-Requested-With": "XMLHttpRequest" }, body: "" })
+              .then(res => { if (res.ok) msg.remove(); else alert("削除に失敗しました。"); })
+              .catch(err => { console.error(err); alert("削除中にエラーが発生しました。"); });
+          });
+        });
+
+        document.addEventListener("click", function () {
+          userMessages.forEach((msg) => {
+            const btn = msg.querySelector(".slide-delete-btn");
+            if (btn && !btn.classList.contains("hidden")) {
+              btn.classList.add("hidden");
+              msg.querySelector(".message-box").style.transform = "translateX(0)";
+            }
+          });
+        });
+      }
+      setupDeleteButtons();
+
+      // ------------------------
+      // スタンプ設定
+      // ------------------------
       const stampToggle = document.getElementById("stampToggle");
       const stampClose = document.getElementById("stampClose");
       const stampList = document.getElementById("stampList");
-      const stampForm = document.getElementById("stampForm");
-      const stampInput = document.getElementById("stampInput");
       const stamps = document.querySelectorAll(".stamp-item");
-      const chatInputForm = document.getElementById("chatInputForm");
 
-      stampToggle.addEventListener("click", function (event) {
-        event.stopPropagation();
+      stampToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
         stampList.classList.toggle("hidden");
         chatInputForm.style.display = stampList.classList.contains("hidden") ? "flex" : "none";
       });
 
-      stampClose.addEventListener("click", function (event) {
-        event.stopPropagation();
+      stampClose.addEventListener("click", (e) => {
+        e.stopPropagation();
         stampList.classList.add("hidden");
         chatInputForm.style.display = "flex";
       });
 
-      stamps.forEach((stamp) => {
-        stamp.addEventListener("click", function (event) {
-          event.stopPropagation();
-          stampInput.value = this.dataset.stampId;
-          stampForm.submit();
+      stamps.forEach(stamp => {
+        stamp.addEventListener("click", (e) => {
+          e.stopPropagation();
+          document.getElementById('stampInput').value = stamp.dataset.stampId;
+          document.getElementById('stampForm').submit();
           stampList.classList.add("hidden");
           chatInputForm.style.display = "flex";
         });
       });
 
-      document.addEventListener("click", function (event) {
-        if (!stampList.contains(event.target) && event.target !== stampToggle) {
+      document.addEventListener("click", (e) => {
+        if (!stampList.contains(e.target) && e.target !== stampToggle) {
           stampList.classList.add("hidden");
           chatInputForm.style.display = "flex";
         }
       });
+
+      // ------------------------
+      // ページ読み込み後に下スクロール
+      // ------------------------
+      window.scrollTo(0, messagesContainer.scrollHeight);
+
     });
 
-    // モーダルを表示する関数
-    function openModal() {
-      // id="myModal" の要素を取得して display を "flex" に変更
-      // これによりモーダルが画面に表示される
-      document.getElementById("myModal").style.display = "flex";
-    }
-
-    // モーダルを非表示にする関数
-    function closeModal() {
-      // id="myModal" の要素を取得して display を "none" に変更
-      // これによりモーダルが閉じられる
-      document.getElementById("myModal").style.display = "none";
-    }
+    // ------------------------
+    // モーダル制御
+    // ------------------------
+    function openModal() { document.getElementById("myModal").style.display = "flex"; }
+    function closeModal() { document.getElementById("myModal").style.display = "none"; }
   </script>
+
+
+
+
 
   <!-- CSS -->
   <style>

@@ -13,8 +13,8 @@ app = create_app()
 # User loader function
 @login_manager.user_loader
 def load_user(user_id):
-    # return User.query.get(user_id)
-    user = User.get_user_by_user_id(user_id)
+    return User.query.get(user_id)
+    # user = User.get_user_by_user_id(user_id)
 
 # # アップロードファイル形式確認（拡張子）
 def allowed_file(filename):
@@ -45,7 +45,7 @@ def login_process():
     elif user == None:
         flash('入力内容を間違っタラコ？')
     else:
-        if check_password_hash(user.password, password) == False:
+        if check_password_hash(user['password'], password) == False:
             flash('入力内容を間違っタラコ？')
         else:
             login_user(User(user['user_id']))

@@ -44,18 +44,9 @@
     </form>
   </main>
 
-  <!-- メッセージ表示 -->
 
-  <script>
-    document.getElementById("icon_file").addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById("fileName").textContent = file.name;
-      } else {
-        document.getElementById("fileName").textContent = "";
-      }
-    });
-  </script>
+  <script src="{{ url_for('static', filename='js/change_icon.js') }}"></script>
+
 
   {% endblock content %}
 </body>

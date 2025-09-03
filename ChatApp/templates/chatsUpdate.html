@@ -168,24 +168,6 @@
     </div>
   </div>
 
-  <!-- ======================== JS ======================== -->
-  <script>
-    // チャット削除モーダル
-    function openDeleteModal() {
-      document.getElementById("deleteModal").style.display = "flex";
-    }
-    function closeDeleteModal() {
-      document.getElementById("deleteModal").style.display = "none";
-    }
-
-    // ログアウトモーダル
-    function openLogoutModal() {
-      document.getElementById("logoutModal").style.display = "flex";
-    }
-    function closeLogoutModal() {
-      document.getElementById("logoutModal").style.display = "none";
-    }
-  </script>
-
+  <script src="{{ url_for('static', filename='js/chatsUpdate.js') }}"></script>
   {% endblock content %}
 </body>

@@ -10,7 +10,8 @@
       <input type="image" src="{{ url_for('static', filename='img/left.png') }}" alt="戻る" class="header-image" />
     </form>
     <div class="deletebox-button">
-      <input type="image" onclick="openModal()" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除" class="header-image" />
+      <input type="image" onclick="openModal()" src="{{ url_for('static', filename='img/delete.png') }}" alt="削除"
+        class="header-image" />
     </div>
   </header>
   <!----- ヘッダー END ----->
@@ -91,22 +92,8 @@
     </div>
   </div>
 
-  <script>
-    function openModal() {
-      document.getElementById("myModal").style.display = "flex";
-    }
-    function closeModal() {
-      document.getElementById("myModal").style.display = "none";
-    }
+  <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 
-    // 背景クリックで閉じる
-    window.onclick = function (event) {
-      const modal = document.getElementById("myModal");
-      if (event.target === modal) {
-        closeModal();
-      }
-    };
-  </script>
   <!-- ユーザー削除のJS関係　ここまで -->
   {% endblock content %}
 </body>
